@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f4f7f5">
+  <title>Payment Status · حالة الدفع · ZC Dorm Laundry</title>
+  <script src="auth.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="supabase-config.js" defer></script>
+  <script src="supabase-client.js" defer></script>
+  <script src="student-payments.js" defer></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #f4f7f5 0%, #e5edea 100%);
+      color: #172e39;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      padding: 18px;
+    }
+    .card {
+      width: min(92vw, 540px);
+      padding: 38px 32px;
+      border: 1px solid #dce8e4;
+      border-radius: 24px;
+      background: white;
+      box-shadow: 0 20px 60px rgba(23, 60, 48, 0.1);
+      text-align: center;
+    }
+    .mark {
+      margin: 0 auto 16px;
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      background: #078f9d;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 22px;
+      box-shadow: 0 8px 20px rgba(7, 143, 157, 0.25);
+    }
+    .status-badge {
+      display: inline-block;
+      font-size: 11px;
+      color: #078f9d;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      background: #eef7f8;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+    .status-badge.success {
+      background: #e6f7ec;
+      color: #137333;
+    }
+    .status-badge.failed {
+      background: #fde8e8;
+      color: #c5221f;
+    }
+    .status-icon {
+      font-size: 42px;
+      line-height: 1;
+      margin: 12px 0;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #102a32;
+      margin: 8px 0 12px;
+    }
+    .arabic-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #3b5860;
+      margin-bottom: 12px;
+      direction: rtl;
+    }
+    .detail {
+      color: #557078;
+      line-height: 1.6;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .detail-ar {
+      color: #6c848b;
+      line-height: 1.6;
+      font-size: 13px;
+      direction: rtl;
+    }
+    .ref-chip {
+      margin: 16px auto;
+      background: #f4f8f7;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: monospace;
+      color: #3b5860;
+      display: inline-block;
+      border: 1px dashed #cfded9;
+    }
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+    a, button {
+      border: 0;
+      border-radius: 12px;
+      padding: 13px 22px;
+      background: #078f9d;
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    a:hover, button:hover {
+      background: #067682;
+      transform: translateY(-1px);
+    }
+    .secondary {
+      background: #eef5f4;
+      color: #24525a;
+    }
+    .secondary:hover {
+      background: #e1eeec;
+    }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #e2eae6;
+      border-top-color: #078f9d;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 12px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="mark">ZC</div>
+    <div id="statusIcon" class="status-icon"><div class="spinner"></div></div>
+    <div class="status-badge" id="statusLabel">CHECKING PAYMENT · جاري التحقق</div>
+    <h1 id="title">Verifying your payment</h1>
+    <div class="arabic-title" id="titleAr">جاري التحقق من حالة الدفع مع الخادم...</div>
+    <p class="detail" id="detail">We are checking the payment confirmation with the secure server. Please keep this page open for a moment.</p>
+    <p class="detail-ar" id="detailAr">نقوم بالتحقق من تأكيد العملية مع السيرفر. يُرجى الانتظار لحظات.</p>
+    <div class="ref-chip" id="refChip" hidden>Ref: <span id="refText"></span></div>
+    <div class="actions">
+      <a href="student.html" id="btnReturn">Return to student portal · العودة للبوابة</a>
+      <button class="secondary" id="checkAgain" type="button">Check again · تحقق مجدداً</button>
+    </div>
+  </main>
+
+  <script>
+    (function(){
+      const ref = new URLSearchParams(location.search).get('reference');
+      const icon = document.getElementById('statusIcon');
+      const label = document.getElementById('statusLabel');
+      const title = document.getElementById('title');
+      const titleAr = document.getElementById('titleAr');
+      const detail = document.getElementById('detail');
+      const detailAr = document.getElementById('detailAr');
+      const button = document.getElementById('checkAgain');
+      const refChip = document.getElementById('refChip');
+      const refText = document.getElementById('refText');
+
+      if (ref) {
+        refChip.hidden = false;
+        refText.textContent = ref;
+      }
+
+      let stopped = false, checking = false, tries = 0;
+
+      function show(state, data) {
+        if (state === 'paid') {
+          stopped = true;
+          icon.textContent = '✓';
+          icon.style.color = '#137333';
+          label.className = 'status-badge success';
+          label.textContent = 'PAYMENT CONFIRMED · تم تأكيد الدفع بنجاح';
+          
+          if (data.kind === 'wallet_topup') {
+            const egp = (data.amountCents / 100).toFixed(2);
+            title.textContent = 'Wallet funded successfully!';
+            titleAr.textContent = `تم شحن محفظتك بمبلغ ${egp} ج.م بنجاح!`;
+            detail.textContent = `EGP ${egp} was added to your student laundry wallet balance.`;
+            detailAr.textContent = `تمت إضافة المبلغ إلى رصيد محفظتك، ويمكنك الآن حجز فترات الغسيل مباشرة.`;
+          } else {
+            title.textContent = 'Laundry ticket confirmed!';
+            titleAr.textContent = 'تم تأكيد حجز تذكرة الغسيل بنجاح!';
+            detail.textContent = 'Your laundry slot ticket is confirmed. Door access QR code is ready in your portal.';
+            detailAr.textContent = 'تم حجز الفترة المحددة وتوليد باركود الدخول (QR Code) لباب غرفة الغسيل.';
+          }
+
+          sessionStorage.removeItem('zcPaymobIdempotencyKey:' + data.kind);
+          window.ZCPayments?.loadWalletBalance();
+          button.hidden = true;
+        } else if (state === 'failed' || state === 'expired') {
+          stopped = true;
+          icon.textContent = '×';
+          icon.style.color = '#c5221f';
+          label.className = 'status-badge failed';
+          label.textContent = 'PAYMENT NOT COMPLETED · لم تكتمل العملية';
+          title.textContent = 'Payment was declined or cancelled';
+          titleAr.textContent = 'لم تكتمل عملية الدفع أو تم إلغاؤها';
+          detail.textContent = 'The server did not confirm this payment. No money was deducted from your wallet or account.';
+          detailAr.textContent = 'لم يتم خصم أي مبالغ. يمكنك إعادة المحاولة مجدداً عبر البوابة.';
+          sessionStorage.removeItem('zcPaymobIdempotencyKey:' + (data.kind || 'ticket'));
+        } else {
+          icon.innerHTML = '<div class="spinner"></div>';
+          label.className = 'status-badge';
+          label.textContent = 'WAITING FOR CONFIRMATION · قيد المعالجة';
+          title.textContent = 'Payment is still processing';
+          titleAr.textContent = 'المعاملة قيد المعالجة في الخادم...';
+          detail.textContent = 'Paymob has not sent a final confirmation yet. We will verify again automatically.';
+          detailAr.textContent = 'جاري انتظار وصول إشعار التأكيد التلقائي.';
+        }
+      }
+
+      async function check() {
+        if (checking || stopped) return;
+        checking = true;
+        tries++;
+        try {
+          const cfg = window.ZC_SUPABASE_CONFIG || {};
+          if (!cfg.url || !cfg.publishableKey || !window.ZCSupabase) {
+            throw new Error('Secure payment status service is not configured yet.');
+          }
+          const client = await window.ZCSupabase.ready();
+          const { data: { session } } = await client.auth.getSession();
+          if (!session) throw new Error('Please sign in again to view this payment.');
+
+          let data = null;
+          // Try Edge Function first
+          try {
+            const response = await fetch(cfg.url.replace(/\/$/, '') + '/functions/v1/payment-status?reference=' + encodeURIComponent(ref || ''), {
+              headers: { Authorization: 'Bearer ' + session.access_token, apikey: cfg.publishableKey },
+              cache: 'no-store'
+            });
+            if (response.ok) {
+              data = await response.json();
+            }
+          } catch (fnErr) {
+            console.warn('Edge Function status check failed, using direct query:', fnErr);
+          }
+
+          // Direct database fallback if edge function was temporarily unreachable
+          if (!data || !data.status) {
+            const { data: dbData, error: dbErr } = await client.from('payment_attempts')
+              .select('special_reference,kind,amount_cents,currency,status')
+              .eq('special_reference', ref).maybeSingle();
+            if (!dbErr && dbData) {
+              data = {
+                reference: dbData.special_reference,
+                kind: dbData.kind,
+                amountCents: dbData.amount_cents,
+                currency: dbData.currency,
+                status: dbData.status
+              };
+            }
+          }
+
+          if (!data) throw new Error('Could not verify payment status from server.');
+          show(data.status, data);
+        } catch (e) {
+          if (tries >= 10) {
+            label.className = 'status-badge failed';
+            label.textContent = 'STATUS UNAVAILABLE';
+            title.textContent = 'We could not verify payment status yet';
+            titleAr.textContent = 'تعذر التحقق من حالة المعاملة حالياً';
+            detail.textContent = e.message + ' If you were charged, please contact dormitory support.';
+          }
+        } finally {
+          checking = false;
+        }
+      }
+
+      button.addEventListener('click', check);
+
+      if (!ref) {
+        stopped = true;
+        icon.textContent = '!';
+        label.className = 'status-badge failed';
+        label.textContent = 'REFERENCE MISSING';
+        title.textContent = 'Payment reference not found';
+        titleAr.textContent = 'رقم المعاملة غير موجود';
+        detail.textContent = 'Open this page from the checkout return link, or check your student portal.';
+        button.hidden = true;
+      } else {
+        document.addEventListener("DOMContentLoaded", () => {
+          check();
+          const timer = setInterval(() => {
+            if (stopped || tries >= 10) clearInterval(timer);
+            else check();
+          }, 2500);
+        }, { once: true });
+      }
+    })();
+  </script>
+</body>
+</html>

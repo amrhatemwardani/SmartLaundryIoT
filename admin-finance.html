@@ -1,0 +1,177 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pricing & wallet · ZC Dorm Laundry</title><script src="auth.js" defer></script><script src="loading.js" defer></script><script src="notifications.js" defer></script><link rel="stylesheet" href="admin-portal.css"></head><body><div class="admin-app"><aside class="admin-side"><a class="admin-brand" href="admin.html"><span class="admin-mark">ZC</span><span>ZC Dorm Laundry<br><small style="font:600 9px 'DM Sans';color:var(--muted)">Main administration</small></span></a><span class="admin-label">Workspace</span><nav class="admin-nav"><a href="admin.html"><span class="nav-icon">⌂</span><span>Overview</span></a><a href="admin-staff.html"><span class="nav-icon">♙</span><span>People & access</span></a><a class="active" href="admin-finance.html"><span class="nav-icon">▤</span><span>Pricing & wallet</span></a><a href="admin-systems.html"><span class="nav-icon">⚙</span><span>System & audit</span></a><a href="audit.html"><span class="nav-icon">≋</span><span>Audit log</span></a></nav><div class="admin-side-bottom">Money-related changes must always be auditable.</div></aside><main class="admin-main"><div class="admin-top"><span class="admin-crumb">Administration / Pricing & wallet</span><div class="admin-top-actions"><span data-session-name>Admin</span><a href="logout.html" data-logout>Log out</a></div></div><section class="admin-heading"><div><div class="admin-eyebrow">Payments & adjustments</div><h1>Pricing and student wallet</h1><p>Configure new ticket pricing and record verified wallet top-ups or service recovery credits.</p></div><span class="pill" style="background:#e8f5ed;color:#327251">LIVE DATABASE</span></section><div class="admin-grid"><section class="admin-card"><h2>Standard laundry ticket</h2><p>New price applies only to future tickets. Existing tickets keep the amount recorded when they were booked.</p><form class="admin-form" onsubmit="savePrice(event)"><div class="admin-field"><label for="price">Ticket price (EGP)</label><input id="price" type="number" min="0" step="1" value="25" required></div><div><button class="admin-btn">Save ticket price</button></div></form><div class="admin-note">Current server price: <b id="priceState">EGP 25.00</b>. This server value applies to new tickets.</div></section><section class="admin-card"><h2>Grant a student wallet credit</h2><p>Select a student or type their email/ID. The amount is immediately credited to their active wallet.</p><form class="admin-form" onsubmit="issueWalletCredit(event)"><div class="admin-field"><label for="creditStudentSelect">Select student</label><select id="creditStudentSelect" onchange="onStudentSelectChange(this.value)"><option value="">Loading student list…</option></select></div><div class="admin-field"><label for="creditStudent">Or enter student email / username / ID</label><input id="creditStudent" placeholder="s-amr.farouk@zewailcity.edu.eg or 20251101"></div><div id="selectedStudentBadge" style="display:none;padding:8px 12px;background:#e8f5ed;color:#1e5e3a;border-radius:8px;font-size:11px;margin-bottom:10px"></div><div class="admin-fields"><div class="admin-field"><label for="creditAmount">Credit amount (EGP)</label><input id="creditAmount" type="number" min="1" max="5000" step="1" placeholder="e.g. 50" required><div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"><button type="button" class="admin-btn outline" style="padding:4px 8px;font-size:10px" onclick="setAmount(25)">+25 EGP</button><button type="button" class="admin-btn outline" style="padding:4px 8px;font-size:10px" onclick="setAmount(50)">+50 EGP</button><button type="button" class="admin-btn outline" style="padding:4px 8px;font-size:10px" onclick="setAmount(100)">+100 EGP</button><button type="button" class="admin-btn outline" style="padding:4px 8px;font-size:10px" onclick="setAmount(200)">+200 EGP</button></div></div><div class="admin-field"><label for="creditReason">Reason / case reference</label><input id="creditReason" maxlength="200" required placeholder="e.g. Manual top-up / Room credit" value="Admin manual credit"></div></div><div><button class="admin-btn" id="btnSubmitCredit">＋ Record wallet credit</button></div></form><div class="admin-note warn">Credits append an auditable wallet ledger entry and notify the student immediately.</div></section></div><div class="admin-section-title"><div><h2>Recent wallet transactions</h2><p>Live wallet ledger history across all student accounts.</p></div><button class="admin-btn secondary" style="font-size:11px;padding:6px 12px" onclick="loadRecentTransactions()">↻ Refresh transactions</button></div><section class="admin-card" id="transactionsCard"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px;min-width:600px"><thead><tr style="border-bottom:1px solid var(--line);text-align:left;color:var(--muted)"><th style="padding:8px 6px">Date & time</th><th style="padding:8px 6px">Student</th><th style="padding:8px 6px">Amount</th><th style="padding:8px 6px">Type</th><th style="padding:8px 6px">Reference / note</th></tr></thead><tbody id="transactionRows"><tr><td colspan="5" style="padding:16px;text-align:center;color:var(--muted)">Loading live transactions…</td></tr></tbody></table></div></section></main></div><script src="supabase-client.js"></script><script>
+let cachedStudents = [];
+
+function setAmount(val){
+  document.getElementById('creditAmount').value = val;
+}
+
+function onStudentSelectChange(userId){
+  const badge = document.getElementById('selectedStudentBadge');
+  const input = document.getElementById('creditStudent');
+  if(!userId){
+    badge.style.display = 'none';
+    return;
+  }
+  const st = cachedStudents.find(s => s.user_id === userId);
+  if(st){
+    input.value = st.university_email;
+    badge.style.display = 'block';
+    badge.innerHTML = `<b>Selected:</b> ${st.full_name} (${st.university_email}) &nbsp;|&nbsp; <b>Current Balance:</b> EGP ${(st.wallet_balance_cents/100).toFixed(2)} (Dorm ${st.dorm_class})`;
+  }
+}
+
+async function loadStudentList(){
+  const sel = document.getElementById('creditStudentSelect');
+  try{
+    const c = await ZCSupabase.ready();
+    const {data, error} = await c.rpc('admin_list_students');
+    if(error) throw error;
+    cachedStudents = data || [];
+    sel.innerHTML = '<option value="">-- Choose student from list --</option>';
+    cachedStudents.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.user_id;
+      const bal = (s.wallet_balance_cents / 100).toFixed(2);
+      opt.textContent = `${s.full_name} (${s.university_email}) — Bal: EGP ${bal} [Dorm ${s.dorm_class}]`;
+      sel.appendChild(opt);
+    });
+  }catch(err){
+    console.error('Failed to load student list for wallet:', err);
+    sel.innerHTML = '<option value="">(Error loading students - use text input below)</option>';
+  }
+}
+
+async function loadRecentTransactions(){
+  const tbody = document.getElementById('transactionRows');
+  try{
+    const c = await ZCSupabase.ready();
+    const {data, error} = await c.rpc('admin_list_recent_transactions');
+    if(error) throw error;
+    if(!data?.length){
+      tbody.innerHTML = '<tr><td colspan="5" style="padding:16px;text-align:center;color:var(--muted)">No wallet ledger records yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = '';
+    data.forEach(tx => {
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid #edf2f2';
+      const dt = new Date(tx.created_at).toLocaleString('en-GB', {dateStyle:'short', timeStyle:'short'});
+      const isPositive = tx.amount_cents > 0;
+      const amountStr = (isPositive ? '+' : '') + 'EGP ' + (tx.amount_cents / 100).toFixed(2);
+      const amountColor = isPositive ? '#1e7e4e' : '#b2392e';
+      
+      tr.innerHTML = `
+        <td style="padding:9px 6px;color:var(--muted)">${dt}</td>
+        <td style="padding:9px 6px"><b>${tx.student_name}</b><br><small style="color:var(--muted)">${tx.student_email}</small></td>
+        <td style="padding:9px 6px;font-weight:700;color:${amountColor}">${amountStr}</td>
+        <td style="padding:9px 6px"><span class="pill" style="font-size:9px">${tx.entry_type}</span></td>
+        <td style="padding:9px 6px;color:#415860"><small style="font-family:monospace">${tx.reference || '—'}</small><br>${tx.note || ''}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }catch(err){
+    console.error('Failed to load transactions:', err);
+    tbody.innerHTML = `<tr><td colspan="5" style="padding:16px;text-align:center;color:#b2392e">Error loading transactions: ${err.message}</td></tr>`;
+  }
+}
+
+async function savePrice(e){
+  e.preventDefault();
+  const amount=Number(document.getElementById('price').value);
+  if(!Number.isFinite(amount)||amount<0||amount>10000){
+    ZCNotify?.error('Enter a price between EGP 0 and EGP 10,000.');
+    return;
+  }
+  const b=e.target.querySelector('button');
+  if(b)b.disabled=true;
+  try{
+    const c=await ZCSupabase.ready();
+    const {error}=await c.rpc('admin_set_ticket_price',{p_price_cents:Math.round(amount*100)});
+    if(error)throw error;
+    document.getElementById('priceState').textContent='EGP '+amount.toFixed(2);
+    ZCNotify?.success('Ticket price updated for future bookings.');
+  }catch(error){
+    ZCNotify?.error(error.message||'Could not save ticket price.');
+  }finally{
+    if(b)b.disabled=false;
+  }
+}
+
+async function issueWalletCredit(e){
+  e.preventDefault();
+  const sel=document.getElementById('creditStudentSelect');
+  const who=document.getElementById('creditStudent').value.trim();
+  const amount=Number(document.getElementById('creditAmount').value);
+  const reason=document.getElementById('creditReason').value.trim();
+
+  if((!who && !sel.value)||!Number.isFinite(amount)||amount<1||amount>5000||reason.length<3){
+    ZCNotify?.error('Select or enter a valid student, enter amount (1-5000), and reason.');
+    return;
+  }
+  const b=document.getElementById('btnSubmitCredit');
+  b.disabled=true;
+  try{
+    const c=await ZCSupabase.ready();
+    let studentId = sel.value;
+    let studentName = '';
+    let studentEmail = who;
+
+    if(!studentId){
+      // Look up student by query (email, ID, name, or local-part)
+      const found=await c.rpc('admin_find_student',{p_query:who});
+      if(found.error) throw found.error;
+      if(!found.data?.length){
+        throw new Error(`Student not found for "${who}". Please check the email or student ID.`);
+      }
+      studentId = found.data[0].user_id;
+      studentName = found.data[0].full_name;
+      studentEmail = found.data[0].university_email;
+    } else {
+      const s = cachedStudents.find(x => x.user_id === studentId);
+      if(s) {
+        studentName = s.full_name;
+        studentEmail = s.university_email;
+      }
+    }
+
+    const ref = 'MANUAL-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+    const {data:creditResult, error}=await c.rpc('admin_credit_wallet',{
+      p_student_id: studentId,
+      p_amount_cents: Math.round(amount*100),
+      p_reason: reason,
+      p_reference: ref
+    });
+    if(error) throw error;
+
+    const newBal = creditResult?.new_balance_cents ? (creditResult.new_balance_cents/100).toFixed(2) : amount.toFixed(2);
+    ZCNotify?.success(`EGP ${amount.toFixed(2)} credited successfully to ${studentName || studentEmail}! New Balance: EGP ${newBal}`);
+    
+    // Reset and reload
+    document.getElementById('creditAmount').value = '';
+    await loadStudentList();
+    if(studentId) onStudentSelectChange(studentId);
+    await loadRecentTransactions();
+  }catch(error){
+    ZCNotify?.error(error.message||'Could not record wallet credit.');
+  }finally{
+    b.disabled=false;
+  }
+}
+
+async function loadFinance(){
+  try{
+    const c=await ZCSupabase.ready();
+    const {data,error}=await c.rpc('admin_finance_summary');
+    if(!error && data){
+      const price=data.ticket_price_cents/100;
+      document.getElementById('price').value=price;
+      document.getElementById('priceState').textContent='EGP '+price.toFixed(2);
+    }
+    await loadStudentList();
+    await loadRecentTransactions();
+  }catch(error){
+    ZCNotify?.error('Finance service error: '+(error.message||'Unavailable'));
+  }
+}
+document.addEventListener('DOMContentLoaded',loadFinance);
+</script></body></html>

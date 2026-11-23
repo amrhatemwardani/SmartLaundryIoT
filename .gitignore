@@ -1,0 +1,9 @@
+# Secrets and local deployment settings
+.env
+.env.*
+!.env.example
+supabase/.temp/
+.DS_Store
+Thumbs.db
+node_modules/
+scratch/

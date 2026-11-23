@@ -1,0 +1,36 @@
+project_id = "zc-dorm-laundry"
+
+[functions.paymob-webhook]
+verify_jwt = false
+
+[functions.create-paymob-intention]
+verify_jwt = true
+
+[functions.payment-status]
+verify_jwt = true
+
+[functions.wallet-summary]
+verify_jwt = true
+[functions.firebase-push]
+verify_jwt = false
+
+[functions.invite-staff]
+verify_jwt = true
+[functions.door-scan]
+verify_jwt = false
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+otp_length = 6
+otp_expiry = 900
+max_frequency = "60s"
+
+[auth.email.template.confirmation]
+subject = "Confirm your ZC Dorm Laundry email"
+content_path = "./supabase/templates/confirmation.html"
+[auth.sessions]
+timebox = "12h"
+inactivity_timeout = "30m"
+[functions.iot-event]
+verify_jwt = false
+

@@ -1,0 +1,78 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Student approvals | Zewail City Laundry for Dorms</title><script src="auth.js" defer></script><style>@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');*{box-sizing:border-box}body{margin:0;background:#f4f7f7;color:#172e39;font:14px 'DM Sans'}header{padding:14px 24px;background:white;border-bottom:1px solid #e0e9ea;display:flex;justify-content:space-between;align-items:center}.brand{font:800 13px Manrope;color:#075567}.brand a,header a{color:#078f9d;text-decoration:none;font-size:10px;font-weight:700;margin-left:13px}main{max-width:1050px;margin:auto;padding:28px 22px}h1{font:800 25px Manrope;margin:0 0 6px}.sub{font-size:11px;color:#71838a;line-height:1.5;margin:0 0 18px}.notice{background:#fff4e7;color:#795c31;padding:10px 12px;border-radius:8px;font-size:9px;line-height:1.5;margin-bottom:14px}.list{display:grid;gap:10px}.item{display:grid;grid-template-columns:1fr auto;gap:15px;align-items:center;background:#fff;border:1px solid #e0e9ea;border-radius:12px;padding:15px}.item b{font-size:11px}.item p{font-size:9px;color:#71838a;margin:5px 0}.tag{display:inline-block;background:#e5f5f5;color:#087886;border-radius:20px;padding:4px 7px;font-size:8px;font-weight:700}.actions{display:flex;gap:6px}.btn{border:0;background:#078f9d;color:white;border-radius:7px;padding:8px 10px;font-size:9px;font-weight:700;cursor:pointer}.btn.red{background:#fff0ec;color:#a74c43}.btn:disabled{opacity:.55}.log{display:block;color:#078f9d;font-weight:700;text-decoration:none;font-size:10px;margin-top:18px}@media(max-width:600px){header{padding:12px}.item{grid-template-columns:1fr}.actions{justify-content:flex-start}}
+</style><script src="loading.js" defer></script><script src="notifications.js" defer></script></head><body><header><div class="brand">ZC · Zewail City Laundry for Dorms · Staff review</div><nav><a id="homeLink" href="supervisor.html">Dashboard</a><a href="audit.html">Activity log</a><a href="logout.html" data-logout>Log out</a></nav></header><main><h1>Student account approvals</h1><p class="sub">Review only after the student’s university email is verified. Approve or decline with a recorded reason.</p><div class="notice">Live student applications are loaded from Supabase. Decisions are scoped by role and dorm and recorded in the audit trail.</div><section class="list" id="requests"><p class="sub" style="padding:15px;background:white;border-radius:10px;text-align:center">Loading pending applications from secure server…</p></section><a class="log" href="audit.html">Review approval audit entries →</a></main>
+<script src="supabase-client.js"></script><script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const s=WashdayAuth.currentSession();
+  if(s?.role==='admin') document.getElementById('homeLink').href='admin-staff.html';
+  else document.getElementById('homeLink').href='supervisor.html';
+});
+
+async function loadApprovals(){
+  const list=document.getElementById('requests');
+  try{
+    const c=await ZCSupabase.ready();
+    const {data,error}=await c.rpc('staff_pending_applications');
+    if(error)throw error;
+    list.replaceChildren();
+    if(!data?.length){
+      list.innerHTML='<div style="background:white;padding:26px;border-radius:12px;border:1px solid #e0e9ea;text-align:center"><b style="font-size:13px;display:block;margin-bottom:6px">No pending applications</b><p class="sub" style="margin:0">All verified student signups for your assigned dorms have been approved or reviewed.</p></div>';
+      return;
+    }
+    for(const item of data){
+      const card=document.createElement('article');
+      card.className='item';
+      const copy=document.createElement('div');
+      const name=document.createElement('b');
+      name.textContent=item.full_name+' · ID '+String(item.university_id);
+      const detail=document.createElement('p');
+      detail.textContent=`${item.university_email} · Dorm ${item.dorm_class} · ${item.major} · Age ${item.age} · Phone ${item.phone_number}`;
+      const tag=document.createElement('span');
+      tag.className='tag';
+      tag.textContent='Awaiting Dorm '+item.dorm_class+' supervisor';
+      copy.append(name,detail,tag);
+      const actions=document.createElement('div');
+      actions.className='actions';
+      for(const [label,state,cls] of [['Approve','approved','btn'],['Decline','declined','btn red']]){
+        const b=document.createElement('button');
+        b.className=cls;
+        b.textContent=label;
+        b.onclick=()=>decideApplication(item.user_id,state,b);
+        actions.appendChild(b);
+      }
+      card.append(copy,actions);
+      list.appendChild(card);
+    }
+  }catch(error){
+    list.innerHTML='';
+    const msg=document.createElement('p');
+    msg.className='sub';
+    msg.textContent='Could not load the review queue: '+(error.message||'Backend not configured');
+    list.appendChild(msg);
+  }
+}
+
+async function decideApplication(userId,state,button){
+  let note='';
+  if(state==='declined'){
+    note=prompt('Reason for declining this application (required):')||'';
+    if(note.trim().length<5){
+      ZCNotify?.error('Enter a short reason so the student knows what to do next.');
+      return;
+    }
+  } else {
+    note=prompt('Optional approval note (press OK to approve):')||'Approved by staff';
+  }
+  button.disabled=true;
+  try{
+    const c=await ZCSupabase.ready();
+    const {error}=await c.rpc('review_student_application',{p_user_id:userId,p_decision:state,p_note:note});
+    if(error)throw error;
+    ZCNotify?.success(`Student application ${state}.`);
+    loadApprovals();
+  }catch(error){
+    ZCNotify?.error(error.message||'Could not update application.');
+    button.disabled=false;
+  }
+}
+document.addEventListener('DOMContentLoaded',loadApprovals);
+</script></body></html>

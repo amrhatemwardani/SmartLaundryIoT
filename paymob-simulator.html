@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paymob Sandbox Checkout · ZC Dorm Laundry</title>
+  <script src="auth.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="supabase-config.js" defer></script>
+  <script src="supabase-client.js" defer></script>
+  <style>
+    :root {
+      --bg: #0c1a24;
+      --card-bg: #ffffff;
+      --text: #1a252c;
+      --muted: #627b87;
+      --paymob-blue: #0070ba;
+      --paymob-dark: #002244;
+      --accent-green: #108a00;
+      --accent-red: #c92a2a;
+      --border: #e1e8ed;
+      --chip-bg: #eef4f8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: linear-gradient(135deg, #0b1a24 0%, #173347 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      color: var(--text);
+    }
+    .checkout-wrap {
+      width: min(520px, 100%);
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+      overflow: hidden;
+      animation: fadeIn .3s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .header {
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-logo {
+      background: var(--paymob-dark);
+      color: #fff;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 1px;
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+    .badge-sandbox {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .order-summary {
+      padding: 20px 24px;
+      background: #fdfefe;
+      border-bottom: 1px dashed var(--border);
+    }
+    .order-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .order-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .order-name {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--paymob-dark);
+    }
+    .order-amount {
+      font-size: 26px;
+      font-weight: 800;
+      color: #078f9d;
+    }
+    .order-meta {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .content-body {
+      padding: 22px 24px;
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid var(--border);
+      background: var(--chip-bg);
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all .2s;
+    }
+    .tab-btn.active {
+      background: #ffffff;
+      border-color: #078f9d;
+      color: #078f9d;
+      box-shadow: 0 3px 10px rgba(7, 143, 157, 0.15);
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #4b636e;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a2d36;
+      background: #fcfdfe;
+      outline: none;
+    }
+    .form-input:focus {
+      border-color: #078f9d;
+      box-shadow: 0 0 0 3px rgba(7, 143, 157, 0.12);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .info-box {
+      background: #f1f8f9;
+      border-left: 4px solid #078f9d;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #27525b;
+      margin-bottom: 20px;
+    }
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all .2s;
+    }
+    .btn-pay {
+      background: #078f9d;
+      color: #ffffff;
+      box-shadow: 0 6px 18px rgba(7, 143, 157, 0.3);
+    }
+    .btn-pay:hover:not(:disabled) {
+      background: #067682;
+      transform: translateY(-1px);
+    }
+    .btn-fail {
+      background: #fef2f2;
+      color: var(--accent-red);
+      border: 1px solid #fed7d7;
+    }
+    .btn-fail:hover:not(:disabled) {
+      background: #fee2e2;
+    }
+    .btn-cancel {
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 10px;
+    }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .footer-secure {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    #statusOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 26, 36, 0.85);
+      backdrop-filter: blur(4px);
+      display: none;
+      place-items: center;
+      color: white;
+      text-align: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    #statusOverlay.active { display: grid; }
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid rgba(255,255,255,0.2);
+      border-top-color: #078f9d;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div class="checkout-wrap">
+    <header class="header">
+      <div class="brand">
+        <div class="brand-logo">paymob</div>
+        <span style="font-size: 12px; font-weight: 700; color: #334e68;">Accept Checkout</span>
+      </div>
+      <span class="badge-sandbox">Sandbox Mode</span>
+    </header>
+
+    <div class="order-summary">
+      <div class="order-title">Zewail City Dormitory Laundry</div>
+      <div class="order-main">
+        <div class="order-name" id="orderPurpose">Wallet Top-up</div>
+        <div class="order-amount" id="orderAmount">EGP --.--</div>
+      </div>
+      <div class="order-meta">
+        <div>Reference: <b id="orderRef" style="font-family: monospace;">ZC-...</b></div>
+        <div>Account: <span id="studentEmail">student@zewailcity.edu.eg</span></div>
+      </div>
+    </div>
+
+    <div class="content-body">
+      <div class="tabs">
+        <button class="tab-btn active" id="tabCard" onclick="switchMethod('card')">
+          <span>💳</span> Bank Card (Test)
+        </button>
+        <button class="tab-btn" id="tabWallet" onclick="switchMethod('wallet')">
+          <span>📱</span> Mobile Wallet (Cash)
+        </button>
+      </div>
+
+      <!-- Card Section -->
+      <div id="cardSection">
+        <div class="form-group">
+          <label>Card Number (Paymob Test Visa)</label>
+          <input class="form-input" id="cardNum" type="text" value="4111 1111 1111 1111" readonly>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Expiry Date</label>
+            <input class="form-input" id="cardExp" type="text" value="12 / 28" readonly>
+          </div>
+          <div class="form-group">
+            <label>CVV / CVC</label>
+            <input class="form-input" id="cardCvv" type="password" value="123" readonly>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Cardholder Name</label>
+          <input class="form-input" id="cardHolder" type="text" value="Student Account" readonly>
+        </div>
+        <div class="info-box">
+          <b>Paymob Sandbox Card Environment</b><br>
+          This is a simulated Paymob Accept checkout environment for testing wallet top-up and laundry ticket booking before setting live merchant keys.
+        </div>
+      </div>
+
+      <!-- Wallet Section -->
+      <div id="walletSection" style="display: none;">
+        <div class="form-group">
+          <label>Mobile Wallet Number (Vodafone / Orange / Etisalat / WE Cash)</label>
+          <input class="form-input" id="walletNum" type="text" value="01012345678">
+        </div>
+        <div class="form-group">
+          <label>Simulated OTP / PIN</label>
+          <input class="form-input" id="walletOtp" type="password" value="123456">
+        </div>
+        <div class="info-box">
+          <b>Paymob Mobile Wallet Sandbox</b><br>
+          Test mobile wallet transaction simulation. In live mode, Paymob prompts for the e-wallet PIN on your phone.
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="actions">
+        <button class="btn btn-pay" id="btnConfirmPay" onclick="executeSandboxPayment(true)">
+          ✓ Confirm & Pay (Simulate Success)
+        </button>
+        <button class="btn btn-fail" id="btnFailPay" onclick="executeSandboxPayment(false)">
+          ✗ Simulate Payment Failure / Decline
+        </button>
+        <button class="btn btn-cancel" onclick="cancelPayment()">
+          Cancel and return to student portal
+        </button>
+      </div>
+
+      <div class="footer-secure">
+        🔒 <span>256-bit SSL encrypted · Verified Paymob Sandbox Simulation</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="statusOverlay">
+    <div>
+      <div class="spinner"></div>
+      <h3 style="font-size: 19px; margin-bottom: 8px;" id="overlayTitle">Processing Sandbox Payment</h3>
+      <p style="font-size: 13px; color: #a4c2cb;" id="overlaySub">Verifying intention and updating student ledger...</p>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('reference');
+    const kind = params.get('kind') || 'wallet_topup';
+    const method = params.get('method') || 'card';
+    const amountCents = Number(params.get('amount') || 0);
+
+    let client = null;
+    let currentUser = null;
+
+    function switchMethod(m) {
+      document.getElementById('tabCard').classList.toggle('active', m === 'card');
+      document.getElementById('tabWallet').classList.toggle('active', m === 'wallet');
+      document.getElementById('cardSection').style.display = m === 'card' ? 'block' : 'none';
+      document.getElementById('walletSection').style.display = m === 'wallet' ? 'block' : 'none';
+    }
+
+    async function init() {
+      if (method === 'wallet') switchMethod('wallet');
+      if (ref) document.getElementById('orderRef').textContent = ref;
+      if (amountCents > 0) {
+        document.getElementById('orderAmount').textContent = 'EGP ' + (amountCents / 100).toFixed(2);
+      }
+      document.getElementById('orderPurpose').textContent = kind === 'ticket' ? 'Laundry Slot Ticket' : 'Student Wallet Top-up';
+
+      try {
+        if (!window.ZCSupabase) return;
+        client = await window.ZCSupabase.ready();
+        const { data: { user }, error: authErr } = await client.auth.getUser();
+        if (authErr || !user) {
+          alert('Please sign in to your university account.');
+          window.location.assign('login.html');
+          return;
+        }
+        currentUser = user;
+        document.getElementById('studentEmail').textContent = user.email;
+
+        // Fetch student profile name and payment attempt details
+        const { data: profile } = await client.from('student_profiles')
+          .select('full_name').eq('user_id', user.id).maybeSingle();
+        if (profile?.full_name) {
+          document.getElementById('cardHolder').value = profile.full_name;
+        }
+
+        if (ref) {
+          const { data: attempt } = await client.from('payment_attempts')
+            .select('amount_cents,kind,status,payment_method').eq('special_reference', ref).maybeSingle();
+          if (attempt) {
+            document.getElementById('orderAmount').textContent = 'EGP ' + (attempt.amount_cents / 100).toFixed(2);
+            document.getElementById('orderPurpose').textContent = attempt.kind === 'ticket' ? 'Laundry Slot Ticket' : 'Student Wallet Top-up';
+            if (attempt.payment_method === 'wallet') switchMethod('wallet');
+            if (attempt.status === 'paid') {
+              window.location.assign('payment-result.html?reference=' + encodeURIComponent(ref));
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Sandbox init check:', err);
+      }
+    }
+
+    async function executeSandboxPayment(isSuccess) {
+      if (!ref) {
+        alert('Missing payment reference.');
+        return;
+      }
+      const overlay = document.getElementById('statusOverlay');
+      const btnPay = document.getElementById('btnConfirmPay');
+      const btnFail = document.getElementById('btnFailPay');
+      btnPay.disabled = true;
+      btnFail.disabled = true;
+      overlay.classList.add('active');
+
+      if (!isSuccess) {
+        document.getElementById('overlayTitle').textContent = 'Simulating Payment Failure';
+        document.getElementById('overlaySub').textContent = 'Recording declined status with Paymob sandbox...';
+      }
+
+      try {
+        if (!client) client = await window.ZCSupabase.ready();
+        const { data, error } = await client.rpc('student_simulate_paymob_sandbox', {
+          p_reference: ref,
+          p_success: isSuccess
+        });
+
+        if (error) throw error;
+
+        // Brief delay to give a realistic checkout experience, then forward to payment-result.html
+        setTimeout(() => {
+          window.location.assign('payment-result.html?reference=' + encodeURIComponent(ref));
+        }, 1200);
+      } catch (err) {
+        alert(err.message || 'Could not complete sandbox simulation.');
+        overlay.classList.remove('active');
+        btnPay.disabled = false;
+        btnFail.disabled = false;
+      }
+    }
+
+    function cancelPayment() {
+      if (confirm('Cancel this payment attempt and return to the student portal?')) {
+        window.location.assign('student.html');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
