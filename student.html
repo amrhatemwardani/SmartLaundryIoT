@@ -301,7 +301,7 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
   const savedTheme=localStorage.getItem('washdayTheme');if(savedTheme)document.documentElement.dataset.theme=savedTheme;const savedAvatar=localStorage.getItem('washdayAvatar');if(savedAvatar)pickAvatar(savedAvatar);const savedLanguage=localStorage.getItem('washdayLanguage');if(savedLanguage)setLanguage(savedLanguage);
   function updatePaymentAction(){const m=document.querySelector('input[name="paymentMethod"]:checked')?.value;const choices=document.getElementById('paymobMethodChoices');if(choices)choices.hidden=m!=='paymob';const b=document.getElementById('payTicketButton');if(b)b.textContent=m==='paymob'?'Proceed to online payment':'Pay with wallet'}
   async function addWalletFunds(e){e.preventDefault();const amount=Number(document.getElementById('topupAmount').value);if(!Number.isFinite(amount)||amount<10||amount>5000){notify('Enter an amount between EGP 10 and EGP 5,000.','error');return}await window.ZCPayments?.start({kind:'wallet_topup',paymentMethod:document.getElementById('topupMethod').value,amountCents:Math.round(amount*100)})}
-  let zcDbSlots=[],zcDbMachines=[],zcDbProfile=null,zcSelectedSlot=null,zcSelectedMachineKey=null;
+  let zcDbSlots=[],zcDbMachines=[],zcDbProfile=null,zcSelectedMachineKey=null;
   let zcLoyaltyData={points:0,ratio:10,min_redeem_points:100};
   let qrCountdownTimer=null;
 
