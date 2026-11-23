@@ -758,23 +758,6 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
       buttonId: 'payTicketButton'
     });
   }
-        closeTicketCheckout();
-        await window.ZCPayments.loadWalletBalance();
-        notify('Ticket confirmed and paid from your wallet. Loyalty points awarded!','success');
-        loadTickets('all');
-        loadBackendSlots();
-        loadNextBooking();
-        loadLoyaltyBalance();
-      }catch(error){
-        notify(error.message||'Wallet payment could not be completed.','error');
-      }finally{
-        button.disabled=false;
-      }
-      return;
-    }
-    closeTicketCheckout();
-    await window.ZCPayments.start({kind:'ticket',paymentMethod:document.querySelector('input[name="paymobMethod"]:checked')?.value||'card',machineKey:zcSelectedSlot.machine_key,slotStart:zcSelectedSlot.starts_at,buttonId:'payTicketButton'});
-  }
 
   async function renderTickets(filter){
     ticketFilter = filter;
