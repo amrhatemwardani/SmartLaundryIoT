@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="theme-color" content="#f4f7f5"/>
+  <title>Washer Access · ZC Dorm Laundry</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="supabase-config.js" defer></script>
+  <script src="supabase-client.js" defer></script>
+  <script src="auth.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+    :root{--ink:#172e39;--muted:#71838a;--line:#e7ece8;--paper:#fff;--bg:#f4f7f5;--green:#078f9d;--green2:#e1f4f6;--lime:#d8f07d;--orange:#f5a666;--red:#d66055;--shadow:0 12px 38px #1c45300c}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:14px 'DM Sans',sans-serif;min-height:100vh}
+    button{font:inherit;cursor:pointer}
+    a{color:var(--green)}
+
+    /* ── Layout ─────────────────────────────────────── */
+    .page{max-width:900px;margin:0 auto;padding:28px 24px 60px}
+    .back-bar{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+    .back-btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 12px;font-size:11px;font-weight:700;color:#55665e;text-decoration:none;display:flex;align-items:center;gap:6px}
+    .back-btn:hover{background:var(--green2);border-color:var(--green)}
+    .breadcrumb{font-size:11px;color:var(--muted)}
+    .breadcrumb strong{color:var(--ink)}
+
+    /* ── Reservation Detail Card ─────────────────────────────────── */
+    .res-card{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
+    .res-header{background:linear-gradient(135deg,#075567,#078f9d);color:#fff;padding:28px 32px;display:flex;align-items:center;gap:24px}
+    .washer-3d{flex:none;position:relative}
+    .w3d-body{width:80px;height:95px;border-radius:14px;background:linear-gradient(160deg,#c8e8e6,#9ec8c4);border:2px solid #8bbcb8;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;box-shadow:4px 6px 18px #0003,inset 0 2px 0 #fff4}
+    .w3d-porthole{width:46px;height:46px;border-radius:50%;border:3px solid #7ab0ac;background:radial-gradient(circle at 35% 35%,#c8f0ee,#5aa7a3 60%,#2d7a76);box-shadow:inset 0 3px 8px #0003,0 2px 6px #0001;position:relative;overflow:hidden;transition:all .3s}
+    .w3d-porthole::after{content:'';position:absolute;top:6px;left:7px;width:13px;height:8px;border-radius:50%;background:#ffffffaa;transform:rotate(-25deg)}
+    .w3d-controls{display:flex;gap:5px}
+    .w3d-ctrl{width:9px;height:9px;border-radius:50%}
+    .w3d-ctrl.on{background:#d8f07d}
+    .w3d-ctrl.b{background:#98ccc8}
+    .w3d-ctrl.c{background:#ccc}
+    .w3d-door{position:absolute;bottom:0;left:0;right:0;height:14px;background:linear-gradient(to bottom,#9ec4c0,#88b4b0);border-radius:0 0 12px 12px}
+    .w3d-shadow{width:70px;height:8px;border-radius:50%;background:#0002;margin:4px auto 0;filter:blur(4px)}
+    /* Spin animation when washing */
+    @keyframes spinPort{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    .w3d-porthole.spinning::after{animation:spinPort 1.8s linear infinite;transform-origin:center}
+    @keyframes glow{0%,100%{box-shadow:0 0 0 0 #22c77855}50%{box-shadow:0 0 0 8px #22c77815}}
+    .w3d-porthole.glow{animation:glow 2s ease-in-out infinite}
+    .w3d-porthole.red-glow{box-shadow:inset 0 3px 8px #0003,0 0 0 4px #d6605540}
+
+    .res-info{flex:1}
+    .res-info .kicker{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#c3e2d4;font-weight:700}
+    .res-info h1{font:800 24px Manrope;margin:6px 0 4px;letter-spacing:-.5px}
+    .res-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;margin-top:12px}
+    .res-meta-row{font-size:11px;color:#cce2d8}
+    .res-meta-row strong{display:block;color:#fff;font-size:12px;margin-bottom:1px}
+
+    .res-status-bar{padding:14px 32px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;background:#f8fafa}
+    .status-pill{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:6px 12px;font-size:10px;font-weight:700}
+    .status-pill.confirmed{background:#dcfce7;color:#15803d}
+    .status-pill.pending{background:#fff4e4;color:#9a5c10}
+    .status-pill.expired{background:#fce8e8;color:#9b2b2b}
+    .status-pill.completed{background:#f0f1f0;color:#55665e}
+    .status-dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+    .res-status-hint{font-size:10px;color:var(--muted);margin-left:auto}
+
+    .res-body{padding:28px 32px}
+
+    /* ── START WASHING button ───────────────────────────────────── */
+    .start-btn{width:100%;border:0;border-radius:14px;background:linear-gradient(135deg,#078f9d,#0ab5c5);color:#fff;font:800 15px Manrope;padding:18px;letter-spacing:-.2px;box-shadow:0 8px 24px #078f9d30;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden}
+    .start-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#ffffff15,transparent);pointer-events:none}
+    .start-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 32px #078f9d40}
+    .start-btn:active:not(:disabled){transform:translateY(0)}
+    .start-btn:disabled{background:linear-gradient(135deg,#9bb8bb,#adc5c8);box-shadow:none;cursor:not-allowed}
+    .start-btn-label{display:flex;align-items:center;justify-content:center;gap:10px}
+
+    .early-notice{background:#eef7f8;border:1px solid #aad8de;border-radius:12px;padding:14px 16px;font-size:11px;color:#075567;line-height:1.6;margin-bottom:16px;display:none}
+    .early-notice b{display:block;margin-bottom:3px}
+    .countdown-to-start{font:800 18px Manrope;color:#075567;display:block;margin:4px 0}
+
+    /* ── QR Screen ──────────────────────────────────────────────── */
+    .qr-screen{display:none;text-align:center;padding:8px 0}
+    .qr-screen.active{display:block}
+    .qr-screen-stage{position:relative;display:inline-block}
+    /* States: waiting / verifying / granted / denied / expired */
+    .qr-state-waiting{}
+    .qr-state-verifying .qr-canvas-wrap{opacity:.4;filter:blur(2px)}
+    .qr-state-granted .qr-canvas-wrap{filter:none}
+
+    .qr-canvas-wrap{background:#fff;border-radius:16px;border:2px solid var(--line);padding:16px;display:inline-block;box-shadow:0 8px 28px #078f9d12;margin-bottom:14px;transition:all .3s}
+    .qr-granted-overlay{display:none;position:absolute;inset:0;background:#22c77888;border-radius:16px;place-items:center;font-size:56px;animation:popIn .4s ease}
+    @keyframes popIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+    .qr-state-granted .qr-granted-overlay{display:grid}
+
+    .qr-countdown{font:800 22px Manrope;color:var(--green);letter-spacing:-.5px;margin-bottom:4px}
+    .qr-countdown.urgent{color:var(--red);animation:pulseText 1s ease-in-out infinite}
+    @keyframes pulseText{0%,100%{opacity:1}50%{opacity:.5}}
+    .qr-instructions{font-size:11px;color:var(--muted);line-height:1.6;max-width:280px;margin:0 auto 16px}
+    .qr-access-status{border-radius:12px;padding:12px 16px;font-size:11px;line-height:1.5;margin:10px 0}
+    .qr-access-status.info{background:#e8f5ed;color:#1e5e3a;border:1px solid #b4d9c0}
+    .qr-access-status.warning{background:#fff4e4;border:1px solid #f3d48b;color:#7a5a17}
+    .qr-access-status.error{background:#fce8e8;border:1px solid #e9b4b4;color:#9b2b2b}
+    .qr-access-status.success{background:#dcfce7;border:1px solid #86efac;color:#15803d}
+
+    .qr-regen-btn{border:1px solid var(--green);background:var(--green2);color:var(--green);border-radius:9px;padding:9px 14px;font-size:11px;font-weight:700;margin-top:8px;display:none}
+    .qr-regen-btn.visible{display:inline-block}
+
+    /* Verifying spinner */
+    .verify-spinner{display:none;width:48px;height:48px;border:4px solid var(--green2);border-top-color:var(--green);border-radius:50%;animation:spin .9s linear infinite;margin:20px auto}
+    .qr-state-verifying .verify-spinner{display:block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ── Detail list ──────────────────────────────────────────── */
+    .detail-list{display:grid;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:18px}
+    .detail-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:11px;border-bottom:1px solid var(--line)}
+    .detail-row:last-child{border:0}
+    .detail-row span:first-child{color:var(--muted);font-weight:600}
+    .detail-row span:last-child{font-weight:700;color:var(--ink)}
+
+    /* ── IoT status strip ───────────────────────────────────── */
+    .iot-strip{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f4fafb;border:1px solid #d0eaed;border-radius:10px;font-size:10px;color:#3a6672;margin-bottom:16px}
+    .iot-dot{width:8px;height:8px;border-radius:50%;background:#22c778;flex:none}
+    .iot-dot.offline{background:#ccc}
+    .iot-dot.demo{background:#f5a040}
+
+    /* ── Success animation ─────────────────────────────────── */
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeInUp .4s ease both}
+
+    /* ── Dark mode ─────────────────────────────────────────── */
+    html[data-theme="dark"]{--ink:#e6eee9;--muted:#a0afa6;--line:#34453b;--paper:#202d26;--bg:#15211a;--green2:#28483a;--shadow:0 12px 38px #0002}
+    html[data-theme="dark"] .res-card,html[data-theme="dark"] .res-status-bar,html[data-theme="dark"] .detail-list,html[data-theme="dark"] .back-btn{background:#202d26;color:var(--ink)}
+    html[data-theme="dark"] .qr-canvas-wrap{background:#1a2820;border-color:#34453b}
+    html[data-theme="dark"] .detail-row{border-color:#34453b}
+    html[data-theme="dark"] .res-status-bar{background:#1a2820}
+    html[data-theme="dark"] .iot-strip{background:#1a2820;border-color:#34453b;color:#9cccd4}
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media(max-width:640px){
+      .page{padding:16px 14px 50px}
+      .res-header{flex-direction:column;align-items:flex-start;padding:20px}
+      .res-meta{grid-template-columns:1fr}
+      .res-body{padding:20px}
+      .res-status-bar{padding:12px 20px;flex-wrap:wrap;gap:6px}
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <!-- Back bar -->
+  <div class="back-bar">
+    <a href="student.html#bookings" class="back-btn">← Back to My Tickets</a>
+    <div class="breadcrumb">Student portal / <strong id="bcTitle">Reservation Access</strong></div>
+  </div>
+
+  <!-- Loading state -->
+  <div id="loadingState" style="text-align:center;padding:60px 20px;color:var(--muted);font-size:12px">
+    <div style="font-size:36px;margin-bottom:12px">⏳</div>
+    <p>Loading reservation details…</p>
+  </div>
+
+  <!-- Main reservation card (hidden until loaded) -->
+  <div class="res-card fade-in" id="resCard" hidden>
+    <!-- Header with 3D washer visual -->
+    <div class="res-header">
+      <div class="washer-3d">
+        <div class="w3d-body">
+          <div class="w3d-porthole" id="w3dPorthole"></div>
+          <div class="w3d-controls">
+            <div class="w3d-ctrl on" id="w3dLed1"></div>
+            <div class="w3d-ctrl b"></div>
+            <div class="w3d-ctrl c"></div>
+          </div>
+          <div class="w3d-door"></div>
+        </div>
+        <div class="w3d-shadow"></div>
+      </div>
+      <div class="res-info">
+        <div class="kicker">ZC Dorm Laundry · Your Reservation</div>
+        <h1 id="resMachineName">Washer</h1>
+        <div class="res-meta">
+          <div class="res-meta-row"><strong id="resDate">—</strong>Date</div>
+          <div class="res-meta-row"><strong id="resTime">—</strong>Time window</div>
+          <div class="res-meta-row"><strong id="resDorm">—</strong>Dorm building</div>
+          <div class="res-meta-row"><strong id="resDuration">30 min</strong>Duration</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status bar -->
+    <div class="res-status-bar">
+      <span class="status-pill confirmed" id="statusPill"><span class="status-dot"></span> <span id="statusPillText">CONFIRMED</span></span>
+      <span class="res-status-hint" id="statusHint">Ticket verified — ready to activate.</span>
+    </div>
+
+    <!-- Body -->
+    <div class="res-body">
+
+      <!-- IoT device status strip -->
+      <div class="iot-strip" id="iotStrip">
+        <div class="iot-dot demo" id="iotDot"></div>
+        <span id="iotLabel">Machine sensor: <b>DEMO MODE</b> — connect ESP32/STM32 for live status</span>
+      </div>
+
+      <!-- Early notice (shown before slot time) -->
+      <div class="early-notice" id="earlyNotice">
+        <b>⏰ Access not yet open</b>
+        Your booking slot starts at <b id="earlyStartTime">—</b>. The START WASHING button activates exactly at that time.<br>
+        Time until your slot: <span class="countdown-to-start" id="countdownToStart">—</span>
+      </div>
+
+      <!-- Reservation detail list -->
+      <div class="detail-list" id="detailList">
+        <div class="detail-row"><span>Ticket ID</span><span id="dlTicketId" style="font-family:monospace;font-size:10px">—</span></div>
+        <div class="detail-row"><span>Machine</span><span id="dlMachine">—</span></div>
+        <div class="detail-row"><span>Date</span><span id="dlDate">—</span></div>
+        <div class="detail-row"><span>Slot</span><span id="dlSlot">—</span></div>
+        <div class="detail-row"><span>QR window</span><span id="dlQrWindow">Opens at slot start · Closes 10 min later</span></div>
+        <div class="detail-row"><span>Payment</span><span id="dlPayment" style="color:#15803d">✓ Paid</span></div>
+        <div class="detail-row"><span>Status</span><span id="dlStatus">—</span></div>
+      </div>
+
+      <!-- START WASHING phase -->
+      <div id="startPhase">
+        <button class="start-btn" id="startBtn" onclick="handleStartWashing()">
+          <span class="start-btn-label">▶&nbsp;&nbsp;START WASHING</span>
+        </button>
+        <p style="font-size:9px;text-align:center;color:var(--muted);margin:10px 0 0;line-height:1.5">
+          Pressing START WASHING verifies your identity, payment, and time window — then generates a secure one-time QR code for door access.
+        </p>
+      </div>
+
+      <!-- QR access screen (shown after START WASHING) -->
+      <div class="qr-screen qr-state-waiting" id="qrScreen">
+        <div style="font:800 15px Manrope;margin-bottom:4px;color:var(--ink)">🔑 Scan to Unlock Your Washer</div>
+        <p style="font-size:10px;color:var(--muted);margin:0 0 16px">Hold your phone up to the QR scanner at the laundry door.</p>
+
+        <!-- QR canvas -->
+        <div class="qr-screen-stage">
+          <div class="qr-canvas-wrap">
+            <div id="qrCanvas" style="width:200px;height:200px;display:grid;place-items:center"></div>
+          </div>
+          <div class="qr-granted-overlay" id="grantedOverlay">✓</div>
+        </div>
+
+        <!-- Verifying spinner -->
+        <div class="verify-spinner" id="verifySpinner"></div>
+
+        <!-- Countdown -->
+        <div class="qr-countdown" id="qrCountdown">10:00</div>
+        <p style="font-size:9px;color:var(--muted);margin:0 0 10px">QR expires in</p>
+
+        <!-- Status messages -->
+        <div class="qr-access-status info" id="qrStatusBox">
+          ⏳ Waiting for door scanner to read QR code…
+        </div>
+
+        <!-- Regen button (for expired state) -->
+        <button class="qr-regen-btn" id="qrRegenBtn" onclick="handleStartWashing()">↻ Generate New QR</button>
+
+        <!-- Instructions -->
+        <div class="qr-instructions" id="qrInstructions" style="margin-top:14px">
+          Present this QR code to the reader mounted at the laundry room door. 
+          The door will unlock automatically after the backend validates your session.
+          <b>Do not share this QR code — it is single-use and tied to your account.</b>
+        </div>
+
+        <button onclick="backToStart()" style="border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 14px;font-size:10px;font-weight:700;color:var(--muted);margin-top:12px">← Back to details</button>
+      </div>
+
+      <!-- Completed / expired state -->
+      <div id="expiredState" hidden style="text-align:center;padding:20px 0">
+        <div style="font-size:48px;margin-bottom:10px">🔒</div>
+        <div style="font:800 16px Manrope;color:var(--ink)">Session Ended</div>
+        <p style="font-size:11px;color:var(--muted);margin:6px 0 0;line-height:1.6">
+          The 10-minute QR access window for this reservation has permanently closed.<br>
+          Door access is no longer possible for this ticket.
+        </p>
+        <a href="student.html" style="display:inline-block;margin-top:16px;border:1px solid var(--green);color:var(--green);border-radius:9px;padding:9px 16px;font-size:11px;font-weight:700;text-decoration:none">← Return to dashboard</a>
+      </div>
+
+    </div><!-- /res-body -->
+  </div><!-- /res-card -->
+
+  <!-- Error state -->
+  <div id="errorState" hidden style="text-align:center;padding:60px 20px">
+    <div style="font-size:40px;margin-bottom:12px">⚠️</div>
+    <div style="font:700 16px Manrope" id="errorMsg">Ticket not found</div>
+    <p style="font-size:11px;color:var(--muted);margin:6px auto 0;max-width:360px;line-height:1.6" id="errorDetail">This ticket may belong to a different account or may not exist.</p>
+    <a href="student.html" style="display:inline-block;margin-top:18px;border:1px solid var(--green);color:var(--green);border-radius:9px;padding:9px 16px;font-size:11px;font-weight:700;text-decoration:none">← My tickets</a>
+  </div>
+</div><!-- /page -->
+
+<div class="toast" id="toast" style="position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#183a2e;color:#fff;padding:12px 17px;border-radius:10px;font-size:12px;box-shadow:0 8px 30px #0002;transition:.25s;z-index:5"></div>
+
+<script>
+  /* ── Saved theme ───────────────────────────────────── */
+  const savedTheme=localStorage.getItem('washdayTheme');
+  if(savedTheme) document.documentElement.dataset.theme=savedTheme;
+
+  /* ── Toast ─────────────────────────────────────────── */
+  function notify(msg,type='info'){
+    const t=document.getElementById('toast');
+    t.textContent=msg;
+    t.style.background=type==='error'?'#4a1e1a':type==='success'?'#1a3a2a':'#183a2e';
+    t.style.opacity='1';t.style.transform='translate(-50%,0)';
+    setTimeout(()=>{t.style.opacity='0';t.style.transform='translate(-50%,20px)';},3200);
+  }
+
+  /* ── State ──────────────────────────────────────────── */
+  let ticketId = null;
+  let ticketData = null;
+  let qrTimer = null;
+
+  /* ── Bootstrap ──────────────────────────────────────── */
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    // Parse ticket ID from URL ?ticket=UUID
+    const params = new URLSearchParams(location.search);
+    ticketId = params.get('ticket');
+    if(!ticketId){
+      showError('No ticket specified','Provide a ticket ID in the URL: ?ticket=UUID');
+      return;
+    }
+    await loadTicket();
+  });
+
+  async function loadTicket(){
+    try{
+      const c = await ZCSupabase.ready();
+      const { data:{ user } } = await c.auth.getUser();
+      if(!user){ location.href='login.html'; return; }
+
+      const { data, error } = await c.from('laundry_tickets')
+        .select('id,status,created_at,laundry_slots(starts_at,duration_minutes,machine_key,laundry_machines(display_name,dorm_class,status))')
+        .eq('id', ticketId)
+        .single();
+
+      if(error||!data){ showError('Ticket not found','This ticket does not exist or belongs to another account.'); return; }
+
+      ticketData = data;
+      renderTicket(data);
+    }catch(err){
+      showError('Could not load ticket', err.message);
+    }
+  }
+
+  function renderTicket(t){
+    document.getElementById('loadingState').hidden = true;
+    const card = document.getElementById('resCard');
+    card.hidden = false;
+
+    const slot = t.laundry_slots;
+    const machine = slot?.laundry_machines;
+    const start = slot ? new Date(slot.starts_at) : null;
+    const end   = start ? new Date(start.getTime()+(slot.duration_minutes||30)*60000) : null;
+    const qrExpiry = end ? new Date(end.getTime()+10*60000) : null;
+    const now   = new Date();
+
+    const machineName = machine?.display_name || slot?.machine_key || 'Washer';
+    const dormClass   = machine?.dorm_class || '—';
+    const duration    = slot?.duration_minutes || 30;
+
+    // Header
+    document.getElementById('resMachineName').textContent = machineName;
+    document.getElementById('resDate').textContent = start ? start.toLocaleDateString([],{weekday:'long',day:'numeric',month:'long'}) : '—';
+    document.getElementById('resTime').textContent = start&&end ? `${fmt(start)} – ${fmt(end)}` : '—';
+    document.getElementById('resDorm').textContent = `Dorm ${dormClass}`;
+    document.getElementById('resDuration').textContent = `${duration} min`;
+
+    // Breadcrumb
+    document.getElementById('bcTitle').textContent = machineName + ' · Access';
+
+    // Detail list
+    document.getElementById('dlTicketId').textContent = t.id.toUpperCase();
+    document.getElementById('dlMachine').textContent = machineName;
+    document.getElementById('dlDate').textContent = start ? start.toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'}) : '—';
+    document.getElementById('dlSlot').textContent = start&&end ? `${fmt(start)} – ${fmt(end)}` : '—';
+    document.getElementById('dlQrWindow').textContent = qrExpiry ? `${fmt(start)} – ${fmt(qrExpiry)} (10-min window)` : '—';
+    document.getElementById('dlStatus').textContent = t.status.toUpperCase();
+
+    // Determine display state
+    const isExpired = qrExpiry && now > qrExpiry;
+    const isEarly   = start && now < start;
+    const isInWindow = start && end && now >= start && now <= qrExpiry;
+
+    if(isExpired || t.status==='cancelled'){
+      setStatusPill('completed','COMPLETED');
+      document.getElementById('statusHint').textContent = 'Session ended · QR access permanently closed.';
+      document.getElementById('w3dPorthole').classList.add('red-glow');
+      document.getElementById('startPhase').hidden = true;
+      document.getElementById('expiredState').hidden = false;
+      return;
+    }
+
+    if(t.status!=='confirmed'){
+      setStatusPill('pending', t.status.toUpperCase());
+      document.getElementById('statusHint').textContent = 'Ticket is not yet confirmed.';
+      document.getElementById('startBtn').disabled = true;
+      return;
+    }
+
+    // Confirmed and within/before window
+    setStatusPill('confirmed','CONFIRMED');
+    document.getElementById('w3dPorthole').classList.add('glow');
+
+    if(isEarly){
+      document.getElementById('earlyNotice').style.display='block';
+      document.getElementById('earlyStartTime').textContent = fmt(start);
+      document.getElementById('startBtn').disabled = true;
+      startCountdownToSlot(start);
+    }else if(isInWindow){
+      document.getElementById('statusHint').textContent = '🟢 Your slot is now ACTIVE — press START WASHING!';
+      document.getElementById('startBtn').disabled = false;
+    }
+  }
+
+  function setStatusPill(cls, text){
+    const pill = document.getElementById('statusPill');
+    pill.className = `status-pill ${cls}`;
+    document.getElementById('statusPillText').textContent = text;
+  }
+
+  function fmt(d){ return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
+
+  /* ── Countdown to slot start ─────────────────────────── */
+  let preSlotTimer = null;
+  function startCountdownToSlot(start){
+    function tick(){
+      const diff = Math.floor((start - Date.now())/1000);
+      if(diff<=0){
+        clearInterval(preSlotTimer);
+        document.getElementById('earlyNotice').style.display='none';
+        document.getElementById('startBtn').disabled=false;
+        document.getElementById('statusHint').textContent='🟢 Your slot is now ACTIVE — press START WASHING!';
+        notify('Your laundry slot has started! You can now activate the washer.','success');
+        return;
+      }
+      const h=Math.floor(diff/3600),m=Math.floor((diff%3600)/60),s=diff%60;
+      const str=h>0?`${h}h ${m}m ${s}s`:`${m}m ${s}s`;
+      document.getElementById('countdownToStart').textContent=str;
+    }
+    tick();
+    preSlotTimer=setInterval(tick,1000);
+  }
+
+  /* ── START WASHING ────────────────────────────────────── */
+  async function handleStartWashing(){
+    if(!ticketId) return;
+    if(qrTimer){ clearInterval(qrTimer); qrTimer=null; }
+
+    // Switch to QR screen
+    document.getElementById('startPhase').hidden=true;
+    document.getElementById('qrScreen').classList.add('active');
+    document.getElementById('earlyNotice').style.display='none';
+
+    // Verifying state
+    setQrState('verifying');
+    document.getElementById('qrStatusBox').className='qr-access-status info';
+    document.getElementById('qrStatusBox').innerHTML='⏳ Verifying reservation & generating secure QR…';
+    document.getElementById('qrCanvas').innerHTML='';
+    document.getElementById('qrCountdown').textContent='--:--';
+    document.getElementById('qrRegenBtn').classList.remove('visible');
+    document.getElementById('w3dPorthole').classList.remove('glow','spinning','red-glow');
+
+    try{
+      const c = await ZCSupabase.ready();
+      const { data, error } = await c.rpc('student_issue_ticket_qr',{p_ticket_id:ticketId});
+      if(error) throw error;
+      if(!data) throw new Error('No response from server.');
+
+      if(data.allowed && data.status==='active'){
+        renderQrCode(data);
+      }else if(data.status==='early'){
+        setQrState('waiting');
+        document.getElementById('qrCanvas').innerHTML=`
+          <div style="color:var(--muted);font-size:11px;text-align:center;padding:20px">
+            <div style="font-size:36px">⏰</div>
+            <b>Too early</b><br>
+            Slot starts at <b>${new Date(data.starts_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</b>
+          </div>`;
+        document.getElementById('qrStatusBox').className='qr-access-status warning';
+        document.getElementById('qrStatusBox').innerHTML=`<b>Not yet accessible.</b> Your slot starts at <b>${new Date(data.starts_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</b>. Return then to activate.`;
+        backToStartWithMsg('Your slot has not started yet. Come back at the slot start time.','info');
+      }else if(data.status==='expired'){
+        setQrState('waiting');
+        document.getElementById('qrStatusBox').className='qr-access-status error';
+        document.getElementById('qrStatusBox').innerHTML='<b>❌ Access window closed.</b> The 10-minute door access period for this slot has ended.';
+        document.getElementById('w3dPorthole').classList.add('red-glow');
+        showExpiredFull();
+      }else{
+        setQrState('waiting');
+        document.getElementById('qrStatusBox').className='qr-access-status error';
+        document.getElementById('qrStatusBox').innerHTML=`<b>🚫 Access Denied.</b> ${data.message||'Restricted by server.'}`;
+        document.getElementById('qrRegenBtn').classList.add('visible');
+      }
+    }catch(err){
+      setQrState('waiting');
+      document.getElementById('qrStatusBox').className='qr-access-status error';
+      document.getElementById('qrStatusBox').innerHTML='<b>❌ Error:</b> '+(err.message||'Could not generate QR.');
+      document.getElementById('qrRegenBtn').classList.add('visible');
+      notify(err.message||'Could not generate QR.','error');
+    }
+  }
+
+  function renderQrCode(data){
+    setQrState('waiting');
+    const canvas = document.getElementById('qrCanvas');
+    canvas.innerHTML='';
+
+    // Render QR
+    let rendered=false;
+    if(window.QRCode){
+      try{
+        new QRCode(canvas,{text:data.qr_data,width:200,height:200,colorDark:'#075567',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+        rendered=true;
+      }catch(e){}
+    }
+    if(!rendered){
+      const img=document.createElement('img');
+      img.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(data.qr_data);
+      img.alt='Door Access QR';
+      img.style.borderRadius='8px';
+      canvas.appendChild(img);
+    }
+
+    // Spin porthole while active
+    document.getElementById('w3dPorthole').classList.add('spinning');
+
+    // Status + countdown
+    document.getElementById('qrStatusBox').className='qr-access-status info';
+    document.getElementById('qrStatusBox').innerHTML='📡 Waiting for QR scanner at the laundry door…';
+
+    let secs = data.time_remaining_seconds||600;
+
+    function tick(){
+      secs--;
+      if(secs<=0){
+        clearInterval(qrTimer);
+        setQrState('expired');
+        canvas.innerHTML=`<div style="color:#8f9e97;font-size:11px;text-align:center;padding:20px"><div style="font-size:40px">🔒</div><b>QR Expired</b><br>10-minute window closed</div>`;
+        document.getElementById('qrCountdown').textContent='00:00';
+        document.getElementById('qrCountdown').classList.add('urgent');
+        document.getElementById('qrStatusBox').className='qr-access-status error';
+        document.getElementById('qrStatusBox').innerHTML='<b>⚠️ QR Code Expired.</b> The 10-minute access window has closed.';
+        document.getElementById('qrRegenBtn').classList.remove('visible');
+        document.getElementById('w3dPorthole').classList.remove('spinning');
+        document.getElementById('w3dPorthole').classList.add('red-glow');
+        showExpiredFull();
+        return;
+      }
+      const m=Math.floor(secs/60),s=secs%60;
+      const str=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+      document.getElementById('qrCountdown').textContent=str;
+      if(secs<=60) document.getElementById('qrCountdown').classList.add('urgent');
+    }
+    tick();
+    qrTimer=setInterval(tick,1000);
+  }
+
+  function setQrState(state){
+    const scr=document.getElementById('qrScreen');
+    scr.className='qr-screen active qr-state-'+state;
+  }
+
+  function backToStart(){
+    if(qrTimer){clearInterval(qrTimer);qrTimer=null;}
+    document.getElementById('qrScreen').classList.remove('active');
+    document.getElementById('startPhase').hidden=false;
+    document.getElementById('w3dPorthole').classList.remove('spinning');
+  }
+  function backToStartWithMsg(msg,type){
+    backToStart();
+    notify(msg,type);
+  }
+
+  function showExpiredFull(){
+    if(qrTimer){clearInterval(qrTimer);qrTimer=null;}
+    document.getElementById('qrScreen').classList.remove('active');
+    document.getElementById('startPhase').hidden=true;
+    document.getElementById('expiredState').hidden=false;
+    setStatusPill('expired','EXPIRED');
+    document.getElementById('statusHint').textContent='Session ended · QR access permanently closed.';
+  }
+
+  function showError(msg,detail){
+    document.getElementById('loadingState').hidden=true;
+    document.getElementById('errorState').hidden=false;
+    document.getElementById('errorMsg').textContent=msg;
+    document.getElementById('errorDetail').textContent=detail||'';
+  }
+</script>
+</body>
+</html>

@@ -22,7 +22,56 @@
     @media(max-width:1000px){.app{grid-template-columns:70px 1fr}aside{padding:22px 10px;align-items:center}.brand{padding:0}.brand-name,.nav-label,.nav button .label,.help-card,.profile-text{display:none}.nav{width:100%}.nav button{justify-content:center;padding:12px 0}.side-bottom{width:100%}.profile{justify-content:center;padding-left:0;padding-right:0}.grid,.bottom-grid{grid-template-columns:1fr  .72fr}main{padding:24px}}
     @media(max-width:720px){.app{display:block;padding-bottom:62px}aside{position:fixed;z-index:4;bottom:0;left:0;right:0;height:60px;padding:5px 10px;border:0;border-top:1px solid var(--line);display:block}.brand,.nav-label,.side-bottom{display:none}.nav{display:flex;justify-content:flex-start;overflow-x:auto;gap:6px}.nav button{display:flex;flex-direction:column;gap:2px;font-size:8px;padding:5px 8px;min-width:54px}.nav button .label{display:block}.nav .ico{font-size:17px}main{padding:18px 15px 30px}.topbar{margin-bottom:22px}.user-mini span{display:none}.welcome{align-items:flex-start;gap:9px}.welcome h1{font-size:23px}.welcome p{font-size:11px}.date-pill{font-size:10px;padding:8px}.hero{align-items:flex-start;gap:14px;flex-direction:column;padding:19px;min-height:auto}.hero h2{font-size:18px}.hero-right{width:100%;justify-content:space-between}.availability{padding:8px 12px;min-width:90px}.availability strong{font-size:22px}.hero-button{flex:1}.grid,.bottom-grid{grid-template-columns:1fr;gap:14px}.booking-card{padding:17px 14px}.slots{grid-template-columns:repeat(2,1fr)}.day{min-width:61px}.right-col{grid-row:auto}.bottom-grid{margin-top:14px}.quick-links button{font-size:9px}.card-head h3{font-size:15px}.feature-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr 1fr}.ticket-card{align-items:flex-start}.top-actions{gap:5px}.tabs{max-width:100%;overflow:auto}.tabs button{white-space:nowrap}}
   </style>
-<script src="loading.js" defer></script><script src="notifications.js" defer></script><style>.topup-choices{display:flex;gap:7px;margin:12px 0}.topup-choices button{flex:1;border:1px solid var(--line);border-radius:8px;padding:9px 6px;background:#f7f9f7;color:#4e6259;font-size:10px;font-weight:700;cursor:pointer}.topup-choices button.chosen{border-color:var(--green);background:var(--green2);color:var(--green)}</style><style>.washer-choices{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}.washer-choice{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 8px;text-align:left;cursor:pointer}.washer-choice b{display:block;font-size:10px}.washer-choice small{display:block;color:var(--muted);font-size:9px;margin-top:4px}.washer-choice.selected{border-color:var(--green);background:var(--green2);box-shadow:0 0 0 2px #078f9d12}.checkout-modal{display:none;position:fixed;inset:0;z-index:50;background:#102a3290;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}.checkout-modal.open{display:flex}.checkout-box{background:var(--paper);color:var(--ink);position:relative;width:min(540px,100%);max-height:92vh;overflow:auto;border-radius:17px;padding:23px;box-shadow:0 25px 70px #001c2633}.checkout-close{position:absolute;top:14px;right:15px;border:0;background:#eff5f5;color:#557078;border-radius:8px;width:29px;height:29px;font-size:18px;cursor:pointer}.checkout-kicker{font-size:9px;letter-spacing:1px;color:var(--green);font-weight:700}.checkout-box h2{font:800 20px Manrope;margin:8px 0 4px}.checkout-sub{font-size:10px;line-height:1.5;color:var(--muted)}.checkout-rules{padding:11px 13px;background:#f5f8f8;border-radius:10px;max-height:240px;overflow:auto;font-size:10px;line-height:1.6;color:#536a70}.checkout-rules h3{font:700 11px Manrope;color:#24545f;margin:8px 0 3px}.checkout-rules ul{padding-left:17px;margin:3px 0 8px}.checkout-agree{display:flex;gap:8px;margin:13px 0;font-size:9px;line-height:1.5;color:var(--muted)}.checkout-agree input{accent-color:var(--green);margin:1px 0 0}.payment-methods{display:grid;gap:7px}.payment-methods label{display:flex;gap:9px;align-items:center;border:1px solid var(--line);border-radius:9px;padding:10px;cursor:pointer}.payment-methods input{accent-color:var(--green)}.payment-methods b{display:block;font-size:10px}.payment-methods small{display:block;color:var(--muted);font-size:9px;margin-top:3px}.payment-methods em{font-style:normal}.checkout-total{display:flex;justify-content:space-between;padding:13px 0;font-size:11px}.checkout-box>.primary{width:100%;border:0;cursor:pointer}.checkout-box>.primary:disabled{opacity:.5;cursor:not-allowed}html[data-theme="dark"] .checkout-rules{background:#1a2820;color:#c5d5ce}html[data-theme="dark"] .checkout-close{background:#31463b;color:#d9e7df}@media(max-width:720px){.washer-choices{grid-template-columns:repeat(2,1fr)}.checkout-box{padding:20px 15px}}
+<script src="loading.js" defer></script><script src="notifications.js" defer></script><style>.topup-choices{display:flex;gap:7px;margin:12px 0}.topup-choices button{flex:1;border:1px solid var(--line);border-radius:8px;padding:9px 6px;background:#f7f9f7;color:#4e6259;font-size:10px;font-weight:700;cursor:pointer}.topup-choices button.chosen{border-color:var(--green);background:var(--green2);color:var(--green)}</style><style>/* ── 3D Machine Cards ───────────────────────────────────────────── */
+.washer-choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-bottom:18px}
+.washer-choice{border:1px solid var(--line);background:#fff;border-radius:14px;padding:0;text-align:center;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center}
+.washer-choice:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 10px 28px #078f9d14}
+.washer-choice.selected{border-color:var(--green);background:linear-gradient(160deg,#f2f9f9,#e6f5f6);box-shadow:0 0 0 2.5px #078f9d22,0 8px 24px #078f9d10}
+.washer-choice:disabled{opacity:.55;cursor:not-allowed;background:#f7f9f7}
+.wc-machine{position:relative;width:100%;padding:14px 10px 6px;display:flex;justify-content:center}
+.wc-body{width:58px;height:68px;border-radius:10px;background:linear-gradient(160deg,#e8f0ee,#d0e2de);border:1.5px solid #b8cecc;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:2px 4px 10px #0002,inset 0 1px 0 #fff5}
+.wc-porthole{width:30px;height:30px;border-radius:50%;border:2.5px solid #9bbcb8;background:radial-gradient(circle at 35% 35%,#c8f0ee,#8ececa 60%,#5aa7a3);box-shadow:inset 0 2px 6px #0003,0 1px 3px #0001;position:relative;overflow:hidden}
+.wc-porthole::after{content:'';position:absolute;top:4px;left:5px;width:9px;height:5px;border-radius:50%;background:#ffffffaa;transform:rotate(-25deg)}
+.wc-controls{display:flex;gap:3px;margin-top:5px}
+.wc-ctrl{width:7px;height:7px;border-radius:50%}
+.wc-ctrl.power{background:#d8f07d}
+.wc-ctrl.prog{background:#98ccc8}
+.wc-ctrl.off{background:#ccc}
+.wc-door{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:62px;height:10px;background:linear-gradient(to bottom,#c0d8d4,#aaccc8);border-radius:0 0 8px 8px;border:1px solid #aac}
+.wc-shadow{width:50px;height:6px;border-radius:50%;background:#0002;margin:0 auto 10px;filter:blur(3px)}
+/* Status ring on porthole */
+.wc-status-ring{position:absolute;inset:-3px;border-radius:50%;border:2.5px solid transparent}
+.washer-choice[data-state="available"] .wc-status-ring{border-color:#22c778;box-shadow:0 0 0 2px #22c77828}
+.washer-choice[data-state="busy"] .wc-status-ring{border-color:#f5a040;box-shadow:0 0 0 2px #f5a04020}
+.washer-choice[data-state="reserved"] .wc-status-ring{border-color:#d66055;box-shadow:0 0 0 2px #d6605520}
+.washer-choice[data-state="offline"] .wc-status-ring{border-color:#aaa;box-shadow:none}
+/* Spin animation for busy machines */
+@keyframes spinPorthole{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.washer-choice[data-state="busy"] .wc-porthole::after{animation:spinPorthole 2s linear infinite;transform-origin:center}
+/* Pulse for available */
+@keyframes pulseRing{0%,100%{opacity:1}50%{opacity:.5}}
+.washer-choice[data-state="available"] .wc-status-ring{animation:pulseRing 2.4s ease-in-out infinite}
+.wc-label{font:700 10px Manrope;margin:0 10px 2px;color:var(--ink)}
+.wc-state-chip{font-size:8px;font-weight:700;padding:2px 7px;border-radius:20px;margin:0 8px 10px;display:inline-block}
+.washer-choice[data-state="available"] .wc-state-chip{background:#dcfce7;color:#15803d}
+.washer-choice[data-state="busy"] .wc-state-chip{background:#fff4e4;color:#9a5c10}
+.washer-choice[data-state="reserved"] .wc-state-chip{background:#fce8e8;color:#9b2b2b}
+.washer-choice[data-state="offline"] .wc-state-chip{background:#f1f1f1;color:#666}
+.washer-choice.selected .wc-state-chip{background:#078f9d22;color:#075567}
+/* Live machine list upgrade */
+.machine{display:flex;align-items:center;gap:11px;padding:10px 0;border-top:1px solid #eff2ef}
+.machine-vis{position:relative;width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#e0eeed,#c8deda);border:1.5px solid #b8cecc;display:flex;align-items:center;justify-content:center;flex:none}
+.machine-vis-port{width:18px;height:18px;border-radius:50%;border:2px solid #9bbcb8;background:radial-gradient(circle at 35% 35%,#c8f0ee,#5aa7a3);box-shadow:inset 0 1px 3px #0002}
+.machine-status-dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;border:2px solid white}
+.machine-status-dot.available{background:#22c778}
+.machine-status-dot.busy{background:#f5a040}
+.machine-status-dot.offline{background:#aaa}
+html[data-theme="dark"] .wc-body{background:linear-gradient(160deg,#2d4a40,#233d35);border-color:#3a5a52}
+html[data-theme="dark"] .wc-door{background:linear-gradient(to bottom,#2d4a40,#233d35);border-color:#3a5a52}
+html[data-theme="dark"] .washer-choice{background:#202d26}
+html[data-theme="dark"] .washer-choice.selected{background:linear-gradient(160deg,#243d32,#1e3429)}
+html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#233d35);border-color:#3a5a52}
+@media(max-width:720px){.washer-choices{grid-template-columns:repeat(2,1fr)}.wc-body{width:50px;height:60px}}.checkout-modal{display:none;position:fixed;inset:0;z-index:50;background:#102a3290;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}.checkout-modal.open{display:flex}.checkout-box{background:var(--paper);color:var(--ink);position:relative;width:min(540px,100%);max-height:92vh;overflow:auto;border-radius:17px;padding:23px;box-shadow:0 25px 70px #001c2633}.checkout-close{position:absolute;top:14px;right:15px;border:0;background:#eff5f5;color:#557078;border-radius:8px;width:29px;height:29px;font-size:18px;cursor:pointer}.checkout-kicker{font-size:9px;letter-spacing:1px;color:var(--green);font-weight:700}.checkout-box h2{font:800 20px Manrope;margin:8px 0 4px}.checkout-sub{font-size:10px;line-height:1.5;color:var(--muted)}.checkout-rules{padding:11px 13px;background:#f5f8f8;border-radius:10px;max-height:240px;overflow:auto;font-size:10px;line-height:1.6;color:#536a70}.checkout-rules h3{font:700 11px Manrope;color:#24545f;margin:8px 0 3px}.checkout-rules ul{padding-left:17px;margin:3px 0 8px}.checkout-agree{display:flex;gap:8px;margin:13px 0;font-size:9px;line-height:1.5;color:var(--muted)}.checkout-agree input{accent-color:var(--green);margin:1px 0 0}.payment-methods{display:grid;gap:7px}.payment-methods label{display:flex;gap:9px;align-items:center;border:1px solid var(--line);border-radius:9px;padding:10px;cursor:pointer}.payment-methods input{accent-color:var(--green)}.payment-methods b{display:block;font-size:10px}.payment-methods small{display:block;color:var(--muted);font-size:9px;margin-top:3px}.payment-methods em{font-style:normal}.checkout-total{display:flex;justify-content:space-between;padding:13px 0;font-size:11px}.checkout-box>.primary{width:100%;border:0;cursor:pointer}.checkout-box>.primary:disabled{opacity:.5;cursor:not-allowed}html[data-theme="dark"] .checkout-rules{background:#1a2820;color:#c5d5ce}html[data-theme="dark"] .checkout-close{background:#31463b;color:#d9e7df}@media(max-width:720px){.washer-choices{grid-template-columns:repeat(2,1fr)}.checkout-box{padding:20px 15px}}
 </style><style>.flow-card{padding:14px 17px;margin:-5px 0 17px}.flow-head{display:flex;justify-content:space-between;align-items:center;gap:9px}.flow-head b{font:700 11px Manrope}.flow-head small{display:block;color:var(--muted);font-size:9px;margin-top:3px}.flow-head a{font-size:9px;color:var(--green);font-weight:700;text-decoration:none}.flow-steps{display:flex;justify-content:space-between;gap:5px;margin-top:12px;position:relative}.flow-steps:before{content:"";position:absolute;top:12px;left:7%;right:7%;height:2px;background:#d8e9e9}.flow-steps span{position:relative;z-index:1;display:grid;justify-items:center;gap:5px;font-size:8px;color:var(--muted);text-align:center}.flow-steps i{font-style:normal;display:grid;place-items:center;background:white;border:2px solid #abd5d8;border-radius:50%;width:25px;height:25px;color:#087e91;font-weight:700;font-size:9px}@media(max-width:720px){.flow-steps span{font-size:7px}.flow-head{align-items:flex-start}}</style><style>.logout-chip{font-size:10px;font-weight:700;color:#075567;background:#e7f3f4;border:1px solid #d7e9ea;border-radius:8px;padding:8px 10px;text-decoration:none}.profile-lock-note{background:#f0f6f6;border-radius:8px;padding:9px;margin:0 0 13px}html[data-theme="dark"] .profile-lock-note{background:#1a2820}@media(max-width:720px){.logout-chip{padding:7px}}</style><style>.notification-trigger{position:relative}.notification-count{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;padding:0 4px;display:grid;place-items:center;border-radius:99px;background:#c9564b;color:#fff;font-size:9px;font-weight:800;border:2px solid #fff}.notification-panel{position:fixed;z-index:45;top:76px;right:26px;width:min(370px,calc(100vw - 24px));max-height:min(560px,calc(100vh - 100px));overflow:auto;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:15px;box-shadow:0 20px 55px #163a3f25;padding:15px}.notification-panel[hidden]{display:none}.notification-panel-head{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:10px;border-bottom:1px solid var(--line)}.notification-panel-head h2{font:800 16px Manrope;margin:0}.notification-panel-head small{display:block;color:var(--muted);font-size:9px;margin-top:4px}.notification-panel-head>button{border:0;background:transparent;color:var(--muted);font-size:22px;cursor:pointer}.notification-items{display:grid}.notification-item{display:grid;grid-template-columns:28px 1fr auto;gap:9px;align-items:start;padding:12px 2px;border-bottom:1px solid var(--line)}.notification-item.unread{background:linear-gradient(90deg,#078f9d0b,transparent)}.notification-symbol{width:27px;height:27px;border-radius:9px;background:var(--green2);color:var(--green);display:grid;place-items:center}.notification-copy b{display:block;font-size:10px}.notification-copy p{margin:4px 0;color:var(--muted);font-size:9px;line-height:1.45}.notification-copy time{font-size:8px;color:var(--muted)}.notification-item button{border:0;background:transparent;color:var(--green);font-size:8px;font-weight:700;cursor:pointer}.notification-empty{padding:14px 4px;color:var(--muted);font-size:10px;line-height:1.5}html[data-theme="dark"] .notification-panel{background:var(--paper);color:var(--ink)}html[data-theme="dark"] .notification-count{border-color:#202d26}@media(max-width:600px){.notification-panel{top:66px;right:10px}}</style><style>.policy-modal{position:fixed;inset:0;z-index:60;background:#102a3290;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)}.policy-modal.open{display:flex}.policy-card{position:relative;width:min(570px,100%);max-height:88vh;overflow:auto;background:var(--paper);color:var(--ink);border-radius:17px;padding:24px;box-shadow:0 25px 70px #001c2633}.policy-card h2{font:800 21px Manrope;margin:7px 0 14px}.policy-kicker{font-size:9px;color:var(--green);font-weight:800;letter-spacing:1px}.policy-close{position:absolute;right:14px;top:14px;border:0;border-radius:8px;background:var(--green2);color:var(--green);font-size:20px;width:31px;height:31px;cursor:pointer}.policy-body{font-size:11px;line-height:1.7;color:var(--muted)}.policy-body h3{font:700 12px Manrope;color:var(--ink);margin:15px 0 4px}.policy-draft{background:#fff4e4;color:#775b31;border-radius:8px;padding:10px;font-size:9px;line-height:1.5}.quick-links{flex-wrap:wrap}.quick-links button{flex:1;min-width:80px} .notification-push-enable{border:1px solid var(--line);background:var(--green2);color:var(--green);border-radius:8px;padding:8px 10px;font-size:9px;font-weight:700;margin:10px 0;cursor:pointer}.ticket-qr-modal{position:fixed;inset:0;background:#102f3785;z-index:80;display:grid;place-items:center;padding:16px}.ticket-qr-modal[hidden]{display:none}.ticket-qr-modal section{background:var(--paper);border-radius:16px;padding:25px;text-align:center;width:min(390px,100%);position:relative}.ticket-qr-modal section>button{position:absolute;right:12px;top:8px;border:0;background:none;font-size:24px}.ticket-qr-modal h2{margin:5px 0 8px}.ticket-qr-modal p,.ticket-qr-modal small{color:var(--muted);font-size:10px}.ticket-qr-modal #ticketQrCanvas{display:grid;place-items:center;min-height:230px;margin:15px}</style></head>
 <body>
 <div class="app">
@@ -259,38 +308,63 @@
           listEl.innerHTML='<p class="empty" style="font-size:11px">No machines found for your dorm.</p>';
         }else{
           zcDbMachines.forEach(m=>{
+            const st = m.status==='available' ? 'available' : m.status==='busy' ? 'busy' : 'offline';
+            const dotCls = `machine-status-dot ${st}`;
+            const subText = st==='available' ? 'Idle · Ready to reserve'
+                          : st==='busy'      ? 'Cycle running · in use'
+                          :                    'Maintenance / Offline';
+            const statusLabel = st==='available' ? 'AVAILABLE' : st==='busy' ? 'IN USE' : 'OFFLINE';
+            const statusCls   = `status${st!=='available' ? (st==='busy' ? ' busy' : ' offline') : ''}`;
             const div=document.createElement('div');
             div.className='machine';
-            const sym=document.createElement('div');
-            sym.className='machine-symbol';
-            sym.textContent='◉';
-            const text=document.createElement('div');
-            const b=document.createElement('b');
-            b.textContent=m.display_name;
-            const sm=document.createElement('small');
-            sm.textContent=m.status==='available'?'Idle · Ready to reserve':m.status==='busy'?'Cycle running · in use':'Maintenance / Offline';
-            text.append(b,sm);
-            const st=document.createElement('span');
-            st.className='status'+(m.status!=='available'?' busy':'');
-            st.textContent=m.status.toUpperCase().replaceAll('_',' ');
-            div.append(sym,text,st);
+            div.innerHTML=`
+              <div class="machine-vis">
+                <div class="machine-vis-port"></div>
+                <div class="${dotCls}"></div>
+              </div>
+              <div>
+                <b>${m.display_name}</b>
+                <small>${subText}</small>
+              </div>
+              <span class="${statusCls}">${statusLabel}</span>`;
             listEl.appendChild(div);
           });
         }
       }
 
-      // Populate washer selector for booking
+      // Populate washer selector for booking (3D cards)
       const box=document.querySelector('.washer-choices');
       box.replaceChildren();
       zcDbMachines.forEach((m,i)=>{
+        const st = m.status==='available' ? 'available'
+                 : m.status==='busy'      ? 'busy'
+                 : m.status==='reserved'  ? 'reserved'
+                 :                          'offline';
+        const stateLabel = st==='available' ? '● Available'
+                         : st==='busy'      ? '◉ In Use'
+                         : st==='reserved'  ? '⊘ Reserved'
+                         :                    '✕ Offline';
+        const isDisabled = st !== 'available';
         const b=document.createElement('button');
-        b.className='washer-choice'+(i===0?' selected':'');
-        b.disabled=m.status!=='available';
-        const name=document.createElement('b'),state=document.createElement('small');
-        name.textContent=m.display_name;
-        state.textContent=m.status==='available'?'Available':m.status.replaceAll('_',' ');
-        b.append(name,state);
-        b.onclick=()=>selectRemoteMachine(m.machine_key,m.display_name,b);
+        b.className='washer-choice'+(i===0&&!isDisabled?' selected':'');
+        b.dataset.state=st;
+        b.disabled=isDisabled;
+        b.innerHTML=`
+          <div class="wc-machine">
+            <div class="wc-body">
+              <div class="wc-porthole"><div class="wc-status-ring"></div></div>
+              <div class="wc-controls">
+                <div class="wc-ctrl power"></div>
+                <div class="wc-ctrl prog"></div>
+                <div class="wc-ctrl off"></div>
+              </div>
+            </div>
+            <div class="wc-door"></div>
+          </div>
+          <div class="wc-shadow"></div>
+          <div class="wc-label">${m.display_name}</div>
+          <div class="wc-state-chip">${stateLabel}</div>`;
+        b.onclick=()=>{ if(!isDisabled) selectRemoteMachine(m.machine_key,m.display_name,b); };
         box.appendChild(b);
       });
 
@@ -306,7 +380,17 @@
         });
       }
 
-      if(zcDbMachines.length)await selectRemoteMachine(zcDbMachines[0].machine_key,zcDbMachines[0].display_name,box.firstElementChild);
+      if(zcDbMachines.length){
+        // Auto-select first AVAILABLE machine
+        const firstAvail = zcDbMachines.find(m=>m.status==='available');
+        const firstAvailBtn = firstAvail ? box.querySelector(`[data-state="available"]`) : null;
+        if(firstAvail && firstAvailBtn){
+          await selectRemoteMachine(firstAvail.machine_key, firstAvail.display_name, firstAvailBtn);
+        } else {
+          slotsEl.innerHTML='<p class="empty">No available washers right now. Try again later.</p>';
+          zcSelectedMachineKey=null;
+        }
+      }
       else{slotsEl.innerHTML='<p class="empty">No washers are configured for your dorm yet.</p>';zcSelectedMachineKey=null;}
     }catch(error){
       notify(error.message||'Could not load available washers.','error');
@@ -502,6 +586,15 @@
             qr.textContent = '⌑ Show access QR';
             qr.onclick = () => showTicketQr(t.id);
             card.append(qr);
+
+            // "Open full access page" link
+            const accessLink = document.createElement('a');
+            accessLink.href = `washer-access.html?ticket=${t.id}`;
+            accessLink.className = 'secondary';
+            accessLink.style.cssText = 'display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:10px;font-weight:700;color:#55665e;text-decoration:none;background:#fff';
+            accessLink.textContent = '▶ START WASHING';
+            accessLink.title = 'Open the full washer access & QR activation page';
+            card.append(accessLink);
 
             if(t.start > new Date(now + 120 * 60000)){
               const cancel = document.createElement('button');
@@ -1031,6 +1124,101 @@
     loadLoyaltyBalance();
     loadTickets('all');
     loadSupportRequests();
-  });</script>
+    // Phase 6: Supabase Realtime — subscribe to machine status changes
+    subscribeToMachineStatus();
+  });
+
+  /* ── Supabase Realtime — live machine status (Phase 6) ─────────── */
+  let realtimeChannel = null;
+  async function subscribeToMachineStatus(){
+    try{
+      const c = await ZCSupabase.ready();
+      if(realtimeChannel){ c.removeChannel(realtimeChannel); realtimeChannel=null; }
+      const dorm = zcDbProfile?.dorm_class;
+      realtimeChannel = c.channel('machine-status-live')
+        .on('postgres_changes',{
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'laundry_machines',
+          ...(dorm ? {filter:`dorm_class=eq.${dorm}`} : {})
+        }, payload => {
+          applyMachineUpdate(payload.new);
+        })
+        .subscribe(status=>{
+          const noteEl = document.querySelector('.machine-note');
+          if(noteEl){
+            noteEl.textContent = status==='SUBSCRIBED'
+              ? 'Live · Status updates in real-time from database.'
+              : 'Connecting to live machine feed…';
+          }
+        });
+    }catch(err){
+      console.warn('Realtime subscription error:', err);
+    }
+  }
+
+  function applyMachineUpdate(machine){
+    // Update zcDbMachines cache
+    const idx = zcDbMachines.findIndex(m=>m.machine_key===machine.machine_key);
+    if(idx>=0) zcDbMachines[idx] = {...zcDbMachines[idx], ...machine};
+
+    const st = machine.status==='available' ? 'available'
+              : machine.status==='busy'      ? 'busy'
+              : machine.status==='reserved'  ? 'reserved'
+              :                                'offline';
+
+    // 1. Update live machine list card
+    const listEl = document.getElementById('liveMachineList');
+    if(listEl){
+      const rows = listEl.querySelectorAll('.machine');
+      rows.forEach(row=>{
+        const nameEl = row.querySelector('b');
+        if(nameEl?.textContent===machine.display_name){
+          const dot = row.querySelector('.machine-status-dot');
+          if(dot){ dot.className=`machine-status-dot ${st}`; }
+          const small = row.querySelector('small');
+          if(small) small.textContent = st==='available' ? 'Idle · Ready to reserve'
+                                       : st==='busy'     ? 'Cycle running · in use'
+                                       :                   'Maintenance / Offline';
+          const statusSpan = row.querySelector('.status');
+          if(statusSpan){
+            statusSpan.className = `status${st!=='available'?(st==='busy'?' busy':' offline'):''}`;
+            statusSpan.textContent = st==='available'?'AVAILABLE': st==='busy'?'IN USE':'OFFLINE';
+          }
+        }
+      });
+    }
+
+    // 2. Update 3D washer booking card
+    const bookingBox = document.querySelector('.washer-choices');
+    if(bookingBox){
+      const cards = bookingBox.querySelectorAll('.washer-choice');
+      cards.forEach(card=>{
+        const lbl = card.querySelector('.wc-label');
+        if(lbl?.textContent===machine.display_name){
+          card.dataset.state = st;
+          card.disabled = st !== 'available';
+          const chip = card.querySelector('.wc-state-chip');
+          if(chip) chip.textContent = st==='available' ? '● Available'
+                                     : st==='busy'     ? '◉ In Use'
+                                     : st==='reserved' ? '⊘ Reserved'
+                                     :                   '✕ Offline';
+        }
+      });
+    }
+
+    // 3. Update available count in hero
+    const countEl = document.getElementById('availableCount');
+    if(countEl) countEl.textContent = zcDbMachines.filter(m=>m.status==='available').length;
+
+    // Visual flash to signal the update
+    const updatedCard = document.querySelector(`.wc-label`);
+    if(updatedCard){
+      updatedCard.closest?.('.washer-choice')?.animate(
+        [{boxShadow:'0 0 0 4px #078f9d44'},{boxShadow:'0 0 0 0 transparent'}],
+        {duration:800, easing:'ease-out'}
+      );
+    }
+  }</script>
 </body>
 </html>
