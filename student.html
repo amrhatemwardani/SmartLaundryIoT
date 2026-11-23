@@ -791,21 +791,17 @@
       const subject=document.getElementById('supportSubject').value.trim();
       const description=document.getElementById('supportDescription').value.trim();
 
-      const {data:{user}}=await c.auth.getUser();
-      if(!zcDbProfile)await loadBackendProfile();
-
-      const {error}=await c.from('support_tickets').insert({
-        user_id:user.id,
-        dorm_class:zcDbProfile.dorm_class,
-        category:cat,
-        machine_key:machKey,
-        urgency:urgency,
-        subject:subject,
-        description:description
+      const {data, error}=await c.rpc('student_create_support_ticket',{
+        p_category: cat,
+        p_machine_key: machKey,
+        p_urgency: urgency,
+        p_subject: subject,
+        p_description: description
       });
       if(error)throw error;
       e.target.reset();
-      notify('Support ticket created. Staff will review it shortly.','success');
+      const num=data?.ticket_number||'';
+      notify(`Support ticket ${num} created! Staff will review it shortly.`,'success');
       loadSupportRequests();
     }catch(error){
       notify(error.message||'Could not submit support request.','error');
