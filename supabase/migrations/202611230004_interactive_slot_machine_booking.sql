@@ -38,11 +38,12 @@ select public.seed_upcoming_30min_slots();
 
 
 -- 3. RPC: GET ALL 30-MINUTE SLOTS FOR A DAY WITH ACCURATE STATUS (ENDED, BOOKED, BUSY, AVAILABLE)
+drop function if exists public.student_get_day_slots(date);
 create or replace function public.student_get_day_slots(p_date date)
 returns table(
   slot_time timestamptz,
   time_label text,
-  status text,
+  slot_status text,
   available_count integer,
   total_machines integer
 )
@@ -58,10 +59,10 @@ begin
     raise exception 'Approved student account required';
   end if;
 
-  -- Total active machines in this dorm
+  -- Total active machines in this dorm (qualified alias to avoid ambiguity)
   select count(*) into m_total
-  from public.laundry_machines
-  where dorm_class = p.dorm_class and status = 'available';
+  from public.laundry_machines lm
+  where lm.dorm_class = p.dorm_class and lm.status = 'available';
 
   if m_total = 0 then
     m_total := 1;
@@ -104,7 +105,7 @@ begin
       when (sm.confirmed_cnt + sm.hold_cnt) >= m_total then 'booked'
       -- Otherwise available
       else 'available'
-    end as status,
+    end as slot_status,
     greatest(0, m_total - (sm.confirmed_cnt + sm.hold_cnt)::integer) as available_count,
     m_total as total_machines
   from slot_metrics sm

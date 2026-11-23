@@ -551,7 +551,7 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
 
     slotsEl.innerHTML = zcDaySlots.map((s, i) => {
       const isSelected = zcSelectedSlot && zcSelectedSlot.slot_time === s.slot_time;
-      const st = s.status; // 'ended', 'busy', 'booked', 'available'
+      const st = s.slot_status || s.status; // 'ended', 'busy', 'booked', 'available'
 
       if(st === 'ended'){
         return `
