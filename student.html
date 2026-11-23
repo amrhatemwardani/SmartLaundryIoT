@@ -41,32 +41,77 @@
   <main>
     <div class="topbar"><div class="crumb">Student portal <span style="margin:0 7px;color:#b4beb8">/</span> <strong id="crumbTitle">Overview</strong></div><div class="top-actions"><a class="logout-chip" href="logout.html" data-logout>Log out</a><button class="quiet-btn" id="langToggle" onclick="toggleLanguage()">عربي</button><button class="icon-btn" aria-label="Theme" onclick="toggleTheme()" title="Toggle dark mode">◐</button><button class="icon-btn notification-trigger" id="notificationButton" aria-label="Open notifications" aria-expanded="false" onclick="openNotifications()">♧<span class="notification-count" id="notificationCount" hidden></span></button><div class="user-mini"><div class="avatar">SA</div><span data-session-name>Student</span></div></div></div>
     <div id="overviewPane">
-    <section class="welcome"><div><h1>Good morning, Salma <span style="font-size:22px">✦</span></h1><p>Ready to make laundry day a little easier?</p></div><div class="date-pill">◷ &nbsp; Mon, 16 November</div></section>
-    <section class="hero"><div class="hero-copy"><div class="eyebrow">Dome Building · Laundry room</div><h2>Your laundry, on your schedule.</h2><p>Book a room time slot, check machine activity, and access the room when your booking begins.</p></div><div class="hero-right"><div class="availability"><strong id="availableCount">3</strong><small>spaces available now</small></div><button class="hero-button" onclick="document.querySelector('.booking-card').scrollIntoView({behavior:'smooth'})">＋ &nbsp; Book a time slot</button></div></section>
+    <section class="welcome"><div><h1 id="welcomeGreeting">Good morning, <span id="welcomeName">Student</span> <span style="font-size:22px">✦</span></h1><p>Ready to make laundry day a little easier?</p></div><div class="date-pill" id="liveDatePill">◷ &nbsp; Today</div></section>
+    <div id="penaltyAlertBanner" style="display:none;margin-bottom:16px;padding:12px 16px;border-radius:12px;font-size:12px;line-height:1.5"></div>
+    <section class="hero"><div class="hero-copy"><div class="eyebrow" id="dormEyebrow">Dorm Building · Laundry room</div><h2>Your laundry, on your schedule.</h2><p>Book a room time slot, check machine activity, and access the room when your booking begins.</p></div><div class="hero-right"><div class="availability"><strong id="availableCount">0</strong><small>spaces available now</small></div><button class="hero-button" id="btnBookTimeSlot" onclick="document.querySelector('.booking-card').scrollIntoView({behavior:'smooth'})">＋ &nbsp; Book a time slot</button></div></section>
     <section class="card flow-card"><div class="flow-head"><div><b>Your ticket journey</b><small>One washer · one time slot · one ticket</small></div><a href="#" onclick="document.querySelector('.booking-card').scrollIntoView({behavior:'smooth'});return false">Start booking →</a></div><div class="flow-steps"><span><i>1</i>Choose washer</span><span><i>2</i>Read & accept</span><span><i>3</i>Pay securely</span><span><i>4</i>Use active QR</span><span><i>5</i>Wash complete</span></div></section>    <div class="grid">
       <section class="card booking-card"><div class="card-head"><div><h3>Find a time that works</h3><p>Choose a day and a 30-minute room slot.</p></div><button class="quiet-btn" onclick="notify('Showing the next 7 days')">Next 7 days⌄</button></div>
-        <div class="washer-select"><div class="slot-title"><span>Choose a washer</span><span>One ticket reserves one machine</span></div><div class="washer-choices"><button class="washer-choice selected" onclick="selectWasher(1,this)"><b>Washer 01</b><small>Available</small></button><button class="washer-choice" onclick="selectWasher(2,this)"><b>Washer 02</b><small>Available</small></button><button class="washer-choice" onclick="selectWasher(3,this)"><b>Washer 03</b><small>Running · 10:18</small></button><button class="washer-choice" onclick="selectWasher(4,this)"><b>Washer 04</b><small>Available</small></button></div></div>
-        <div class="day-row" id="days"></div><div class="slot-title"><span>Available times</span><span>Four washers · machine-specific ticket</span></div><div class="slots" id="slots"></div>
+        <div class="washer-select"><div class="slot-title"><span>Choose a washer</span><span>One ticket reserves one machine</span></div><div class="washer-choices"><button class="washer-choice selected"><b>Loading washers…</b><small>Connecting…</small></button></div></div>
+        <div class="day-row" id="days"></div><div class="slot-title"><span>Available times</span><span>Open slots for selected washer</span></div><div class="slots" id="slots"></div>
         <div class="legend"><span><i></i> Available</span><span><i class="few"></i> Filling up</span><span><i class="full"></i> Full</span></div>
       </section>
       <div class="right-col">
-        <section class="card next-card"><div class="next-head"><h3>Your next booking</h3><span class="tag" id="bookingStatus">CONFIRMED</span></div><div class="booking-info"><div class="cal-icon">▣</div><div><b id="bookingDate">Today · 10:30 – 11:00</b><small>30-minute room access window</small></div></div><div class="booking-actions"><button class="primary" id="bookingAction" onclick="bookingAction()">⌑ &nbsp; Request door access</button><button class="secondary" onclick="cancelBooking()">Cancel</button></div><p class="hint">Door access is available during your slot. Your request is checked against your booking.</p></section>
+        <section class="card next-card"><div class="next-head"><h3>Your next booking</h3><span class="tag" id="bookingStatus">NO BOOKINGS</span></div><div class="booking-info"><div class="cal-icon">▣</div><div><b id="bookingDate">No active laundry tickets</b><small>30-minute room access window</small></div></div><div class="booking-actions"><button class="primary" id="bookingAction" onclick="bookingAction()">＋ &nbsp; Book a washer</button><button class="secondary" onclick="cancelBooking()">Cancel</button></div><p class="hint">Door access QR activates when your slot begins and expires 10 minutes later.</p></section>
         <section class="card machine-card"><h3>Machine activity <span style="font-size:10px;color:var(--muted);font:500 10px 'DM Sans'">· live</span></h3>
-          <div class="machine"><div class="machine-symbol">◉</div><div><b>Washer 01</b><small>Cycle finished · 9:42 AM</small></div><span class="status">IDLE</span></div>
-          <div class="machine"><div class="machine-symbol">◉</div><div><b>Washer 02</b><small>Cycle in progress · est. 10:18</small></div><span class="status busy">RUNNING</span></div><div class="machine"><div class="machine-symbol">◉</div><div><b>Washer 03</b><small>Idle · sensor online</small></div><span class="status">IDLE</span></div><div class="machine"><div class="machine-symbol">◉</div><div><b>Washer 04</b><small>Idle · sensor online</small></div><span class="status">IDLE</span></div>
-          <p class="machine-note">Availability is based on machine sensors. Status may take a moment to update.</p>
+          <div id="liveMachineList" style="display:grid;gap:8px">
+            <div class="machine"><div class="machine-symbol">◉</div><div><b>Loading machines…</b><small>Sensor status</small></div><span class="status">…</span></div>
+          </div>
+          <p class="machine-note">Availability is based on machine sensors. Status updates live from database.</p>
         </section>
       </div>
     </div>
     <div class="bottom-grid"><section class="card notice"><div class="notice-icon">ⓘ</div><div><b>Before you book</b><p>Arrive within 10 minutes of your start time. Unused bookings may be released so another student can use the room. Please cancel if your plans change.</p></div></section><section class="card quick"><h3>Quick links</h3><div class="quick-links"><button onclick="openStudentPolicy('rules')">Room rules</button><button onclick="openStudentPolicy('privacy')">Privacy</button><button onclick="openStudentPolicy('terms')">Terms</button><button onclick="showPane('support')">Get help</button></div></section></div>
     </div>
     <section class="feature-pane" id="bookingsPane"><div class="feature-head"><h1>My laundry tickets</h1><p>View your upcoming and previous washer bookings.</p></div><div class="tabs"><button class="on" onclick="filterTickets('all',this)">All tickets</button><button onclick="filterTickets('completed',this)">Completed</button><button onclick="filterTickets('open',this)">Not completed</button></div><div id="ticketList" class="ticket-list"></div></section>
-    <section class="feature-pane" id="supportPane"><div class="feature-head"><h1>Support & complaints</h1><p>Tell us what happened. We’ll create a support ticket you can track.</p></div><div class="feature-grid"><form class="card feature-card" onsubmit="submitSupport(event)"><h3>Submit a support ticket</h3><label>What do you need help with?<select id="supportCategory" required><option value="">Choose a topic</option><option>Washer or room issue</option><option>Booking or ticket</option><option>Payment or refund</option><option>Complaint about service</option><option>Other</option></select></label><label>Related ticket number (optional)<input id="supportRelated" placeholder="Ticket reference"/></label><label>Describe the issue<textarea id="supportDescription" required rows="5" placeholder="Share the details and when it happened…"></textarea></label><button class="primary">Send support request</button><p class="subtle">Avoid including passwords or payment card details.</p></form><div class="card feature-card"><h3>Your support requests</h3><div id="supportList"><p class="empty">You haven’t sent a support request yet.</p></div></div></div></section>
+    <section class="feature-pane" id="supportPane"><div class="feature-head"><h1>Support & complaints</h1><p>Need help with a washer, booking, or room access? Track and submit tickets here.</p></div><div class="feature-grid"><form class="card feature-card" onsubmit="submitSupport(event)"><h3>Submit a support ticket</h3><label>What do you need help with?<select id="supportCategory" required><option value="">Choose a topic</option><option value="washer">Washer or dryer hardware issue</option><option value="booking">Booking or ticket issue</option><option value="payment">Payment or refund</option><option value="wallet">Wallet balance inquiry</option><option value="door_access">Door access & QR scanner</option><option value="complaint">Complaint about laundry room</option><option value="other">Other inquiry</option></select></label><label>Related machine (if washer issue)<select id="supportMachine"><option value="">-- None / Not machine-related --</option></select></label><label>Urgency level<select id="supportUrgency"><option value="low">Low - General question</option><option value="medium" selected>Medium - Normal issue</option><option value="high">High - Urgent / Needs quick attention</option></select></label><label>Subject / Summary<input id="supportSubject" required placeholder="Brief description of the problem" maxlength="120"/></label><label>Describe the issue<textarea id="supportDescription" required rows="4" placeholder="Share specific details, washer number, or error messages…"></textarea></label><button class="primary" id="btnSubmitSupport">Send support request</button><p class="subtle">Avoid including passwords or payment card details.</p></form><div class="card feature-card"><h3>Your support requests</h3><div id="supportList"><p class="empty">You haven’t sent a support request yet.</p></div></div></div></section>
     <section class="feature-pane" id="profilePane"><div class="feature-head"><h1>My profile</h1><p>Keep your student and contact details up to date.</p></div><div class="feature-grid"><form class="card feature-card" onsubmit="saveProfile(event)"><h3>Profile details</h3><div class="avatar-picker"><div class="avatar large" id="chosenAvatar">🌿</div><div><b>Choose a profile picture</b><div class="avatar-options"><button type="button" onclick="pickAvatar('🌿')">🌿</button><button type="button" onclick="pickAvatar('🫧')">🫧</button><button type="button" onclick="pickAvatar('🌼')">🌼</button><button type="button" onclick="pickAvatar('🐳')">🐳</button><button type="button" onclick="pickAvatar('☀️')">☀️</button><button type="button" onclick="pickAvatar('🍃')">🍃</button></div><small class="subtle">Preset icons keep profile images lightweight.</small></div></div><p class="subtle profile-lock-note">Name, university ID, university email, major, dorm, phone, and age are verified and read-only here. To correct them, submit a support request for supervisor review. Only your WhatsApp number is editable.</p><div class="form-grid"><label>Full name<input id="profileFullName" value="" readonly aria-readonly="true"/></label><label>University ID<input id="profileUniversityId" value="" readonly aria-readonly="true"/></label><label>University email<input id="profileEmail" value="" readonly/></label><label>Major<input id="profileMajor" value="" readonly aria-readonly="true"/></label><label>Dorm class<select id="profileDorm" disabled aria-disabled="true"><option>A</option><option>B</option><option>C</option><option>D</option></select></label><label>Phone number<input id="profilePhone" value="" readonly aria-readonly="true"/></label><label>WhatsApp<input id="profileWhatsapp" value="Same as phone"/></label><label>Age<input id="profileAge" type="number" value="" readonly aria-readonly="true"/></label></div><button class="primary">Save profile</button></form><form class="card feature-card" onsubmit="savePassword(event)"><h3>Change password</h3><label>Current password<input id="currentPassword" type="password" required placeholder="Current password"/></label><label>New password<input id="newPassword" type="password" minlength="12" required placeholder="12+ characters, mixed types"/></label><label>Confirm new password<input id="confirmNewPassword" type="password" minlength="12" required placeholder="Re-enter new password"/></label><button class="secondary">Update password</button><p class="subtle">Password updates will require your current password and a secure server session.</p></form></div></section>
     <section class="feature-pane" id="walletPane"><div class="feature-head"><h1>My wallet</h1><p>Top up your balance and review payments or refunds.</p></div><div class="wallet-balance card"><div><small>Available balance</small><strong id="walletBalance">EGP 0.00</strong><p>Wallet balance is updated only after verified payment confirmation.</p></div><span>▤</span></div><div class="feature-grid"><form class="card feature-card" onsubmit="addWalletFunds(event)"><h3>Add money to wallet</h3><p class="subtle">Choose a top-up amount. You will continue to Paymob hosted checkout; this page never collects card details.</p><div class="topup-choices"><button type="button" onclick="setTopup(50,this)">EGP 50</button><button type="button" class="chosen" onclick="setTopup(100,this)">EGP 100</button><button type="button" onclick="setTopup(200,this)">EGP 200</button></div><label>Other amount (EGP)<input id="topupAmount" type="number" min="10" max="5000" step="1" value="100" required/></label><label style="display:grid;gap:5px;font-size:10px;font-weight:700;margin:10px 0">Online method<select id="topupMethod"><option value="card">Debit / credit card</option><option value="wallet">Mobile wallet</option></select></label><button class="primary">Proceed to online payment →</button><p class="subtle">A successful return page is not proof of payment. The wallet is credited only after the verified server callback.</p></form><div class="card feature-card"><h3>Wallet activity</h3><div id="walletActivity"><p class="empty">No wallet transactions yet. Payment and refunds will appear here after backend setup.</p></div></div></div></section>
-    <section class="feature-pane" id="loyaltyPane"><div class="feature-head"><h1>Laundry rewards</h1><p>Earn points when completed laundry tickets are recorded.</p></div><div class="reward-hero card"><div><small>YOUR POINTS</small><strong>0 pts</strong><p>Complete a wash to start collecting points.</p></div><span>✦</span></div><div class="card feature-card"><h3>How rewards work</h3><p class="subtle">The project team can configure points per completed ticket and future rewards. Points are prototypes for now and have no cash value.</p><div class="reward-steps"><span>① Book & pay</span><span>② Complete your wash</span><span>③ Collect points</span></div></div></section>
+    <section class="feature-pane" id="loyaltyPane"><div class="feature-head"><h1>Laundry rewards program</h1><p>Earn points when you wash and turn your points directly into real wallet cash!</p></div>
+    <div class="reward-hero card" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#075567,#078f9d);color:white;padding:22px;border-radius:16px">
+      <div>
+        <small style="text-transform:uppercase;letter-spacing:1px;font-size:11px;opacity:0.85">YOUR LOYALTY BALANCE</small>
+        <div style="display:flex;align-items:baseline;gap:12px;margin:6px 0">
+          <strong id="loyaltyPointsDisplay" style="font-size:32px;font-weight:800">0 pts</strong>
+          <span id="loyaltyCashDisplay" style="font-size:18px;opacity:0.95;background:rgba(255,255,255,0.2);padding:3px 10px;border-radius:20px">≈ EGP 0.00</span>
+        </div>
+        <p id="loyaltyRuleText" style="margin:0;font-size:11px;opacity:0.9">10 Points = EGP 1.00 (200 pts = EGP 20.00 wallet credit)</p>
+      </div>
+      <div style="font-size:44px;opacity:0.3">✦</div>
+    </div>
+    <div class="feature-grid" style="margin-top:18px">
+      <form class="card feature-card" onsubmit="redeemLoyaltyPoints(event)">
+        <h3>Redeem points for wallet cash</h3>
+        <p class="subtle">Convert your earned points into laundry wallet funds instantly. Minimum redemption: <b id="minRedeemLabel">100 pts</b>.</p>
+        <div class="topup-choices" style="margin-bottom:12px">
+          <button type="button" onclick="setRedeemPts(100,this)">100 pts (=10 EGP)</button>
+          <button type="button" onclick="setRedeemPts(200,this)">200 pts (=20 EGP)</button>
+          <button type="button" onclick="setRedeemAllPts(this)">All points</button>
+        </div>
+        <label>Points to redeem
+          <input id="redeemPointsInput" type="number" min="10" step="10" value="100" required oninput="updateRedeemPreview()">
+        </label>
+        <div id="redeemPreview" style="margin:10px 0;padding:10px 14px;background:#eef7f8;border-radius:8px;font-size:12px;color:#075567">
+          You will receive: <b id="redeemCashPreview">EGP 10.00</b> directly into your wallet.
+        </div>
+        <button class="primary" id="btnRedeemPoints">✦ Convert points to wallet cash</button>
+      </form>
+      <div class="card feature-card">
+        <h3>How our rewards program works</h3>
+        <p class="subtle">The dorm rewards program gives back to regular students every time you complete a booking.</p>
+        <div class="reward-steps" style="display:grid;gap:10px;margin-top:12px">
+          <div style="display:flex;gap:12px;align-items:center"><span style="background:#e5f5f5;color:#087886;font-weight:800;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center">1</span><span><b>Book & Wash:</b> Earn points on every verified booking.</span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span style="background:#e5f5f5;color:#087886;font-weight:800;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center">2</span><span><b>Accumulate:</b> Reach the minimum threshold (e.g. 100 or 200 pts).</span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span style="background:#e5f5f5;color:#087886;font-weight:800;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center">3</span><span><b>Redeem:</b> Turn points into real wallet credit for future washes.</span></div>
+        </div>
+        <div style="margin-top:18px">
+          <h4 style="font-size:12px;margin:0 0 8px">Recent rewards ledger</h4>
+          <div id="loyaltyHistoryList" style="max-height:180px;overflow-y:auto;font-size:11px"><p class="empty">Loading rewards activity…</p></div>
+        </div>
+      </div>
+    </div>
+    </section>
   </main>
-</div><div class="policy-modal" id="studentPolicyModal" role="dialog" aria-modal="true" aria-labelledby="studentPolicyTitle" onclick="if(event.target===this)closeStudentPolicy()"><section class="policy-card"><button class="policy-close" onclick="closeStudentPolicy()" aria-label="Close">×</button><span class="policy-kicker">ZC DORM LAUNDRY</span><h2 id="studentPolicyTitle"></h2><div id="studentPolicyBody" class="policy-body"></div><p class="policy-draft">Project draft: Zewail City must review and approve the final policy before production.</p><button class="primary" onclick="closeStudentPolicy()">I understand</button></section></div><div class="notification-panel" id="notificationPanel" role="dialog" aria-modal="false" aria-labelledby="notificationTitle" hidden><div class="notification-panel-head"><div><h2 id="notificationTitle">Notifications</h2><small id="notificationStatus">Connecting securely…</small></div><button type="button" aria-label="Close notifications" onclick="closeNotifications()">×</button></div><button type="button" class="notification-push-enable" onclick="enableFirebasePush()">Enable browser notifications</button><div id="notificationItems" class="notification-items"><p class="notification-empty">Your notifications will appear here after secure account setup.</p></div></div><div class="checkout-modal" id="ticketCheckout" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle"><div class="checkout-box"><button class="checkout-close" onclick="closeTicketCheckout()" aria-label="Close">×</button><div class="checkout-kicker">ZC DORM LAUNDRY · TICKET CHECKOUT</div><h2 id="checkoutTitle">Before you book</h2><p class="checkout-sub">Please review the laundry, safety, and privacy information before you pay.</p><div class="checkout-rules"><h3>Use the washer safely</h3><ul><li>Follow the posted washer instructions and load limits.</li><li>Keep personal items with you and leave the area clean.</li><li>Report equipment faults or hazards to the supervisor.</li></ul><h3>Room access & privacy</h3><ul><li>Your ticket is for one washer and one time slot.</li><li>Door access is tied to your paid ticket and recorded for safety.</li><li>Do not share your QR ticket; emergency exit hardware works independently.</li></ul><h3>Cancellation & no-show</h3><p>The final cancellation, refund, and no-show rules must be approved by the university before real payment is enabled.</p></div><label class="checkout-agree"><input id="checkoutAgree" type="checkbox" onchange="document.getElementById('payTicketButton').disabled=!this.checked"/><span>I have read and agree to the laundry instructions, safety information, privacy notice, and booking policy.</span></label><div class="payment-methods"><label><input type="radio" name="paymentMethod" value="wallet" checked onchange="updatePaymentAction()"/><span><b>Pay from wallet</b><small>Balance: <em id="checkoutWalletBalance">EGP 0.00</em></small></span></label><label><input type="radio" name="paymentMethod" value="paymob" onchange="updatePaymentAction()"/><span><b>Online payment</b><small>Paymob hosted checkout: mobile wallets, debit or credit cards, and Apple Pay where enabled.</small></span></label></div><div id="paymobMethodChoices" hidden><p style="font-size:9px;font-weight:700;margin:10px 0 6px">Choose online method</p><div class="payment-methods"><label><input type="radio" name="paymobMethod" value="card" checked/><span><b>Debit / credit card</b><small>Secure Paymob checkout</small></span></label><label><input type="radio" name="paymobMethod" value="wallet"/><span><b>Mobile wallet</b><small>Available methods depend on Paymob account setup</small></span></label></div></div><div class="checkout-total"><span>Ticket price</span><b id="checkoutPrice">EGP 25.00</b></div><button class="primary" id="payTicketButton" disabled onclick="startTicketPayment()">Pay with wallet</button><p class="checkout-sub">The ticket is confirmed only after the server verifies payment.</p></div></div><div class="ticket-qr-modal" id="ticketQrModal" hidden><section><button type="button" onclick="closeTicketQr()" aria-label="Close">×</button><h2>Your laundry access QR</h2><p>Show this one-time QR at the laundry door during your ticket window.</p><div id="ticketQrCanvas"></div><small id="ticketQrMessage"></small></section></div><div class="toast" id="toast"></div>
+</div><div class="policy-modal" id="studentPolicyModal" role="dialog" aria-modal="true" aria-labelledby="studentPolicyTitle" onclick="if(event.target===this)closeStudentPolicy()"><section class="policy-card"><button class="policy-close" onclick="closeStudentPolicy()" aria-label="Close">×</button><span class="policy-kicker">ZC DORM LAUNDRY</span><h2 id="studentPolicyTitle"></h2><div id="studentPolicyBody" class="policy-body"></div><p class="policy-draft">Project draft: Zewail City must review and approve the final policy before production.</p><button class="primary" onclick="closeStudentPolicy()">I understand</button></section></div><div class="notification-panel" id="notificationPanel" role="dialog" aria-modal="false" aria-labelledby="notificationTitle" hidden><div class="notification-panel-head"><div><h2 id="notificationTitle">Notifications</h2><small id="notificationStatus">Connecting securely…</small></div><button type="button" aria-label="Close notifications" onclick="closeNotifications()">×</button></div><button type="button" class="notification-push-enable" onclick="enableFirebasePush()">Enable browser notifications</button><div id="notificationItems" class="notification-items"><p class="notification-empty">Your notifications will appear here after secure account setup.</p></div></div><div class="checkout-modal" id="ticketCheckout" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle"><div class="checkout-box"><button class="checkout-close" onclick="closeTicketCheckout()" aria-label="Close">×</button><div class="checkout-kicker">ZC DORM LAUNDRY · TICKET CHECKOUT</div><h2 id="checkoutTitle">Before you book</h2><p class="checkout-sub">Please review the laundry, safety, and privacy information before you pay.</p><div class="checkout-rules"><h3>Use the washer safely</h3><ul><li>Follow the posted washer instructions and load limits.</li><li>Keep personal items with you and leave the area clean.</li><li>Report equipment faults or hazards to the supervisor.</li></ul><h3>Room access & privacy</h3><ul><li>Your ticket is for one washer and one time slot.</li><li>Door access is tied to your paid ticket and recorded for safety.</li><li>Do not share your QR ticket; emergency exit hardware works independently.</li></ul><h3>Cancellation & no-show</h3><p>The final cancellation, refund, and no-show rules must be approved by the university before real payment is enabled.</p></div><label class="checkout-agree"><input id="checkoutAgree" type="checkbox" onchange="document.getElementById('payTicketButton').disabled=!this.checked"/><span>I have read and agree to the laundry instructions, safety information, privacy notice, and booking policy.</span></label><div class="payment-methods"><label><input type="radio" name="paymentMethod" value="wallet" checked onchange="updatePaymentAction()"/><span><b>Pay from wallet</b><small>Balance: <em id="checkoutWalletBalance">EGP 0.00</em></small></span></label><label><input type="radio" name="paymentMethod" value="paymob" onchange="updatePaymentAction()"/><span><b>Online payment</b><small>Paymob hosted checkout: mobile wallets, debit or credit cards, and Apple Pay where enabled.</small></span></label></div><div id="paymobMethodChoices" hidden><p style="font-size:9px;font-weight:700;margin:10px 0 6px">Choose online method</p><div class="payment-methods"><label><input type="radio" name="paymobMethod" value="card" checked/><span><b>Debit / credit card</b><small>Secure Paymob checkout</small></span></label><label><input type="radio" name="paymobMethod" value="wallet"/><span><b>Mobile wallet</b><small>Available methods depend on Paymob account setup</small></span></label></div></div><div class="checkout-total"><span>Ticket price</span><b id="checkoutPrice">EGP 25.00</b></div><button class="primary" id="payTicketButton" disabled onclick="startTicketPayment()">Pay with wallet</button><p class="checkout-sub">The ticket is confirmed only after the server verifies payment.</p></div></div><div class="ticket-qr-modal" id="ticketQrModal" hidden><section><button type="button" onclick="closeTicketQr()" aria-label="Close">×</button><h2 id="ticketQrTitle">Laundry door access QR</h2><p id="ticketQrSubtitle">Show this one-time QR at the laundry door during your ticket window.</p><div id="ticketQrCanvas"></div><div id="ticketQrTimer" style="margin:10px 0;font-size:12px;font-weight:700"></div><small id="ticketQrMessage"></small></section></div><div class="toast" id="toast"></div>
 <script>
   function openStudentPolicy(kind){const specs={rules:['Laundry room rules','<h3>Before using a machine</h3><p>Follow the posted load limits and machine instructions. Check pockets and keep small items out of the drum.</p><h3>Room safety</h3><p>Keep walkways clear, do not touch electrical or IoT equipment, and report faults or hazards to the dorm supervisor. Emergency exits must remain accessible.</p><h3>Your booking</h3><p>Use only the washer and time slot shown on your ticket. Arrive on time, leave the area clean, and do not share your door QR code. Cancel if you can no longer attend.</p>'],privacy:['Privacy notice','<h3>Information used</h3><p>The service may use your university account, contact details, booking and payment status, support requests, and door access events to operate the dorm laundry service.</p><h3>Access and retention</h3><p>Students can view their own records. Supervisors and administrators receive access needed for their duties. Final retention periods and a privacy contact must be confirmed by Zewail City.</p><h3>Your choices</h3><p>Contact support to request a correction or ask a privacy question. Never send passwords or full payment card details in a support request.</p>'],terms:['Terms & conditions','<h3>Bookings and tickets</h3><p>A ticket reserves the washer and slot shown before payment. A real ticket is confirmed only after payment is verified. Cancellation, refund, and no-show rules must be approved and displayed before live payment is enabled.</p><h3>Safe use</h3><p>Follow posted machine instructions, keep the laundry room safe, and report equipment issues. Do not tamper with locks, QR scanners, or sensors.</p><h3>Door access</h3><p>Use your own time-limited ticket QR only during its valid access window. Emergency exit hardware must work independently of the app.</p>']};const spec=specs[kind];if(!spec)return;document.getElementById('studentPolicyTitle').textContent=spec[0];document.getElementById('studentPolicyBody').innerHTML=spec[1];document.getElementById('studentPolicyModal').classList.add('open')}function closeStudentPolicy(){document.getElementById('studentPolicyModal').classList.remove('open')}document.addEventListener('keydown',e=>{if(e.key==='Escape')closeStudentPolicy()});
   const dayData=Array.from({length:7},(_,i)=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+i);return [i===0?'TODAY':['SUN','MON','TUE','WED','THU','FRI','SAT'][d.getDay()],String(d.getDate()).padStart(2,'0')]});
@@ -105,20 +150,269 @@
   function setTopup(amount,button){document.getElementById('topupAmount').value=amount;document.querySelectorAll('.topup-choices button').forEach(b=>b.classList.toggle('chosen',b===button))}
   const savedTheme=localStorage.getItem('washdayTheme');if(savedTheme)document.documentElement.dataset.theme=savedTheme;const savedAvatar=localStorage.getItem('washdayAvatar');if(savedAvatar)pickAvatar(savedAvatar);const savedLanguage=localStorage.getItem('washdayLanguage');if(savedLanguage)setLanguage(savedLanguage);
   function updatePaymentAction(){const m=document.querySelector('input[name="paymentMethod"]:checked')?.value;const choices=document.getElementById('paymobMethodChoices');if(choices)choices.hidden=m!=='paymob';const b=document.getElementById('payTicketButton');if(b)b.textContent=m==='paymob'?'Proceed to online payment':'Pay with wallet'}
-  async function addWalletFunds(e){e.preventDefault();const amount=Number(document.getElementById('topupAmount').value);if(!Number.isFinite(amount)||amount<10||amount>5000){notify('Enter an amount between EGP 10 and EGP 5,000.','error');return}await window.ZCPayments?.start({kind:'wallet_topup',paymentMethod:document.getElementById('topupMethod').value,amountCents:Math.round(amount*100)})}  let zcDbSlots=[],zcDbMachines=[],zcDbProfile=null,zcSelectedSlot=null,zcSelectedMachineKey=null;
+  async function addWalletFunds(e){e.preventDefault();const amount=Number(document.getElementById('topupAmount').value);if(!Number.isFinite(amount)||amount<10||amount>5000){notify('Enter an amount between EGP 10 and EGP 5,000.','error');return}await window.ZCPayments?.start({kind:'wallet_topup',paymentMethod:document.getElementById('topupMethod').value,amountCents:Math.round(amount*100)})}
+  let zcDbSlots=[],zcDbMachines=[],zcDbProfile=null,zcSelectedSlot=null,zcSelectedMachineKey=null;
+  let zcLoyaltyData={points:0,ratio:10,min_redeem_points:100};
+  let qrCountdownTimer=null;
+
+  function updateLiveDate(){
+    const pill=document.getElementById('liveDatePill');
+    if(!pill)return;
+    const now=new Date();
+    const isAr=document.documentElement.lang==='ar';
+    const opt={weekday:'short',day:'numeric',month:'short',year:'numeric'};
+    pill.innerHTML='◷ &nbsp; '+now.toLocaleDateString(isAr?'ar-EG':'en-US',opt);
+  }
+
+  function formatCountdown(sec){
+    if(sec<=0)return '00:00';
+    const m=Math.floor(sec/60),s=sec%60;
+    return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  }
+
   function localDayRange(offset){const from=new Date();from.setHours(0,0,0,0);from.setDate(from.getDate()+offset);const until=new Date(from);until.setDate(until.getDate()+1);return {from,until}}
-  async function loadBackendProfile(){try{const c=await ZCSupabase.ready(),{data:{user}}=await c.auth.getUser();const {data,error}=await c.from('student_profiles').select('full_name,university_email,university_id,major,age,phone_number,whatsapp_number,dorm_class').eq('user_id',user.id).single();if(error)throw error;zcDbProfile=data;for(const [id,value] of [['profileFullName',data.full_name],['profileUniversityId',data.university_id],['profileEmail',data.university_email],['profileMajor',data.major],['profilePhone',data.phone_number],['profileAge',data.age],['profileWhatsapp',data.whatsapp_number||'']]){const el=document.getElementById(id);if(el)el.value=value||''}const dorm=document.getElementById('profileDorm');if(dorm)dorm.value=data.dorm_class;document.querySelectorAll('[data-session-name]').forEach(el=>el.textContent=data.full_name);}
-  catch(error){notify(error.message||'Could not load your student profile.','error')}}
-  async function loadBackendMachines(){try{const c=await ZCSupabase.ready();const {data,error}=await c.from('laundry_machines').select('machine_key,display_name,dorm_class,status').order('display_name');if(error)throw error;zcDbMachines=data||[];const box=document.querySelector('.washer-choices');box.replaceChildren();zcDbMachines.forEach((m,i)=>{const b=document.createElement('button');b.className='washer-choice'+(i===0?' selected':'');b.disabled=m.status!=='available';const name=document.createElement('b'),state=document.createElement('small');name.textContent=m.display_name;state.textContent=m.status==='available'?'Available':m.status.replaceAll('_',' ');b.append(name,state);b.onclick=()=>selectRemoteMachine(m.machine_key,m.display_name,b);box.appendChild(b)});if(zcDbMachines.length)await selectRemoteMachine(zcDbMachines[0].machine_key,zcDbMachines[0].display_name,box.firstElementChild);else{slotsEl.innerHTML='<p class="empty">No washers are configured for your dorm yet.</p>';zcSelectedMachineKey=null}}
-  catch(error){notify(error.message||'Could not load available washers.','error')}}
-  async function selectRemoteMachine(key,name,button){zcSelectedMachineKey=key;selectedWasher=Number(key.match(/\d+/)?.[0]||1);document.querySelectorAll('.washer-choice').forEach(b=>b.classList.toggle('selected',b===button));document.getElementById('checkoutTitle').textContent=name+' · Review your ticket';await loadBackendSlots()}
-  async function loadBackendSlots(){if(!zcSelectedMachineKey)return;try{const c=await ZCSupabase.ready(),{from,until}=localDayRange(selectedDay);const {data,error}=await c.rpc('student_available_slots',{p_from:from.toISOString(),p_until:until.toISOString(),p_machine_key:zcSelectedMachineKey});if(error)throw error;zcDbSlots=data||[];renderSlots()}
-  catch(error){zcDbSlots=[];renderSlots();notify(error.message||'Could not load open slots.','error')}}
-  function renderSlots(){if(!zcDbSlots.length){slotsEl.innerHTML='<p class="empty">No open slots for this washer and date. Select another day or machine.</p>';return}slotsEl.innerHTML=zcDbSlots.map((slot,i)=>{const time=new Date(slot.starts_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:false});return `<button class="slot ${selectedSlot===i?'selected':''}" onclick="selectSlot(${i})"><div class="slot-top"><time>${time}</time><span class="count">Available</span></div><small>${slot.duration_minutes} min · ${slot.machine_name}</small></button>`}).join('')}
+
+  async function loadBackendProfile(){
+    try{
+      const c=await ZCSupabase.ready(),{data:{user}}=await c.auth.getUser();
+      const {data,error}=await c.from('student_profiles')
+        .select('full_name,university_email,university_id,major,age,phone_number,whatsapp_number,dorm_class,penalty_status,penalty_reason,suspended_until')
+        .eq('user_id',user.id).single();
+      if(error)throw error;
+      zcDbProfile=data;
+
+      // Update name greetings and header
+      const firstName=(data.full_name||'Student').trim().split(' ')[0];
+      const welcomeEl=document.getElementById('welcomeName');
+      if(welcomeEl)welcomeEl.textContent=firstName;
+      document.querySelectorAll('[data-session-name]').forEach(el=>el.textContent=data.full_name);
+
+      // Dynamic initials for avatars
+      const initials=(data.full_name||'ST').split(' ').filter(Boolean).map(x=>x[0]).slice(0,2).join('').toUpperCase();
+      document.querySelectorAll('.avatar:not(.large)').forEach(a=>{ if(!localStorage.getItem('washdayAvatar')) a.textContent=initials; });
+
+      // Dorm Class Eyebrow
+      const dormEyebrow=document.getElementById('dormEyebrow');
+      if(dormEyebrow && data.dorm_class) dormEyebrow.textContent=`Dorm Building ${data.dorm_class} · Laundry room`;
+
+      // Check penalty status & show warning/suspension banner
+      const banner=document.getElementById('penaltyAlertBanner');
+      const bookBtn=document.getElementById('btnBookTimeSlot');
+      if(banner){
+        if(data.penalty_status==='suspended'){
+          const untilStr=data.suspended_until?new Date(data.suspended_until).toLocaleString():'further notice';
+          banner.style.display='block';
+          banner.style.background='#fff0ec';
+          banner.style.border='1px solid #e8a096';
+          banner.style.color='#8b2e24';
+          banner.innerHTML=`<b>⚠️ Account Suspended:</b> Laundry room access is suspended until <b>${untilStr}</b>.<br><small>Reason: ${data.penalty_reason||'Dorm policy violation'}. Slot booking and room access are locked. Contact your dorm supervisor.</small>`;
+          if(bookBtn){bookBtn.disabled=true;bookBtn.title='Account suspended';}
+        }else if(data.penalty_status==='blocked'){
+          banner.style.display='block';
+          banner.style.background='#fbeae9';
+          banner.style.border='1px solid #d66055';
+          banner.style.color='#8b2e24';
+          banner.innerHTML=`<b>🚫 Account Blocked:</b> Laundry access has been revoked by administration.<br><small>Reason: ${data.penalty_reason||'Disciplinary restriction'}. Contact your supervisor.</small>`;
+          if(bookBtn){bookBtn.disabled=true;bookBtn.title='Account blocked';}
+        }else if(data.penalty_status==='warning'){
+          banner.style.display='block';
+          banner.style.background='#fff8e6';
+          banner.style.border='1px solid #f3d48b';
+          banner.style.color='#7a5a17';
+          banner.innerHTML=`<b>⚠️ Supervisor Warning Notice:</b> ${data.penalty_reason||'Please observe laundry room rules and avoid late attendance'}. Repeated infractions will cause suspension.`;
+          if(bookBtn)bookBtn.disabled=false;
+        }else{
+          banner.style.display='none';
+          if(bookBtn)bookBtn.disabled=false;
+        }
+      }
+
+      for(const [id,value] of [['profileFullName',data.full_name],['profileUniversityId',data.university_id],['profileEmail',data.university_email],['profileMajor',data.major],['profilePhone',data.phone_number],['profileAge',data.age],['profileWhatsapp',data.whatsapp_number||'']]){
+        const el=document.getElementById(id);if(el)el.value=value||'';
+      }
+      const dorm=document.getElementById('profileDorm');if(dorm)dorm.value=data.dorm_class;
+    }catch(error){
+      notify(error.message||'Could not load your student profile.','error');
+    }
+  }
+
+  async function loadBackendMachines(){
+    try{
+      const c=await ZCSupabase.ready();
+      if(!zcDbProfile) await loadBackendProfile();
+      let query=c.from('laundry_machines').select('machine_key,display_name,dorm_class,status').order('display_name');
+      if(zcDbProfile?.dorm_class) query=query.eq('dorm_class',zcDbProfile.dorm_class);
+      const {data,error}=await query;
+      if(error)throw error;
+      zcDbMachines=data||[];
+
+      // Update available spaces count
+      const availCount=zcDbMachines.filter(m=>m.status==='available').length;
+      const countEl=document.getElementById('availableCount');
+      if(countEl)countEl.textContent=availCount;
+
+      // Update Live Machine Activity section
+      const listEl=document.getElementById('liveMachineList');
+      if(listEl){
+        listEl.replaceChildren();
+        if(!zcDbMachines.length){
+          listEl.innerHTML='<p class="empty" style="font-size:11px">No machines found for your dorm.</p>';
+        }else{
+          zcDbMachines.forEach(m=>{
+            const div=document.createElement('div');
+            div.className='machine';
+            const sym=document.createElement('div');
+            sym.className='machine-symbol';
+            sym.textContent='◉';
+            const text=document.createElement('div');
+            const b=document.createElement('b');
+            b.textContent=m.display_name;
+            const sm=document.createElement('small');
+            sm.textContent=m.status==='available'?'Idle · Ready to reserve':m.status==='busy'?'Cycle running · in use':'Maintenance / Offline';
+            text.append(b,sm);
+            const st=document.createElement('span');
+            st.className='status'+(m.status!=='available'?' busy':'');
+            st.textContent=m.status.toUpperCase().replaceAll('_',' ');
+            div.append(sym,text,st);
+            listEl.appendChild(div);
+          });
+        }
+      }
+
+      // Populate washer selector for booking
+      const box=document.querySelector('.washer-choices');
+      box.replaceChildren();
+      zcDbMachines.forEach((m,i)=>{
+        const b=document.createElement('button');
+        b.className='washer-choice'+(i===0?' selected':'');
+        b.disabled=m.status!=='available';
+        const name=document.createElement('b'),state=document.createElement('small');
+        name.textContent=m.display_name;
+        state.textContent=m.status==='available'?'Available':m.status.replaceAll('_',' ');
+        b.append(name,state);
+        b.onclick=()=>selectRemoteMachine(m.machine_key,m.display_name,b);
+        box.appendChild(b);
+      });
+
+      // Populate support tickets machine dropdown
+      const supMach=document.getElementById('supportMachine');
+      if(supMach){
+        supMach.innerHTML='<option value="">-- None / Not machine-related --</option>';
+        zcDbMachines.forEach(m=>{
+          const opt=document.createElement('option');
+          opt.value=m.machine_key;
+          opt.textContent=`${m.display_name} (Dorm ${m.dorm_class})`;
+          supMach.appendChild(opt);
+        });
+      }
+
+      if(zcDbMachines.length)await selectRemoteMachine(zcDbMachines[0].machine_key,zcDbMachines[0].display_name,box.firstElementChild);
+      else{slotsEl.innerHTML='<p class="empty">No washers are configured for your dorm yet.</p>';zcSelectedMachineKey=null;}
+    }catch(error){
+      notify(error.message||'Could not load available washers.','error');
+    }
+  }
+
+  async function selectRemoteMachine(key,name,button){
+    zcSelectedMachineKey=key;
+    selectedWasher=Number(key.match(/\d+/)?.[0]||1);
+    document.querySelectorAll('.washer-choice').forEach(b=>b.classList.toggle('selected',b===button));
+    document.getElementById('checkoutTitle').textContent=name+' · Review your ticket';
+    await loadBackendSlots();
+  }
+
+  async function loadBackendSlots(){
+    if(!zcSelectedMachineKey)return;
+    try{
+      const c=await ZCSupabase.ready(),{from,until}=localDayRange(selectedDay);
+      const {data,error}=await c.rpc('student_available_slots',{p_from:from.toISOString(),p_until:until.toISOString(),p_machine_key:zcSelectedMachineKey});
+      if(error)throw error;
+      zcDbSlots=data||[];
+      renderSlots();
+    }catch(error){
+      zcDbSlots=[];
+      renderSlots();
+      notify(error.message||'Could not load open slots.','error');
+    }
+  }
+
+  function renderSlots(){
+    if(!zcDbSlots.length){
+      slotsEl.innerHTML='<p class="empty">No open slots for this washer and date. Select another day or machine.</p>';
+      return;
+    }
+    slotsEl.innerHTML=zcDbSlots.map((slot,i)=>{
+      const time=new Date(slot.starts_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:false});
+      return `<button class="slot ${selectedSlot===i?'selected':''}" onclick="selectSlot(${i})"><div class="slot-top"><time>${time}</time><span class="count">Available</span></div><small>${slot.duration_minutes} min · ${slot.machine_name}</small></button>`;
+    }).join('');
+  }
+
   function selectDay(i){selectedDay=i;selectedSlot=null;zcSelectedSlot=null;renderDays();loadBackendSlots()}
-  function selectSlot(i){selectedSlot=i;zcSelectedSlot=zcDbSlots[i];renderSlots();if(!zcSelectedSlot)return;const date=new Date(zcSelectedSlot.starts_at),end=new Date(date.getTime()+zcSelectedSlot.duration_minutes*60000);document.getElementById('bookingDate').textContent=zcSelectedSlot.machine_name+' · '+date.toLocaleString([],{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+' – '+end.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});bookingExists=true;document.getElementById('bookingStatus').textContent='SELECTED';document.getElementById('bookingAction').textContent='✓  Confirm this slot';notify('Time selected. Review the terms before booking.')}
-  async function openTicketCheckout(){if(!zcSelectedSlot){notify('Choose an available server slot first.','error');return}try{const c=await ZCSupabase.ready();const {data,error}=await c.rpc('student_ticket_price');if(error)throw error;const price=(data||0)/100;document.getElementById('checkoutPrice').textContent='EGP '+price.toFixed(2);document.getElementById('checkoutTitle').textContent=zcSelectedSlot.machine_name+' · Review your ticket';document.getElementById('checkoutAgree').checked=false;document.getElementById('payTicketButton').disabled=true;updatePaymentAction();document.getElementById('ticketCheckout').classList.add('open')}catch(error){notify(error.message||'Ticket price is not available.','error')}}
-  async function startTicketPayment(){if(!document.getElementById('checkoutAgree').checked)return;if(!zcSelectedSlot){notify('Choose an available server slot first.','error');return}const method=document.querySelector('input[name="paymentMethod"]:checked').value;if(method==='wallet'){const button=document.getElementById('payTicketButton');button.disabled=true;try{const c=await ZCSupabase.ready();const {data,error}=await c.rpc('student_pay_ticket_from_wallet',{p_slot_id:zcSelectedSlot.slot_id});if(error)throw error;closeTicketCheckout();await window.ZCPayments.loadWalletBalance();notify('Ticket confirmed and paid from your wallet.','success');loadTickets('all');loadBackendSlots();loadNextBooking()}catch(error){notify(error.message||'Wallet payment could not be completed.','error')}finally{button.disabled=false}return}closeTicketCheckout();await window.ZCPayments.start({kind:'ticket',paymentMethod:document.querySelector('input[name="paymobMethod"]:checked')?.value||'card',machineKey:zcSelectedSlot.machine_key,slotStart:zcSelectedSlot.starts_at,buttonId:'payTicketButton'})}
+
+  function selectSlot(i){
+    selectedSlot=i;
+    zcSelectedSlot=zcDbSlots[i];
+    renderSlots();
+    if(!zcSelectedSlot)return;
+    const date=new Date(zcSelectedSlot.starts_at),end=new Date(date.getTime()+zcSelectedSlot.duration_minutes*60000);
+    document.getElementById('bookingDate').textContent=zcSelectedSlot.machine_name+' · '+date.toLocaleString([],{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+' – '+end.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    bookingExists=true;
+    document.getElementById('bookingStatus').textContent='SELECTED';
+    document.getElementById('bookingAction').textContent='✓  Confirm this slot';
+    notify('Time selected. Review the terms before booking.');
+  }
+
+  async function openTicketCheckout(){
+    if(zcDbProfile?.penalty_status==='suspended'||zcDbProfile?.penalty_status==='blocked'){
+      notify('Cannot book: Your laundry account is restricted.','error');
+      return;
+    }
+    if(!zcSelectedSlot){notify('Choose an available server slot first.','error');return}
+    try{
+      const c=await ZCSupabase.ready();
+      const {data,error}=await c.rpc('student_ticket_price');
+      if(error)throw error;
+      const price=(data||0)/100;
+      document.getElementById('checkoutPrice').textContent='EGP '+price.toFixed(2);
+      document.getElementById('checkoutTitle').textContent=zcSelectedSlot.machine_name+' · Review your ticket';
+      document.getElementById('checkoutAgree').checked=false;
+      document.getElementById('payTicketButton').disabled=true;
+      updatePaymentAction();
+      document.getElementById('ticketCheckout').classList.add('open');
+    }catch(error){
+      notify(error.message||'Ticket price is not available.','error');
+    }
+  }
+
+  async function startTicketPayment(){
+    if(!document.getElementById('checkoutAgree').checked)return;
+    if(!zcSelectedSlot){notify('Choose an available server slot first.','error');return}
+    const method=document.querySelector('input[name="paymentMethod"]:checked').value;
+    if(method==='wallet'){
+      const button=document.getElementById('payTicketButton');
+      button.disabled=true;
+      try{
+        const c=await ZCSupabase.ready();
+        const {data,error}=await c.rpc('student_pay_ticket_from_wallet',{p_slot_id:zcSelectedSlot.slot_id});
+        if(error)throw error;
+        closeTicketCheckout();
+        await window.ZCPayments.loadWalletBalance();
+        notify('Ticket confirmed and paid from your wallet. Loyalty points awarded!','success');
+        loadTickets('all');
+        loadBackendSlots();
+        loadNextBooking();
+        loadLoyaltyBalance();
+      }catch(error){
+        notify(error.message||'Wallet payment could not be completed.','error');
+      }finally{
+        button.disabled=false;
+      }
+      return;
+    }
+    closeTicketCheckout();
+    await window.ZCPayments.start({kind:'ticket',paymentMethod:document.querySelector('input[name="paymobMethod"]:checked')?.value||'card',machineKey:zcSelectedSlot.machine_key,slotStart:zcSelectedSlot.starts_at,buttonId:'payTicketButton'});
+  }
+
   async function renderTickets(filter){
     ticketFilter = filter;
     const list = document.getElementById('ticketList');
@@ -185,113 +479,459 @@
       list.innerHTML = '<p class="empty">Could not load tickets: ' + (error.message || 'Backend unavailable') + '</p>';
     }
   }
+
   async function loadTickets(filter='all'){await renderTickets(filter)}
-  async function cancelStudentTicket(id){if(!confirm('Cancel this ticket? Eligible wallet-paid tickets are refunded automatically.'))return;try{const c=await ZCSupabase.ready();const {error}=await c.rpc('student_cancel_ticket',{p_ticket_id:id});if(error)throw error;notify('Ticket cancelled.','success');loadTickets(ticketFilter);loadWalletActivity();loadBackendSlots();loadNextBooking()}catch(error){notify(error.message||'Could not cancel ticket.','error')}}
+
+  async function cancelStudentTicket(id){
+    if(!confirm('Cancel this ticket? Eligible wallet-paid tickets are refunded automatically.'))return;
+    try{
+      const c=await ZCSupabase.ready();
+      const {error}=await c.rpc('student_cancel_ticket',{p_ticket_id:id});
+      if(error)throw error;
+      notify('Ticket cancelled.','success');
+      loadTickets(ticketFilter);
+      loadWalletActivity();
+      loadBackendSlots();
+      loadNextBooking();
+    }catch(error){
+      notify(error.message||'Could not cancel ticket.','error');
+    }
+  }
+
   async function showTicketQr(id){
     const modal=document.getElementById('ticketQrModal'),
           canvas=document.getElementById('ticketQrCanvas'),
+          timerEl=document.getElementById('ticketQrTimer'),
           message=document.getElementById('ticketQrMessage');
+
+    if(qrCountdownTimer) clearInterval(qrCountdownTimer);
     canvas.replaceChildren();
-    message.innerHTML='<span style="color:#078f9d">⏳ Generating secure door access QR code...</span>';
+    timerEl.innerHTML='';
+    message.innerHTML='<span style="color:#078f9d">⏳ Verifying time window & generating secure access QR...</span>';
     modal.hidden=false;
+
     try{
       const c=await ZCSupabase.ready();
       const {data,error}=await c.rpc('student_issue_ticket_qr',{p_ticket_id:id});
       if(error)throw error;
-      if(!data)throw new Error('No QR token returned by server.');
-      canvas.replaceChildren();
-      let rendered = false;
-      if(window.QRCode){
-        try{
-          new QRCode(canvas,{
-            text:data,
-            width:210,
-            height:210,
-            colorDark:'#075567',
-            colorLight:'#ffffff',
-            correctLevel:QRCode.CorrectLevel.M
-          });
-          rendered = true;
-        }catch(qrErr){
-          console.warn('QRCode canvas error, using fallback image:', qrErr);
+      if(!data)throw new Error('No QR status returned by server.');
+
+      if(data.allowed && data.status==='active'){
+        canvas.replaceChildren();
+        let rendered=false;
+        if(window.QRCode){
+          try{
+            new QRCode(canvas,{
+              text:data.qr_data,
+              width:210,
+              height:210,
+              colorDark:'#075567',
+              colorLight:'#ffffff',
+              correctLevel:QRCode.CorrectLevel.M
+            });
+            rendered=true;
+          }catch(qrErr){
+            console.warn('QRCode canvas error, using fallback:', qrErr);
+          }
         }
+        if(!rendered){
+          const img=document.createElement('img');
+          img.src='https://api.qrserver.com/v1/create-qr-code/?size=210x210&data='+encodeURIComponent(data.qr_data);
+          img.alt='Door Access QR Code';
+          img.style.borderRadius='8px';
+          img.style.boxShadow='0 4px 14px rgba(7,85,103,0.12)';
+          canvas.appendChild(img);
+        }
+
+        let secondsRemaining=data.time_remaining_seconds||600;
+        timerEl.innerHTML=`<div style="background:#e8f5ed;color:#1e5e3a;padding:8px 12px;border-radius:8px">⏳ <b>Active QR Access:</b> Expires in <span id="qrCountdownVal">${formatCountdown(secondsRemaining)}</span> (at ${new Date(data.valid_until).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})})</div>`;
+        message.innerHTML='<b style="color:#078f9d;display:block;font-size:11px;margin-bottom:4px">🔑 Valid for Door Access (IoT ESP32/STM32)</b><span style="font-size:10px;color:var(--muted)">Scan at laundry door reader. QR vanishes 10 minutes after slot start.</span>';
+
+        qrCountdownTimer=setInterval(()=>{
+          secondsRemaining--;
+          if(secondsRemaining<=0){
+            clearInterval(qrCountdownTimer);
+            canvas.replaceChildren();
+            timerEl.innerHTML='<div style="background:#fff0ec;color:#8b2e24;padding:8px 12px;border-radius:8px;font-weight:700">⚠️ QR Code Expired</div>';
+            message.innerHTML='<span style="color:#8b2e24;font-size:11px">The 10-minute door check-in period has ended. Door access is locked. Contact your dorm supervisor.</span>';
+          }else{
+            const cd=document.getElementById('qrCountdownVal');
+            if(cd) cd.textContent=formatCountdown(secondsRemaining);
+          }
+        },1000);
+
+      }else if(data.status==='early'){
+        canvas.replaceChildren();
+        const startFormatted=new Date(data.starts_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+        timerEl.innerHTML=`<div style="background:#eef7f8;color:#075567;padding:12px;border-radius:10px;font-size:12px"><b>⏰ Access not yet open</b><br>Your booking starts at <b>${startFormatted}</b>.<br>The door QR code will activate exactly when your slot begins.</div>`;
+        message.innerHTML='<span style="font-size:10px;color:var(--muted)">Door locks remain secured until the slot start time. Please return at your booking time.</span>';
+      }else if(data.status==='expired'){
+        canvas.replaceChildren();
+        timerEl.innerHTML=`<div style="background:#fff0ec;color:#8b2e24;padding:12px;border-radius:10px;font-size:12px"><b>❌ 10-Minute Access Window Closed</b><br>${data.message}</div>`;
+        message.innerHTML='<span style="font-size:10px;color:var(--muted)">For safety and room turnover, door access credentials expire 10 minutes after slot start time.</span>';
+      }else{
+        canvas.replaceChildren();
+        timerEl.innerHTML=`<div style="background:#fff0ec;color:#8b2e24;padding:12px;border-radius:10px;font-size:12px"><b>🚫 Access Denied</b><br>${data.message||'Restricted by server.'}</div>`;
+        message.innerHTML='';
       }
-      if(!rendered){
-        const img = document.createElement('img');
-        img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=210x210&data=' + encodeURIComponent(data);
-        img.alt = 'Door Access QR Code';
-        img.style.borderRadius = '8px';
-        img.style.boxShadow = '0 4px 14px rgba(7,85,103,0.12)';
-        canvas.appendChild(img);
-      }
-      message.innerHTML='<b style="color:#078f9d;display:block;font-size:11px;margin-bottom:4px">🔑 Valid for Door Access (IoT ESP32/STM32)</b><span style="font-size:9px;color:var(--muted)">Single-use encrypted ticket credential. Point this QR at the laundry room door scanner to unlock.</span>';
     }catch(error){
       canvas.replaceChildren();
-      message.innerHTML='<span style="color:#d66055;font-weight:700">❌ '+(error.message||'QR is not available yet.')+'</span>';
+      timerEl.innerHTML='';
+      message.innerHTML='<span style="color:#d66055;font-weight:700">❌ '+(error.message||'QR is not available.')+'</span>';
     }
   }
 
   async function loadNextBooking(){
-    const statEl = document.getElementById('bookingStatus'),
-          dateEl = document.getElementById('bookingDate'),
-          actEl  = document.getElementById('bookingAction');
-    try {
-      const c = await ZCSupabase.ready();
-      const { data, error } = await c.from('laundry_tickets')
+    const statEl=document.getElementById('bookingStatus'),
+          dateEl=document.getElementById('bookingDate'),
+          actEl=document.getElementById('bookingAction');
+    try{
+      const c=await ZCSupabase.ready();
+      const {data,error}=await c.from('laundry_tickets')
         .select('id, status, created_at, laundry_slots(starts_at, duration_minutes, machine_key, laundry_machines(display_name))')
         .eq('status', 'confirmed')
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if(error || !data || !data.length){
-        statEl.textContent = 'NO BOOKINGS';
-        dateEl.textContent = 'No active laundry tickets';
-        actEl.textContent  = '＋  Book a washer';
-        zcNextTicketId = null;
+      if(error||!data||!data.length){
+        statEl.textContent='NO BOOKINGS';
+        dateEl.textContent='No active laundry tickets';
+        actEl.textContent='＋  Book a washer';
+        zcNextTicketId=null;
         return;
       }
 
-      const now = Date.now();
-      const upcoming = data.filter(t => {
-        const slot = t.laundry_slots;
-        if (!slot?.starts_at) return false;
-        const end = new Date(slot.starts_at).getTime() + (slot.duration_minutes || 30) * 60000 + 10 * 60000;
-        return end > now;
-      }).sort((a,b) => new Date(a.laundry_slots.starts_at) - new Date(b.laundry_slots.starts_at));
+      const now=Date.now();
+      const upcoming=data.filter(t=>{
+        const slot=t.laundry_slots;
+        if(!slot?.starts_at) return false;
+        const end=new Date(slot.starts_at).getTime()+(slot.duration_minutes||30)*60000+10*60000;
+        return end>now;
+      }).sort((a,b)=>new Date(a.laundry_slots.starts_at)-new Date(b.laundry_slots.starts_at));
 
-      const next = upcoming[0];
-      if(!next || !next.laundry_slots){
-        statEl.textContent = 'NO BOOKINGS';
-        dateEl.textContent = 'No upcoming laundry slots';
-        actEl.textContent  = '＋  Book a washer';
-        zcNextTicketId = null;
+      const next=upcoming[0];
+      if(!next||!next.laundry_slots){
+        statEl.textContent='NO BOOKINGS';
+        dateEl.textContent='No upcoming laundry slots';
+        actEl.textContent='＋  Book a washer';
+        zcNextTicketId=null;
         return;
       }
 
-      zcNextTicketId = next.id;
-      const slot = next.laundry_slots;
-      const start = new Date(slot.starts_at);
-      const end = new Date(start.getTime() + (slot.duration_minutes || 30) * 60000);
-      const machName = slot.laundry_machines?.display_name || slot.machine_key;
+      zcNextTicketId=next.id;
+      const slot=next.laundry_slots;
+      const start=new Date(slot.starts_at);
+      const end=new Date(start.getTime()+(slot.duration_minutes||30)*60000);
+      const machName=slot.laundry_machines?.display_name||slot.machine_key;
 
-      statEl.textContent = 'CONFIRMED';
-      dateEl.textContent = machName + ' · ' + start.toLocaleString([],{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) + ' – ' + end.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-      actEl.textContent = '⌑  Show door access QR';
-    } catch(err) {
+      statEl.textContent='CONFIRMED';
+      dateEl.textContent=machName+' · '+start.toLocaleString([],{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+' – '+end.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      actEl.textContent='⌑  Show door access QR';
+    }catch(err){
       console.warn('Could not load next booking:', err);
-      statEl.textContent = 'NO BOOKINGS';
-      dateEl.textContent = 'No active laundry tickets';
-      actEl.textContent  = '＋  Book a washer';
-      zcNextTicketId = null;
+      statEl.textContent='NO BOOKINGS';
+      dateEl.textContent='No active laundry tickets';
+      actEl.textContent='＋  Book a washer';
+      zcNextTicketId=null;
     }
   }
-  function closeTicketQr(){document.getElementById('ticketQrModal').hidden=true}
-  async function loadWalletActivity(){const box=document.getElementById('walletActivity');try{const c=await ZCSupabase.ready();const {data,error}=await c.from('wallet_ledger').select('amount_cents,entry_type,note,created_at').order('created_at',{ascending:false}).limit(30);if(error)throw error;if(!data?.length){box.innerHTML='<p class="empty">No wallet transactions yet.</p>';return}box.replaceChildren();data.forEach(item=>{const row=document.createElement('article');row.className='ticket-card';const copy=document.createElement('div'),b=document.createElement('b'),p=document.createElement('p');b.textContent=item.entry_type.replaceAll('_',' ');p.textContent=new Date(item.created_at).toLocaleString()+' · '+(item.note||'');const amount=document.createElement('strong');amount.textContent=(item.amount_cents<0?'−':'+')+'EGP '+(Math.abs(item.amount_cents)/100).toFixed(2);copy.append(b,p);row.append(copy,amount);box.append(row)})}catch(error){box.innerHTML='<p class="empty">Wallet history unavailable: '+(error.message||'Backend not configured')+'</p>'}}
-  async function submitSupport(e){e.preventDefault();try{const c=await ZCSupabase.ready(),catText=document.getElementById('supportCategory').value,description=document.getElementById('supportDescription').value.trim(),category=/washer/i.test(catText)?'washer':/booking/i.test(catText)?'booking':/payment/i.test(catText)?'payment':/complaint/i.test(catText)?'complaint':'other';const {data:{user}}=await c.auth.getUser();if(!zcDbProfile)await loadBackendProfile();const subject=(catText+': '+description).slice(0,160);const {error}=await c.from('support_tickets').insert({user_id:user.id,dorm_class:zcDbProfile.dorm_class,category,subject,description});if(error)throw error;e.target.reset();notify('Support request sent.','success');loadSupportRequests()}catch(error){notify(error.message||'Could not submit support request.','error')}}
-  async function loadSupportRequests(){const box=document.getElementById('supportList');if(!box)return;try{const c=await ZCSupabase.ready();const {data,error}=await c.from('support_tickets').select('id,category,subject,status,created_at').order('created_at',{ascending:false}).limit(30);if(error)throw error;if(!data?.length){box.innerHTML='<p class="empty">You have no support requests yet.</p>';return}box.replaceChildren();data.forEach(t=>{const row=document.createElement('div');row.className='ticket-card';const info=document.createElement('div'),b=document.createElement('b'),p=document.createElement('p'),state=document.createElement('span');b.textContent=t.subject;p.textContent=new Date(t.created_at).toLocaleString();state.className='ticket-state open';state.textContent=t.status;info.append(b,p);row.append(info,state);box.append(row)})}catch(error){box.innerHTML='<p class="empty">Support history unavailable: '+(error.message||'Backend not configured')+'</p>'}}
-  async function saveProfile(e){e.preventDefault();const value=document.getElementById('profileWhatsapp').value.trim();try{const c=await ZCSupabase.ready(),{data:{user}}=await c.auth.getUser();const {error}=await c.from('student_profiles').update({whatsapp_number:value||null}).eq('user_id',user.id);if(error)throw error;notify('WhatsApp number updated.','success')}catch(error){notify(error.message||'Could not update WhatsApp number.','error')}}
-  async function savePassword(e){e.preventDefault();const current=document.getElementById('currentPassword').value,next=document.getElementById('newPassword').value,confirmPassword=document.getElementById('confirmNewPassword').value;if(next!==confirmPassword){notify('New passwords do not match.','error');return}if(next.length<12||!/[A-Z]/.test(next)||!/[a-z]/.test(next)||!/[0-9]/.test(next)||!/[^A-Za-z0-9]/.test(next)){notify('Use 12+ characters with uppercase, lowercase, a number, and a symbol.','error');return}try{const c=await ZCSupabase.ready(),{data:{user}}=await c.auth.getUser();const {error:reauthError}=await c.auth.signInWithPassword({email:user.email,password:current});if(reauthError)throw new Error('Current password is incorrect.');const {error}=await c.auth.updateUser({password:next});if(error)throw error;await c.rpc('record_user_audit',{p_action:'password_changed',p_details:'Password updated'});e.target.reset();notify('Password updated.','success')}catch(error){notify(error.message||'Could not update password.','error')}}
-  function showPane(name,button){currentPane=name;document.getElementById('overviewPane').style.display=name==='overview'?'block':'none';document.querySelectorAll('.feature-pane').forEach(p=>p.classList.toggle('active',p.id===name+'Pane'));document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));if(button)button.classList.add('active');else{const b=[...document.querySelectorAll('.nav button')].find(x=>x.querySelector('.label')?.dataset.en===paneNames[name]);if(b)b.classList.add('active')}document.getElementById('crumbTitle').textContent=(document.documentElement.lang==='ar'?arText[paneNames[name]]:paneNames[name])||paneNames[name];if(name==='wallet'){window.ZCPayments?.loadWalletBalance();loadWalletActivity()}if(name==='bookings')loadTickets(ticketFilter);if(name==='support')loadSupportRequests();window.scrollTo({top:0,behavior:'smooth'})}
-  document.addEventListener('DOMContentLoaded',()=>{renderDays();loadBackendProfile();loadBackendMachines();loadNextBooking();window.ZCPayments?.loadWalletBalance();loadWalletActivity();loadTickets('all');loadSupportRequests()});</script>
+
+  function closeTicketQr(){
+    if(qrCountdownTimer) clearInterval(qrCountdownTimer);
+    document.getElementById('ticketQrModal').hidden=true;
+  }
+
+  async function loadWalletActivity(){
+    const box=document.getElementById('walletActivity');
+    try{
+      const c=await ZCSupabase.ready();
+      const {data,error}=await c.from('wallet_ledger').select('amount_cents,entry_type,note,created_at').order('created_at',{ascending:false}).limit(30);
+      if(error)throw error;
+      if(!data?.length){box.innerHTML='<p class="empty">No wallet transactions yet.</p>';return}
+      box.replaceChildren();
+      data.forEach(item=>{
+        const row=document.createElement('article');
+        row.className='ticket-card';
+        const copy=document.createElement('div'),b=document.createElement('b'),p=document.createElement('p');
+        b.textContent=item.entry_type.replaceAll('_',' ');
+        p.textContent=new Date(item.created_at).toLocaleString()+' · '+(item.note||'');
+        const amount=document.createElement('strong');
+        amount.textContent=(item.amount_cents<0?'−':'+')+'EGP '+(Math.abs(item.amount_cents)/100).toFixed(2);
+        copy.append(b,p);
+        row.append(copy,amount);
+        box.append(row);
+      });
+    }catch(error){
+      box.innerHTML='<p class="empty">Wallet history unavailable: '+(error.message||'Backend not configured')+'</p>';
+    }
+  }
+
+  // Loyalty Rewards Functions
+  async function loadLoyaltyBalance(){
+    try{
+      const c=await ZCSupabase.ready();
+      const {data,error}=await c.rpc('get_loyalty_balance');
+      if(error)throw error;
+      zcLoyaltyData=data||{points:0,ratio:10,min_redeem_points:100};
+
+      const ptsEl=document.getElementById('loyaltyPointsDisplay');
+      const cashEl=document.getElementById('loyaltyCashDisplay');
+      const ruleEl=document.getElementById('loyaltyRuleText');
+      const minLbl=document.getElementById('minRedeemLabel');
+      const inp=document.getElementById('redeemPointsInput');
+
+      if(ptsEl) ptsEl.textContent=`${zcLoyaltyData.points} pts`;
+      if(cashEl) cashEl.textContent=`≈ EGP ${(zcLoyaltyData.egp_value||0).toFixed(2)}`;
+      if(ruleEl) ruleEl.textContent=`${zcLoyaltyData.ratio} Points = EGP 1.00 (${zcLoyaltyData.ratio * 20} pts = EGP 20.00 wallet credit)`;
+      if(minLbl) minLbl.textContent=`${zcLoyaltyData.min_redeem_points} pts`;
+      if(inp){
+        inp.min=zcLoyaltyData.min_redeem_points;
+        inp.max=Math.max(zcLoyaltyData.points, zcLoyaltyData.min_redeem_points);
+        updateRedeemPreview();
+      }
+      loadLoyaltyHistory();
+    }catch(err){
+      console.warn('Could not load loyalty balance:', err);
+    }
+  }
+
+  function setRedeemPts(val, btn){
+    document.getElementById('redeemPointsInput').value=val;
+    document.querySelectorAll('#loyaltyPane .topup-choices button').forEach(b=>b.classList.toggle('chosen',b===btn));
+    updateRedeemPreview();
+  }
+
+  function setRedeemAllPts(btn){
+    document.getElementById('redeemPointsInput').value=zcLoyaltyData.points||0;
+    document.querySelectorAll('#loyaltyPane .topup-choices button').forEach(b=>b.classList.toggle('chosen',b===btn));
+    updateRedeemPreview();
+  }
+
+  function updateRedeemPreview(){
+    const pts=Number(document.getElementById('redeemPointsInput').value)||0;
+    const ratio=zcLoyaltyData.ratio||10;
+    const cash=(pts/ratio).toFixed(2);
+    const prev=document.getElementById('redeemCashPreview');
+    if(prev) prev.textContent=`EGP ${cash}`;
+  }
+
+  async function redeemLoyaltyPoints(e){
+    e.preventDefault();
+    const pts=Number(document.getElementById('redeemPointsInput').value);
+    if(!pts||pts<zcLoyaltyData.min_redeem_points){
+      notify(`Minimum redemption is ${zcLoyaltyData.min_redeem_points} points.`,'error');
+      return;
+    }
+    if(pts>zcLoyaltyData.points){
+      notify(`You only have ${zcLoyaltyData.points} points.`,'error');
+      return;
+    }
+    const btn=document.getElementById('btnRedeemPoints');
+    btn.disabled=true;
+    try{
+      const c=await ZCSupabase.ready();
+      const {data,error}=await c.rpc('student_redeem_loyalty_points',{p_points:pts});
+      if(error)throw error;
+      notify(`✦ Points converted! Added EGP ${Number(data.credited_egp).toFixed(2)} to your laundry wallet.`,'success');
+      await loadLoyaltyBalance();
+      await window.ZCPayments?.loadWalletBalance();
+      await loadWalletActivity();
+    }catch(err){
+      notify(err.message||'Could not redeem loyalty points.','error');
+    }finally{
+      btn.disabled=false;
+    }
+  }
+
+  async function loadLoyaltyHistory(){
+    const list=document.getElementById('loyaltyHistoryList');
+    if(!list)return;
+    try{
+      const c=await ZCSupabase.ready();
+      const {data,error}=await c.from('loyalty_ledger').select('points,entry_type,note,created_at').order('created_at',{ascending:false}).limit(20);
+      if(error)throw error;
+      if(!data?.length){
+        list.innerHTML='<p class="empty">No reward activity recorded yet.</p>';
+        return;
+      }
+      list.replaceChildren();
+      data.forEach(item=>{
+        const row=document.createElement('div');
+        row.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #edf2f2';
+        const info=document.createElement('div');
+        const b=document.createElement('b');
+        b.textContent=item.entry_type.replaceAll('_',' ').toUpperCase();
+        b.style.fontSize='10px';
+        const p=document.createElement('div');
+        p.textContent=new Date(item.created_at).toLocaleDateString()+' · '+(item.note||'');
+        p.style.fontSize='10px';
+        p.style.color='var(--muted)';
+        info.append(b,p);
+        const ptsSpan=document.createElement('strong');
+        ptsSpan.style.color=item.points>0?'#1e5e3a':'#8b2e24';
+        ptsSpan.textContent=(item.points>0?'+':'')+item.points+' pts';
+        row.append(info,ptsSpan);
+        list.appendChild(row);
+      });
+    }catch(err){
+      console.warn('Loyalty history load error:', err);
+    }
+  }
+
+  // Support Tickets
+  async function submitSupport(e){
+    e.preventDefault();
+    const btn=document.getElementById('btnSubmitSupport');
+    btn.disabled=true;
+    try{
+      const c=await ZCSupabase.ready();
+      const cat=document.getElementById('supportCategory').value;
+      const machKey=document.getElementById('supportMachine').value||null;
+      const urgency=document.getElementById('supportUrgency').value||'medium';
+      const subject=document.getElementById('supportSubject').value.trim();
+      const description=document.getElementById('supportDescription').value.trim();
+
+      const {data:{user}}=await c.auth.getUser();
+      if(!zcDbProfile)await loadBackendProfile();
+
+      const {error}=await c.from('support_tickets').insert({
+        user_id:user.id,
+        dorm_class:zcDbProfile.dorm_class,
+        category:cat,
+        machine_key:machKey,
+        urgency:urgency,
+        subject:subject,
+        description:description
+      });
+      if(error)throw error;
+      e.target.reset();
+      notify('Support ticket created. Staff will review it shortly.','success');
+      loadSupportRequests();
+    }catch(error){
+      notify(error.message||'Could not submit support request.','error');
+    }finally{
+      btn.disabled=false;
+    }
+  }
+
+  async function loadSupportRequests(){
+    const box=document.getElementById('supportList');
+    if(!box)return;
+    try{
+      const c=await ZCSupabase.ready();
+      const {data,error}=await c.rpc('student_list_my_support_tickets');
+      if(error)throw error;
+      if(!data?.length){
+        box.innerHTML='<p class="empty">You have no support requests yet.</p>';
+        return;
+      }
+      box.replaceChildren();
+      data.forEach(t=>{
+        const row=document.createElement('div');
+        row.className='ticket-card';
+        row.style.display='block';
+        row.style.marginBottom='10px';
+
+        const head=document.createElement('div');
+        head.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px';
+        const num=document.createElement('b');
+        num.style.cssText='font-size:11px;color:#075567';
+        num.textContent=t.ticket_number+' · '+(t.category||'').toUpperCase();
+        const st=document.createElement('span');
+        st.className='ticket-state '+(t.status==='open'?'open':'');
+        st.textContent=t.status.toUpperCase();
+        head.append(num,st);
+
+        const sub=document.createElement('div');
+        sub.style.fontWeight='700';
+        sub.style.fontSize='12px';
+        sub.textContent=t.subject;
+
+        const body=document.createElement('p');
+        body.style.cssText='font-size:11px;color:#556b72;margin:4px 0 6px;line-height:1.4';
+        body.textContent=t.description;
+
+        const meta=document.createElement('div');
+        meta.style.cssText='font-size:10px;color:var(--muted)';
+        meta.textContent=(t.machine_name?`Machine: ${t.machine_name} · `:'')+new Date(t.created_at).toLocaleString();
+
+        row.append(head,sub,body,meta);
+
+        if(t.resolution){
+          const resBox=document.createElement('div');
+          resBox.style.cssText='margin-top:8px;padding:8px 10px;background:#e8f5ed;border-left:3px solid #1e5e3a;border-radius:4px;font-size:11px;color:#1e5e3a';
+          resBox.innerHTML=`<b>Staff Resolution:</b> ${t.resolution}`;
+          row.appendChild(resBox);
+        }
+
+        box.appendChild(row);
+      });
+    }catch(error){
+      box.innerHTML='<p class="empty">Support history unavailable: '+(error.message||'Backend error')+'</p>';
+    }
+  }
+
+  async function saveProfile(e){
+    e.preventDefault();
+    const value=document.getElementById('profileWhatsapp').value.trim();
+    try{
+      const c=await ZCSupabase.ready(),{data:{user}}=await c.auth.getUser();
+      const {error}=await c.from('student_profiles').update({whatsapp_number:value||null}).eq('user_id',user.id);
+      if(error)throw error;
+      notify('WhatsApp number updated.','success');
+    }catch(error){
+      notify(error.message||'Could not update WhatsApp number.','error');
+    }
+  }
+
+  async function savePassword(e){
+    e.preventDefault();
+    const current=document.getElementById('currentPassword').value,next=document.getElementById('newPassword').value,confirmPassword=document.getElementById('confirmNewPassword').value;
+    if(next!==confirmPassword){notify('New passwords do not match.','error');return}
+    if(next.length<12||!/[A-Z]/.test(next)||!/[a-z]/.test(next)||!/[0-9]/.test(next)||!/[^A-Za-z0-9]/.test(next)){notify('Use 12+ characters with uppercase, lowercase, a number, and a symbol.','error');return}
+    try{
+      const c=await ZCSupabase.ready(),{data:{user}}=await c.auth.getUser();
+      const {error:reauthError}=await c.auth.signInWithPassword({email:user.email,password:current});
+      if(reauthError)throw new Error('Current password is incorrect.');
+      const {error}=await c.auth.updateUser({password:next});
+      if(error)throw error;
+      await c.rpc('record_user_audit',{p_action:'password_changed',p_details:'Password updated'});
+      e.target.reset();
+      notify('Password updated.','success');
+    }catch(error){
+      notify(error.message||'Could not update password.','error');
+    }
+  }
+
+  function showPane(name,button){
+    currentPane=name;
+    document.getElementById('overviewPane').style.display=name==='overview'?'block':'none';
+    document.querySelectorAll('.feature-pane').forEach(p=>p.classList.toggle('active',p.id===name+'Pane'));
+    document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+    if(button)button.classList.add('active');
+    else{
+      const b=[...document.querySelectorAll('.nav button')].find(x=>x.querySelector('.label')?.dataset.en===paneNames[name]);
+      if(b)b.classList.add('active');
+    }
+    document.getElementById('crumbTitle').textContent=(document.documentElement.lang==='ar'?arText[paneNames[name]]:paneNames[name])||paneNames[name];
+    if(name==='wallet'){window.ZCPayments?.loadWalletBalance();loadWalletActivity()}
+    if(name==='loyalty'){loadLoyaltyBalance()}
+    if(name==='bookings')loadTickets(ticketFilter);
+    if(name==='support')loadSupportRequests();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    updateLiveDate();
+    renderDays();
+    loadBackendProfile();
+    loadBackendMachines();
+    loadNextBooking();
+    window.ZCPayments?.loadWalletBalance();
+    loadWalletActivity();
+    loadLoyaltyBalance();
+    loadTickets('all');
+    loadSupportRequests();
+  });</script>
 </body>
 </html>

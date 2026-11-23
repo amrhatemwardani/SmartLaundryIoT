@@ -1,11 +1,127 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Support queue · ZC Dorm Laundry</title><script src="auth.js" defer></script><script src="supabase-client.js" defer></script><script src="notifications.js" defer></script><style>*{box-sizing:border-box}body{margin:0;background:#f4f7f7;color:#172e39;font:14px Arial,sans-serif}header{display:flex;justify-content:space-between;padding:15px 24px;background:white;border-bottom:1px solid #e1e9ea}a{color:#078f9d;text-decoration:none;font-weight:700;font-size:11px;margin-left:12px}main{max-width:1100px;margin:auto;padding:28px 20px}h1{font-size:25px;margin:0 0 7px}.sub{color:#71838a;font-size:12px;margin:0 0 20px}.filters{display:flex;gap:8px;margin-bottom:14px}select,button{padding:9px 12px;border:1px solid #dae6e7;border-radius:8px;background:white;color:#172e39;font-weight:700;font-size:11px;cursor:pointer}.list{display:grid;gap:10px}.item{background:white;border:1px solid #e1e9ea;border-radius:12px;padding:15px;display:grid;grid-template-columns:1fr auto;gap:14px}.item h2{font-size:14px;margin:0 0 7px}.item p{font-size:11px;line-height:1.55;color:#586d74;white-space:pre-wrap}.meta{font-size:10px;color:#74878c}.actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.primary{background:#078f9d;color:white;border-color:#078f9d}.empty{background:white;padding:18px;border-radius:10px;color:#71838a}@media(max-width:640px){.item{grid-template-columns:1fr}.actions{justify-content:flex-start}}
-</style></head><body><header><b>ZC · Dorm Laundry · Support queue</b><nav><a id="overviewLink" href="supervisor.html">Overview</a><a href="approvals.html">Approvals</a><a href="audit.html">Audit log</a><a href="logout.html" data-logout>Log out</a></nav></header><main><h1>Support & complaints</h1><p class="sub">Student support requests in the dorms assigned to your staff role.</p><div class="filters"><select id="statusFilter"><option value="">All requests</option><option value="open">Open</option><option value="in_progress">In progress</option><option value="resolved">Resolved</option><option value="closed">Closed</option></select><button onclick="loadSupportQueue()">Refresh</button></div><section class="list" id="supportQueue"><p class="empty">Loading support requests…</p></section></main><script>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Support & complaints queue · ZC Dorm Laundry</title><script src="auth.js" defer></script><script src="supabase-client.js" defer></script><script src="notifications.js" defer></script><style>@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');*{box-sizing:border-box}body{margin:0;background:#f4f7f7;color:#172e39;font:14px 'DM Sans'}header{display:flex;justify-content:space-between;padding:15px 24px;background:white;border-bottom:1px solid #e1e9ea;align-items:center}.brand{font:800 13px Manrope;color:#075567}a{color:#078f9d;text-decoration:none;font-weight:700;font-size:11px;margin-left:12px}main{max-width:1100px;margin:auto;padding:28px 20px}h1{font:800 25px Manrope;margin:0 0 7px}.sub{color:#71838a;font-size:12px;margin:0 0 20px}.filters{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}select,button{padding:8px 12px;border:1px solid #dae6e7;border-radius:8px;background:white;color:#172e39;font-weight:700;font-size:11px;cursor:pointer}.list{display:grid;gap:12px}.item{background:white;border:1px solid #e1e9ea;border-radius:12px;padding:16px;display:grid;grid-template-columns:1fr auto;gap:16px}.ticket-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}.ticket-num{font:800 12px Manrope;color:#075567}.pill{display:inline-block;padding:3px 8px;border-radius:12px;font-size:9px;font-weight:700;text-transform:uppercase}.pill.washer{background:#e5f5f5;color:#087886}.pill.wallet,.pill.payment{background:#eef2f7;color:#2c3e50}.pill.door_access{background:#fff8e6;color:#7a5a17}.pill.urgent{background:#fff0ec;color:#8b2e24}.pill.status-open{background:#eef7f8;color:#078f9d}.pill.status-in_progress{background:#fff8e6;color:#7a5a17}.pill.status-resolved{background:#e8f5ed;color:#1e5e3a}.pill.status-closed{background:#f1f5f5;color:#71838a}.item h2{font-size:14px;font-weight:700;margin:4px 0 6px}.item p{font-size:11px;line-height:1.55;color:#586d74;margin:0 0 8px;white-space:pre-wrap}.meta{font-size:10px;color:#74878c;margin-top:6px}.resolution-box{margin-top:8px;padding:8px 12px;background:#e8f5ed;border-left:3px solid #1e5e3a;border-radius:4px;font-size:11px;color:#1e5e3a}.actions{display:flex;gap:7px;align-items:flex-start;flex-wrap:wrap}.primary{background:#078f9d;color:white;border-color:#078f9d}.empty{background:white;padding:24px;border-radius:12px;color:#71838a;text-align:center;border:1px solid #e1e9ea}@media(max-width:640px){.item{grid-template-columns:1fr}.actions{justify-content:flex-start}}
+</style></head><body><header><div class="brand">ZC · Zewail City Laundry · Support & complaints</div><nav><a id="overviewLink" href="supervisor.html">Overview</a><a href="approvals.html">Approvals</a><a href="audit.html">Audit log</a><a href="logout.html" data-logout>Log out</a></nav></header><main><h1>Student support tickets</h1><p class="sub">Review complaints, hardware faults, booking errors, and door access issues scoped to your staff assignment.</p><div class="filters"><label style="font-size:11px;font-weight:700">Status: <select id="statusFilter"><option value="">All tickets</option><option value="open">Open</option><option value="in_progress">In progress</option><option value="resolved">Resolved</option><option value="closed">Closed</option></select></label><label style="font-size:11px;font-weight:700">Category: <select id="categoryFilter"><option value="">All topics</option><option value="washer">Washer hardware</option><option value="booking">Bookings</option><option value="payment">Payment & billing</option><option value="wallet">Wallet balance</option><option value="door_access">Door access</option><option value="complaint">Room complaints</option><option value="other">Other</option></select></label><button onclick="loadSupportQueue()">↻ Refresh</button></div><section class="list" id="supportQueue"><p class="empty">Loading support requests…</p></section></main><script>
+let cachedTickets = [];
+
 document.addEventListener('DOMContentLoaded',()=>{
   const s=WashdayAuth.currentSession();
   if(s?.role==='admin') document.getElementById('overviewLink').href='admin.html';
-  document.getElementById('statusFilter').addEventListener('change', loadSupportQueue);
+  document.getElementById('statusFilter').addEventListener('change', renderTicketsList);
+  document.getElementById('categoryFilter').addEventListener('change', renderTicketsList);
+  loadSupportQueue();
 });
-async function loadSupportQueue(){const list=document.getElementById('supportQueue');try{const c=await ZCSupabase.ready(),status=document.getElementById('statusFilter').value;const {data,error}=await c.rpc('staff_list_support_tickets',{p_status:status||null});if(error)throw error;list.replaceChildren();if(!data?.length){list.innerHTML='<p class="empty">No support requests found.</p>';return}data.forEach(t=>{const card=document.createElement('article');card.className='item';const copy=document.createElement('div'),title=document.createElement('h2'),meta=document.createElement('div'),desc=document.createElement('p');title.textContent=t.subject;meta.className='meta';meta.textContent=`${t.student_name} · ${t.student_email} · Dorm ${t.dorm_class} · ${t.category} · ${t.status} · ${new Date(t.created_at).toLocaleString()}`;desc.textContent=t.description;copy.append(title,meta,desc);const actions=document.createElement('div');actions.className='actions';for(const [label,next] of [['Start','in_progress'],['Resolve','resolved'],['Close','closed']]){const b=document.createElement('button');b.className=next==='resolved'?'primary':'';b.textContent=label;b.disabled=t.status===next||t.status==='closed';b.onclick=()=>updateSupport(t.ticket_id,next,b);actions.appendChild(b)}card.append(copy,actions);list.appendChild(card)})}catch(error){list.innerHTML='';const p=document.createElement('p');p.className='empty';p.textContent='Could not load queue: '+(error.message||'Backend not configured');list.append(p)}}
-async function updateSupport(id,status,button){let resolution=null;if(status==='resolved'||status==='closed'){resolution=prompt('Add a short response for the student:');if(!resolution||resolution.trim().length<3)return}button.disabled=true;try{const c=await ZCSupabase.ready();const {error}=await c.rpc('staff_update_support_ticket',{p_ticket_id:id,p_status:status,p_resolution:resolution});if(error)throw error;ZCNotify?.success('Support request updated; student notified.');loadSupportQueue()}catch(error){ZCNotify?.error(error.message||'Could not update request.');button.disabled=false}}
-document.addEventListener('DOMContentLoaded',loadSupportQueue);
+
+async function loadSupportQueue(){
+  const list=document.getElementById('supportQueue');
+  try{
+    const c=await ZCSupabase.ready();
+    const {data,error}=await c.rpc('staff_list_support_tickets');
+    if(error)throw error;
+    cachedTickets=data||[];
+    renderTicketsList();
+  }catch(error){
+    list.innerHTML='';
+    const p=document.createElement('p');
+    p.className='empty';
+    p.textContent='Could not load support queue: '+(error.message||'Backend not configured');
+    list.append(p);
+  }
+}
+
+function renderTicketsList(){
+  const list=document.getElementById('supportQueue');
+  const statusFilter=document.getElementById('statusFilter').value;
+  const categoryFilter=document.getElementById('categoryFilter').value;
+
+  const filtered=cachedTickets.filter(t => {
+    if(statusFilter && t.status !== statusFilter) return false;
+    if(categoryFilter && t.category !== categoryFilter) return false;
+    return true;
+  });
+
+  list.replaceChildren();
+  if(!filtered.length){
+    list.innerHTML='<p class="empty">No support tickets match the selected filters.</p>';
+    return;
+  }
+
+  filtered.forEach(t=>{
+    const card=document.createElement('article');
+    card.className='item';
+    const copy=document.createElement('div');
+
+    const topHeader=document.createElement('div');
+    topHeader.className='ticket-header';
+    const num=document.createElement('span');
+    num.className='ticket-num';
+    num.textContent=t.ticket_number || ('SUP-'+t.ticket_id.slice(0,6));
+    const catPill=document.createElement('span');
+    catPill.className='pill '+(t.category||'other');
+    catPill.textContent=(t.category||'other').replaceAll('_',' ');
+    const statPill=document.createElement('span');
+    statPill.className='pill status-'+t.status;
+    statPill.textContent=t.status.replaceAll('_',' ');
+    topHeader.append(num, catPill, statPill);
+
+    if(t.urgency==='high'||t.urgency==='urgent'){
+      const urg=document.createElement('span');
+      urg.className='pill urgent';
+      urg.textContent='⚠️ URGENT';
+      topHeader.appendChild(urg);
+    }
+
+    const title=document.createElement('h2');
+    title.textContent=t.subject;
+
+    const desc=document.createElement('p');
+    desc.textContent=t.description;
+
+    const meta=document.createElement('div');
+    meta.className='meta';
+    meta.textContent=`Student: ${t.student_name} (${t.student_email}) · Dorm ${t.dorm_class}${t.machine_name ? ' · Machine: '+t.machine_name : ''} · ${new Date(t.created_at).toLocaleString()}`;
+
+    copy.append(topHeader, title, desc, meta);
+
+    if(t.resolution){
+      const resBox=document.createElement('div');
+      resBox.className='resolution-box';
+      resBox.innerHTML=`<b>Staff Resolution Note:</b> ${t.resolution}`;
+      copy.appendChild(resBox);
+    }
+
+    const actions=document.createElement('div');
+    actions.className='actions';
+    for(const [label,next] of [['In Progress','in_progress'],['Resolve & Reply','resolved'],['Close','closed']]){
+      const b=document.createElement('button');
+      b.className=next==='resolved'?'primary':'';
+      b.textContent=label;
+      b.disabled=t.status===next||t.status==='closed';
+      b.onclick=()=>updateSupport(t.ticket_id,next,b);
+      actions.appendChild(b);
+    }
+    card.append(copy,actions);
+    list.appendChild(card);
+  });
+}
+
+async function updateSupport(id,status,button){
+  let resolution=null;
+  if(status==='resolved'||status==='closed'){
+    resolution=prompt('Enter resolution note to record and notify student:');
+    if(!resolution||resolution.trim().length<3){
+      ZCNotify?.error('Please enter a short resolution note.');
+      return;
+    }
+  }
+  button.disabled=true;
+  try{
+    const c=await ZCSupabase.ready();
+    const {error}=await c.rpc('staff_update_support_ticket',{p_ticket_id:id,p_status:status,p_resolution:resolution});
+    if(error)throw error;
+    ZCNotify?.success('Support ticket updated; student notified.');
+    loadSupportQueue();
+  }catch(error){
+    ZCNotify?.error(error.message||'Could not update request.');
+    button.disabled=false;
+  }
+}
 </script></body></html>

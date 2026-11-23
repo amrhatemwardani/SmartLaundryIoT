@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Loyalty & rewards · ZC Dorm Laundry Admin</title>
+  <script src="auth.js" defer></script>
+  <script src="loading.js" defer></script>
+  <script src="notifications.js" defer></script>
+  <link rel="stylesheet" href="admin-portal.css">
+  <style>
+    .stat-badge {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--teal, #078f9d);
+      margin: 4px 0;
+    }
+    .stat-card {
+      background: white;
+      border: 1px solid var(--line, #e0e9ea);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .stat-card small {
+      text-transform: uppercase;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--muted, #71838a);
+    }
+  </style>
+</head>
+<body>
+<div class="admin-app">
+  <aside class="admin-side">
+    <a class="admin-brand" href="admin.html">
+      <span class="admin-mark">ZC</span>
+      <span>ZC Dorm Laundry<br><small style="font:600 9px 'DM Sans';color:var(--muted)">Main administration</small></span>
+    </a>
+    <span class="admin-label">Workspace</span>
+    <nav class="admin-nav">
+      <a href="admin.html"><span class="nav-icon">⌂</span><span>Overview</span></a>
+      <a href="admin-staff.html"><span class="nav-icon">♙</span><span>People & access</span></a>
+      <a href="admin-finance.html"><span class="nav-icon">▤</span><span>Pricing & wallet</span></a>
+      <a class="active" href="admin-rewards.html"><span class="nav-icon">✦</span><span>Loyalty & rewards</span></a>
+      <a href="admin-systems.html"><span class="nav-icon">⚙</span><span>System & audit</span></a>
+      <a href="audit.html"><span class="nav-icon">≋</span><span>Audit log</span></a>
+    </nav>
+    <div class="admin-side-bottom">Student reward conversions immediately credit wallet ledger accounts.</div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-top">
+      <span class="admin-crumb">Administration / Loyalty & rewards</span>
+      <div class="admin-top-actions">
+        <span data-session-name>Admin</span>
+        <a href="logout.html" data-logout>Log out</a>
+      </div>
+    </div>
+
+    <section class="admin-heading">
+      <div>
+        <div class="admin-eyebrow">Dorm Incentive Program</div>
+        <h1>Loyalty rewards & point redemption</h1>
+        <p>Control reward points earned per laundry cycle, points-to-EGP cash conversion rates, and grant bonus points to students.</p>
+      </div>
+      <span class="pill" id="programStatusPill" style="background:#e8f5ed;color:#1e5e3a">PROGRAM ACTIVE</span>
+    </section>
+
+    <!-- Key Stats Grid -->
+    <div class="admin-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px">
+      <div class="stat-card">
+        <small>Total Points Issued</small>
+        <div class="stat-badge" id="statIssued">0 pts</div>
+        <p style="font-size:10px;color:var(--muted);margin:0">From washes & admin grants</p>
+      </div>
+      <div class="stat-card">
+        <small>Points Redeemed</small>
+        <div class="stat-badge" id="statRedeemed" style="color:#e07a5f">0 pts</div>
+        <p style="font-size:10px;color:var(--muted);margin:0">Converted to wallet cash</p>
+      </div>
+      <div class="stat-card">
+        <small>Active Points Pool</small>
+        <div class="stat-badge" id="statPool" style="color:#2a9d8f">0 pts</div>
+        <p style="font-size:10px;color:var(--muted);margin:0">Current student balances</p>
+      </div>
+      <div class="stat-card">
+        <small>Total Cash Paid</small>
+        <div class="stat-badge" id="statCashPaid" style="color:#264653">EGP 0.00</div>
+        <p style="font-size:10px;color:var(--muted);margin:0">Credited into laundry wallets</p>
+      </div>
+      <div class="stat-card">
+        <small>Active Students</small>
+        <div class="stat-badge" id="statStudents" style="color:#078f9d">0</div>
+        <p style="font-size:10px;color:var(--muted);margin:0">Holding reward points</p>
+      </div>
+    </div>
+
+    <div class="admin-grid">
+      <!-- Program Settings -->
+      <section class="admin-card">
+        <h2>Reward settings & conversion rates</h2>
+        <p>Set how students earn points and the conversion rate into Egyptian Pounds (e.g., 10 points = 1 EGP -> 200 points = 20 EGP).</p>
+        <form class="admin-form" onsubmit="saveLoyaltySettings(event)">
+          <div class="admin-fields">
+            <div class="admin-field">
+              <label for="cfgCyclePoints">Points awarded per completed wash</label>
+              <input id="cfgCyclePoints" type="number" min="1" max="1000" step="5" value="50" required>
+            </div>
+            <div class="admin-field">
+              <label for="cfgRatio">Points per 1 EGP (Conversion Ratio)</label>
+              <input id="cfgRatio" type="number" min="1" max="500" step="1" value="10" required oninput="updateRatioHint()">
+              <small id="ratioHint" style="font-size:10px;color:var(--muted);display:block;margin-top:4px">10 points = 1.00 EGP (200 points = 20.00 EGP)</small>
+            </div>
+          </div>
+          <div class="admin-fields">
+            <div class="admin-field">
+              <label for="cfgMinPoints">Minimum points to redeem</label>
+              <input id="cfgMinPoints" type="number" min="10" max="5000" step="10" value="100" required>
+            </div>
+            <div class="admin-field">
+              <label for="cfgEnabled">Program status</label>
+              <select id="cfgEnabled">
+                <option value="true">Active · Students can earn and redeem</option>
+                <option value="false">Paused · Temporarily disable redemptions</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <button class="admin-btn" id="btnSaveSettings">Save reward settings</button>
+          </div>
+        </form>
+        <div class="admin-note">Changes take effect immediately for all subsequent laundry bookings and redemptions.</div>
+      </section>
+
+      <!-- Grant Bonus Points -->
+      <section class="admin-card">
+        <h2>Grant student bonus points</h2>
+        <p>Award reward points to an individual student for dorm activities, competitions, or courtesy recovery.</p>
+        <form class="admin-form" onsubmit="grantBonusPoints(event)">
+          <div class="admin-field">
+            <label for="grantStudentSelect">Select student</label>
+            <select id="grantStudentSelect" required onchange="onGrantStudentChange(this.value)">
+              <option value="">Loading students…</option>
+            </select>
+          </div>
+          <div id="grantStudentBadge" style="display:none;padding:8px 12px;background:#e8f5ed;color:#1e5e3a;border-radius:8px;font-size:11px;margin-bottom:10px"></div>
+          <div class="admin-fields">
+            <div class="admin-field">
+              <label for="grantPoints">Points to award</label>
+              <input id="grantPoints" type="number" min="5" max="5000" step="5" value="50" required>
+              <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+                <button type="button" class="admin-btn outline" style="padding:4px 8px;font-size:10px" onclick="setGrantPts(50)">+50 pts</button>
+                <button type="button" class="admin-btn outline" style="padding:4px 8px;font-size:10px" onclick="setGrantPts(100)">+100 pts</button>
+                <button type="button" class="admin-btn outline" style="padding:4px 8px;font-size:10px" onclick="setGrantPts(200)">+200 pts</button>
+                <button type="button" class="admin-btn outline" style="padding:4px 8px;font-size:10px" onclick="setGrantPts(500)">+500 pts</button>
+              </div>
+            </div>
+            <div class="admin-field">
+              <label for="grantReason">Reason / Award campaign</label>
+              <input id="grantReason" maxlength="150" required placeholder="e.g. Dorm Cleanliness Winner / Service Courtesy" value="Dorm activity bonus">
+            </div>
+          </div>
+          <div>
+            <button class="admin-btn" id="btnGrantPoints">✦ Award bonus points</button>
+          </div>
+        </form>
+        <div class="admin-note warn">Points are instantly appended to the student's loyalty ledger and notify the student.</div>
+      </section>
+    </div>
+
+    <!-- Live Loyalty Ledger -->
+    <div class="admin-section-title">
+      <div>
+        <h2>Live rewards activity ledger</h2>
+        <p>Real-time audit log of all points issued, awarded, or redeemed across all dormitories.</p>
+      </div>
+      <button class="admin-btn secondary" style="font-size:11px;padding:6px 12px" onclick="loadLoyaltyData()">↻ Refresh ledger</button>
+    </div>
+
+    <section class="admin-card">
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;min-width:650px">
+          <thead>
+            <tr style="border-bottom:1px solid var(--line);text-align:left;color:var(--muted)">
+              <th style="padding:8px 6px">Date & time</th>
+              <th style="padding:8px 6px">Student</th>
+              <th style="padding:8px 6px">Points</th>
+              <th style="padding:8px 6px">Type</th>
+              <th style="padding:8px 6px">Reference / note</th>
+            </tr>
+          </thead>
+          <tbody id="loyaltyRows">
+            <tr><td colspan="5" style="padding:16px;text-align:center;color:var(--muted)">Loading reward events…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="supabase-client.js"></script>
+<script>
+let cachedStudents = [];
+
+function setGrantPts(val){
+  document.getElementById('grantPoints').value = val;
+}
+
+function updateRatioHint(){
+  const r = Number(document.getElementById('cfgRatio').value) || 10;
+  document.getElementById('ratioHint').textContent = `${r} points = 1.00 EGP (${r * 20} points = 20.00 EGP)`;
+}
+
+function onGrantStudentChange(userId){
+  const badge = document.getElementById('grantStudentBadge');
+  if(!userId){
+    badge.style.display = 'none';
+    return;
+  }
+  const st = cachedStudents.find(s => s.user_id === userId);
+  if(st){
+    badge.style.display = 'block';
+    badge.innerHTML = `<b>Selected:</b> ${st.full_name} (${st.university_email}) &nbsp;|&nbsp; <b>Dorm:</b> ${st.dorm_class}`;
+  }
+}
+
+async function loadStudents(){
+  const sel = document.getElementById('grantStudentSelect');
+  try{
+    const c = await ZCSupabase.ready();
+    const {data, error} = await c.rpc('admin_list_students');
+    if(error) throw error;
+    cachedStudents = data || [];
+    sel.innerHTML = '<option value="">-- Choose student from directory --</option>';
+    cachedStudents.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.user_id;
+      opt.textContent = `${s.full_name} (${s.university_email}) [Dorm ${s.dorm_class}]`;
+      sel.appendChild(opt);
+    });
+  }catch(err){
+    console.error('Error loading students:', err);
+    sel.innerHTML = '<option value="">(Failed to load student list)</option>';
+  }
+}
+
+async function loadLoyaltyData(){
+  try{
+    const c = await ZCSupabase.ready();
+    const {data, error} = await c.rpc('admin_get_loyalty_summary');
+    if(error) throw error;
+
+    // Fill settings inputs
+    if(data.settings){
+      document.getElementById('cfgCyclePoints').value = data.settings.points_per_cycle;
+      document.getElementById('cfgRatio').value = data.settings.ratio;
+      document.getElementById('cfgMinPoints').value = data.settings.min_redeem_points;
+      document.getElementById('cfgEnabled').value = String(data.settings.enabled);
+      updateRatioHint();
+
+      const pill = document.getElementById('programStatusPill');
+      if(data.settings.enabled){
+        pill.textContent = 'PROGRAM ACTIVE';
+        pill.style.background = '#e8f5ed';
+        pill.style.color = '#1e5e3a';
+      }else{
+        pill.textContent = 'PROGRAM PAUSED';
+        pill.style.background = '#fff0ec';
+        pill.style.color = '#8b2e24';
+      }
+    }
+
+    // Fill stats cards
+    if(data.stats){
+      document.getElementById('statIssued').textContent = `${data.stats.total_issued} pts`;
+      document.getElementById('statRedeemed').textContent = `${data.stats.total_redeemed} pts`;
+      document.getElementById('statPool').textContent = `${data.stats.active_points_pool} pts`;
+      document.getElementById('statCashPaid').textContent = `EGP ${(data.stats.total_cash_paid_cents / 100).toFixed(2)}`;
+      document.getElementById('statStudents').textContent = String(data.stats.active_participants);
+    }
+
+    // Load recent loyalty ledger entries
+    loadRecentLedger();
+  }catch(err){
+    ZCNotify?.error(err.message || 'Could not load loyalty program data.');
+  }
+}
+
+async function loadRecentLedger(){
+  const tbody = document.getElementById('loyaltyRows');
+  try{
+    const c = await ZCSupabase.ready();
+    const {data, error} = await c.from('loyalty_ledger')
+      .select('id, user_id, points, entry_type, reference, note, created_at, student_profiles(full_name, university_email)')
+      .order('created_at', {ascending: false})
+      .limit(50);
+    if(error) throw error;
+
+    if(!data?.length){
+      tbody.innerHTML = '<tr><td colspan="5" style="padding:16px;text-align:center;color:var(--muted)">No loyalty events recorded yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = '';
+    data.forEach(item => {
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid #edf2f2';
+      const dt = new Date(item.created_at).toLocaleString('en-GB', {dateStyle:'short', timeStyle:'short'});
+      const isPositive = item.points > 0;
+      const ptsStr = (isPositive ? '+' : '') + item.points + ' pts';
+      const studentName = item.student_profiles?.full_name || item.student_profiles?.university_email || 'Student';
+
+      tr.innerHTML = `
+        <td style="padding:8px 6px;white-space:nowrap">${dt}</td>
+        <td style="padding:8px 6px"><b>${studentName}</b></td>
+        <td style="padding:8px 6px;font-weight:700;color:${isPositive ? '#1e5e3a' : '#8b2e24'}">${ptsStr}</td>
+        <td style="padding:8px 6px"><span class="pill" style="font-size:9px">${item.entry_type.replaceAll('_', ' ')}</span></td>
+        <td style="padding:8px 6px;color:var(--muted);font-size:10px">${item.note || item.reference || '—'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }catch(err){
+    console.error('Ledger load error:', err);
+    tbody.innerHTML = `<tr><td colspan="5" style="padding:16px;text-align:center;color:#d66055">Failed to load ledger: ${err.message}</td></tr>`;
+  }
+}
+
+async function saveLoyaltySettings(e){
+  e.preventDefault();
+  const btn = document.getElementById('btnSaveSettings');
+  btn.disabled = true;
+  try{
+    const c = await ZCSupabase.ready();
+    const cyclePts = Number(document.getElementById('cfgCyclePoints').value);
+    const ratio = Number(document.getElementById('cfgRatio').value);
+    const minPts = Number(document.getElementById('cfgMinPoints').value);
+    const enabled = document.getElementById('cfgEnabled').value === 'true';
+
+    const {error} = await c.rpc('admin_update_loyalty_settings', {
+      p_points_per_cycle: cyclePts,
+      p_ratio: ratio,
+      p_min_points: minPts,
+      p_enabled: enabled
+    });
+    if(error) throw error;
+    ZCNotify?.success('Loyalty settings updated successfully.');
+    loadLoyaltyData();
+  }catch(err){
+    ZCNotify?.error(err.message || 'Could not update settings.');
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+async function grantBonusPoints(e){
+  e.preventDefault();
+  const sel = document.getElementById('grantStudentSelect');
+  const userId = sel.value;
+  const pts = Number(document.getElementById('grantPoints').value);
+  const reason = document.getElementById('grantReason').value.trim();
+
+  if(!userId){
+    ZCNotify?.error('Please select a student.');
+    return;
+  }
+  if(!pts || pts < 1){
+    ZCNotify?.error('Please enter a valid points amount.');
+    return;
+  }
+
+  const btn = document.getElementById('btnGrantPoints');
+  btn.disabled = true;
+  try{
+    const c = await ZCSupabase.ready();
+    const {data, error} = await c.rpc('admin_grant_loyalty_points', {
+      p_student_id: userId,
+      p_points: pts,
+      p_reason: reason
+    });
+    if(error) throw error;
+    ZCNotify?.success(`✦ Granted ${pts} points to student! Student notified.`);
+    loadLoyaltyData();
+  }catch(err){
+    ZCNotify?.error(err.message || 'Could not grant bonus points.');
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadStudents();
+  loadLoyaltyData();
+});
+</script>
+</body>
+</html>

@@ -1,10 +1,41 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Student approvals | Zewail City Laundry for Dorms</title><script src="auth.js" defer></script><style>@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');*{box-sizing:border-box}body{margin:0;background:#f4f7f7;color:#172e39;font:14px 'DM Sans'}header{padding:14px 24px;background:white;border-bottom:1px solid #e0e9ea;display:flex;justify-content:space-between;align-items:center}.brand{font:800 13px Manrope;color:#075567}.brand a,header a{color:#078f9d;text-decoration:none;font-size:10px;font-weight:700;margin-left:13px}main{max-width:1050px;margin:auto;padding:28px 22px}h1{font:800 25px Manrope;margin:0 0 6px}.sub{font-size:11px;color:#71838a;line-height:1.5;margin:0 0 18px}.notice{background:#fff4e7;color:#795c31;padding:10px 12px;border-radius:8px;font-size:9px;line-height:1.5;margin-bottom:14px}.list{display:grid;gap:10px}.item{display:grid;grid-template-columns:1fr auto;gap:15px;align-items:center;background:#fff;border:1px solid #e0e9ea;border-radius:12px;padding:15px}.item b{font-size:11px}.item p{font-size:9px;color:#71838a;margin:5px 0}.tag{display:inline-block;background:#e5f5f5;color:#087886;border-radius:20px;padding:4px 7px;font-size:8px;font-weight:700}.actions{display:flex;gap:6px}.btn{border:0;background:#078f9d;color:white;border-radius:7px;padding:8px 10px;font-size:9px;font-weight:700;cursor:pointer}.btn.red{background:#fff0ec;color:#a74c43}.btn:disabled{opacity:.55}.log{display:block;color:#078f9d;font-weight:700;text-decoration:none;font-size:10px;margin-top:18px}@media(max-width:600px){header{padding:12px}.item{grid-template-columns:1fr}.actions{justify-content:flex-start}}
-</style><script src="loading.js" defer></script><script src="notifications.js" defer></script></head><body><header><div class="brand">ZC · Zewail City Laundry for Dorms · Staff review</div><nav><a id="homeLink" href="supervisor.html">Dashboard</a><a href="audit.html">Activity log</a><a href="logout.html" data-logout>Log out</a></nav></header><main><h1>Student account approvals</h1><p class="sub">Review only after the student’s university email is verified. Approve or decline with a recorded reason.</p><div class="notice">Live student applications are loaded from Supabase. Decisions are scoped by role and dorm and recorded in the audit trail.</div><section class="list" id="requests"><p class="sub" style="padding:15px;background:white;border-radius:10px;text-align:center">Loading pending applications from secure server…</p></section><a class="log" href="audit.html">Review approval audit entries →</a></main>
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Student approvals & discipline | ZC Dorm Laundry</title><script src="auth.js" defer></script><style>@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');*{box-sizing:border-box}body{margin:0;background:#f4f7f7;color:#172e39;font:14px 'DM Sans'}header{padding:14px 24px;background:white;border-bottom:1px solid #e0e9ea;display:flex;justify-content:space-between;align-items:center}.brand{font:800 13px Manrope;color:#075567}.brand a,header a{color:#078f9d;text-decoration:none;font-size:10px;font-weight:700;margin-left:13px}main{max-width:1100px;margin:auto;padding:28px 22px}h1{font:800 25px Manrope;margin:0 0 6px}h2{font:800 18px Manrope;margin:28px 0 6px}.sub{font-size:11px;color:#71838a;line-height:1.5;margin:0 0 18px}.notice{background:#fff4e7;color:#795c31;padding:10px 12px;border-radius:8px;font-size:9px;line-height:1.5;margin-bottom:14px}.list{display:grid;gap:10px}.item{display:grid;grid-template-columns:1fr auto;gap:15px;align-items:center;background:#fff;border:1px solid #e0e9ea;border-radius:12px;padding:15px}.item b{font-size:11px}.item p{font-size:9px;color:#71838a;margin:5px 0}.tag{display:inline-block;background:#e5f5f5;color:#087886;border-radius:20px;padding:4px 7px;font-size:8px;font-weight:700}.tag.warn{background:#fff8e6;color:#7a5a17}.tag.danger{background:#fff0ec;color:#8b2e24}.actions{display:flex;gap:6px;flex-wrap:wrap}.btn{border:0;background:#078f9d;color:white;border-radius:7px;padding:7px 10px;font-size:9px;font-weight:700;cursor:pointer}.btn.outline{background:white;color:#172e39;border:1px solid #d4dedf}.btn.warn{background:#f39c12;color:white}.btn.red{background:#fff0ec;color:#a74c43;border:1px solid #f5c4be}.btn.danger{background:#e74c3c;color:white}.btn:disabled{opacity:.55}.log{display:block;color:#078f9d;font-weight:700;text-decoration:none;font-size:10px;margin-top:18px}.card-box{background:white;border:1px solid #e0e9ea;border-radius:12px;padding:16px;overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:11px;min-width:700px}th,td{padding:8px 6px;text-align:left;border-bottom:1px solid #edf2f2}th{color:#71838a;font-size:10px;text-transform:uppercase}@media(max-width:600px){header{padding:12px}.item{grid-template-columns:1fr}.actions{justify-content:flex-start}}
+</style><script src="loading.js" defer></script><script src="notifications.js" defer></script></head><body><header><div class="brand">ZC · Zewail City Laundry for Dorms · Staff review</div><nav><a id="homeLink" href="supervisor.html">Dashboard</a><a href="support-admin.html">Support queue</a><a href="audit.html">Activity log</a><a href="logout.html" data-logout>Log out</a></nav></header><main><h1>Student account approvals</h1><p class="sub">Review verified university signups for your assigned dorms. Approve or decline with recorded reasoning.</p><div class="notice">Decisions are strictly scoped by role and assigned dorm and recorded in the audit trail.</div><section class="list" id="requests"><p class="sub" style="padding:15px;background:white;border-radius:10px;text-align:center">Loading pending applications from secure server…</p></section>
+
+<h2>Manage student penalties & suspensions</h2>
+<p class="sub">Disciplinary control for dorm laundry rooms. Issue warnings, suspend access for a period (e.g. 7 days), or block accounts for rule violations.</p>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap">
+  <input id="penaltySearch" placeholder="Filter by student name, email, or ID…" style="padding:7px 12px;border:1px solid #d4dedf;border-radius:8px;font-size:11px;width:260px" oninput="filterPenaltyStudents()">
+  <button class="btn outline" onclick="loadDormStudents()">↻ Refresh students</button>
+</div>
+<section class="card-box">
+  <table>
+    <thead>
+      <tr>
+        <th>Student name</th>
+        <th>University email & ID</th>
+        <th>Dorm</th>
+        <th>Penalty status</th>
+        <th>Reason / Notes</th>
+        <th>Suspended until</th>
+        <th style="text-align:right">Disciplinary actions</th>
+      </tr>
+    </thead>
+    <tbody id="penaltyRows">
+      <tr><td colspan="7" style="text-align:center;color:#71838a;padding:16px">Loading dorm students…</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<a class="log" href="audit.html">Review approval & penalty audit entries →</a></main>
 <script src="supabase-client.js"></script><script>
+let cachedDormStudents = [];
+
 document.addEventListener('DOMContentLoaded',()=>{
   const s=WashdayAuth.currentSession();
   if(s?.role==='admin') document.getElementById('homeLink').href='admin-staff.html';
   else document.getElementById('homeLink').href='supervisor.html';
+  loadApprovals();
+  loadDormStudents();
 });
 
 async function loadApprovals(){
@@ -69,10 +100,114 @@ async function decideApplication(userId,state,button){
     if(error)throw error;
     ZCNotify?.success(`Student application ${state}.`);
     loadApprovals();
+    loadDormStudents();
   }catch(error){
     ZCNotify?.error(error.message||'Could not update application.');
     button.disabled=false;
   }
 }
-document.addEventListener('DOMContentLoaded',loadApprovals);
+
+// Student Penalties Management
+async function loadDormStudents(){
+  const tbody=document.getElementById('penaltyRows');
+  try{
+    const c=await ZCSupabase.ready();
+    const {data,error}=await c.rpc('staff_list_dorm_students');
+    if(error)throw error;
+    cachedDormStudents=data||[];
+    renderPenaltyRows(cachedDormStudents);
+  }catch(err){
+    tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:#d66055;padding:16px">Could not load students: ${err.message}</td></tr>`;
+  }
+}
+
+function filterPenaltyStudents(){
+  const q=(document.getElementById('penaltySearch').value||'').toLowerCase().trim();
+  if(!q){
+    renderPenaltyRows(cachedDormStudents);
+    return;
+  }
+  const filtered=cachedDormStudents.filter(s=>
+    (s.full_name||'').toLowerCase().includes(q) ||
+    (s.university_email||'').toLowerCase().includes(q) ||
+    (s.university_id||'').toLowerCase().includes(q)
+  );
+  renderPenaltyRows(filtered);
+}
+
+function renderPenaltyRows(students){
+  const tbody=document.getElementById('penaltyRows');
+  if(!students.length){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#71838a;padding:16px">No students found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML='';
+  students.forEach(s=>{
+    const tr=document.createElement('tr');
+    const pen=s.penalty_status||'none';
+    const tagCls = pen==='suspended'?'tag danger':pen==='blocked'?'tag danger':pen==='warning'?'tag warn':'tag';
+    const tagText = pen.toUpperCase();
+    const untilStr = s.suspended_until ? new Date(s.suspended_until).toLocaleDateString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+
+    tr.innerHTML = `
+      <td><b>${s.full_name}</b></td>
+      <td>${s.university_email}<br><small style="color:#71838a">ID: ${s.university_id}</small></td>
+      <td>Dorm ${s.dorm_class}</td>
+      <td><span class="${tagCls}">${tagText}</span></td>
+      <td style="font-size:10px;color:#556b72;max-width:180px">${s.penalty_reason||'—'}</td>
+      <td style="font-size:10px;white-space:nowrap">${untilStr}</td>
+      <td style="text-align:right">
+        <div class="actions" style="justify-content:flex-end">
+          <button class="btn warn" onclick="applyPenalty('${s.user_id}','warning')">⚠️ Warn</button>
+          <button class="btn danger" onclick="applyPenalty('${s.user_id}','suspended')">⏳ Suspend</button>
+          <button class="btn red" onclick="applyPenalty('${s.user_id}','blocked')">🚫 Block</button>
+          ${pen!=='none'?`<button class="btn outline" onclick="applyPenalty('${s.user_id}','none')">🟢 Reinstate</button>`:''}
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function applyPenalty(userId, status){
+  let reason = '';
+  let duration = null;
+
+  if(status==='warning'){
+    reason = prompt('Enter disciplinary warning reason:')||'';
+    if(!reason.trim()) return;
+  }else if(status==='suspended'){
+    const durStr = prompt('Suspension duration in days (e.g. 3, 7, 14):', '7');
+    if(!durStr) return;
+    duration = parseInt(durStr, 10);
+    if(isNaN(duration) || duration < 1){
+      ZCNotify?.error('Please enter a valid positive number of days.');
+      return;
+    }
+    reason = prompt('Enter reason for suspension:')||'';
+    if(!reason.trim()) return;
+  }else if(status==='blocked'){
+    if(!confirm('Are you sure you want to BLOCK this student from dorm laundry access?')) return;
+    reason = prompt('Enter reason for blocking account:')||'';
+    if(!reason.trim()) return;
+  }else if(status==='none'){
+    if(!confirm('Clear penalty and reinstate this student to normal status?')) return;
+    reason = 'Penalty cleared by supervisor';
+  }
+
+  try{
+    const c=await ZCSupabase.ready();
+    const {data, error}=await c.rpc('staff_set_student_penalty',{
+      p_student_id: userId,
+      p_penalty_status: status,
+      p_reason: reason,
+      p_duration_days: duration
+    });
+    if(error) throw error;
+    ZCNotify?.success(`Updated student penalty to: ${status.toUpperCase()}. Student notified.`);
+    loadDormStudents();
+  }catch(err){
+    ZCNotify?.error(err.message||'Could not update penalty.');
+  }
+}
 </script></body></html>
