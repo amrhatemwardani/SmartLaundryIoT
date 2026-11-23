@@ -453,25 +453,69 @@
 
         title.textContent = (slot?.laundry_machines?.display_name || slot?.machine_key || 'Washer') + ' · ' + short;
         when.textContent = t.start.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' · ' + (slot?.duration_minutes || 30) + ' min';
-        state.className = 'ticket-state ' + (t.displayStatus === 'confirmed' ? 'open' : '');
-        state.textContent = t.displayStatus.replaceAll('_', ' ');
-        info.append(title, when);
+
+        // Colour-coded status badges
+        if(t.displayStatus === 'confirmed' && !t.isPast){
+          state.className = 'ticket-state open';
+          state.textContent = '✓ CONFIRMED';
+          card.style.borderLeft = '3px solid var(--green)';
+        } else if(t.displayStatus === 'completed' || (t.displayStatus === 'confirmed' && t.isPast)){
+          state.className = 'ticket-state';
+          state.style.cssText = 'background:#edf1ef;color:#55665e;font-size:9px;font-weight:700;border-radius:20px;padding:6px 9px;white-space:nowrap';
+          state.textContent = '🔒 COMPLETED';
+          card.style.opacity = '0.80';
+          card.style.borderLeft = '3px solid #c9d3cf';
+        } else if(t.displayStatus === 'cancelled'){
+          state.className = 'ticket-state cancelled';
+          state.textContent = '✗ CANCELLED';
+          card.style.opacity = '0.65';
+        } else {
+          state.className = 'ticket-state';
+          state.textContent = t.displayStatus.replaceAll('_', ' ').toUpperCase();
+        }
+
+        // Show QR expiry time inline for completed tickets
+        if(t.isPast && slot?.starts_at){
+          const qrExp = new Date(t.end.getTime() + 10*60000);
+          const expNote = document.createElement('p');
+          expNote.style.cssText = 'margin:3px 0 0;font-size:9px;color:#8f9e97';
+          expNote.textContent = `QR access closed at ${qrExp.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+          info.append(title, when, expNote);
+        } else {
+          info.append(title, when);
+        }
         card.append(info, state);
 
         if(t.status === 'confirmed'){
-          const qr = document.createElement('button');
-          qr.className = 'secondary';
-          qr.textContent = 'Show access QR';
-          qr.onclick = () => showTicketQr(t.id);
-          card.append(qr);
+          if(t.isPast){
+            // Session over — show a locked/expired QR badge instead of a live button
+            const expiredBadge = document.createElement('button');
+            expiredBadge.className = 'secondary';
+            expiredBadge.style.cssText = 'opacity:0.65;cursor:pointer;border-color:#d9e3e1;color:#78817b';
+            expiredBadge.title = 'This session has ended. QR access is permanently closed.';
+            expiredBadge.textContent = '🔒 Session Ended';
+            expiredBadge.onclick = () => showExpiredTicketModal(t);
+            card.append(expiredBadge);
+          } else {
+            const qr = document.createElement('button');
+            qr.className = 'secondary';
+            qr.textContent = '⌑ Show access QR';
+            qr.onclick = () => showTicketQr(t.id);
+            card.append(qr);
 
-          if(!t.isPast && t.start > now + 120 * 60000){
-            const cancel = document.createElement('button');
-            cancel.className = 'secondary';
-            cancel.textContent = 'Cancel ticket';
-            cancel.onclick = () => cancelStudentTicket(t.id);
-            card.append(cancel);
+            if(t.start > new Date(now + 120 * 60000)){
+              const cancel = document.createElement('button');
+              cancel.className = 'secondary';
+              cancel.textContent = 'Cancel ticket';
+              cancel.onclick = () => cancelStudentTicket(t.id);
+              card.append(cancel);
+            }
           }
+        } else if(t.status === 'cancelled'){
+          const badge = document.createElement('span');
+          badge.style.cssText = 'font-size:9px;color:#78817b;padding:5px 9px;border:1px solid #dde3df;border-radius:20px;white-space:nowrap;margin-left:auto';
+          badge.textContent = '🚫 Cancelled';
+          card.append(badge);
         }
         list.appendChild(card);
       }
@@ -498,6 +542,60 @@
     }
   }
 
+  /* ── Expired session modal ─────────────────────────────────────── */
+  function showExpiredTicketModal(t){
+    const slot = t.laundry_slots;
+    const machineName = slot?.laundry_machines?.display_name || slot?.machine_key || 'Washer';
+    const slotStart = t.start ? t.start.toLocaleString([], {weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+    const slotEnd   = t.end   ? t.end.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—';
+    const qrExpiredAt = t.end ? new Date(t.end.getTime() + 10*60000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—';
+
+    const modal = document.getElementById('ticketQrModal');
+    const canvas = document.getElementById('ticketQrCanvas');
+    const timerEl = document.getElementById('ticketQrTimer');
+    const message = document.getElementById('ticketQrMessage');
+
+    if(qrCountdownTimer){ clearInterval(qrCountdownTimer); qrCountdownTimer=null; }
+    canvas.replaceChildren();
+    modal.hidden = false;
+
+    // Set modal title/subtitle to reflect expired state
+    const titleEl = document.getElementById('ticketQrTitle');
+    const subtitleEl = document.getElementById('ticketQrSubtitle');
+    if(titleEl) titleEl.textContent = '🔒 Session Ended — Access Closed';
+    if(subtitleEl) subtitleEl.textContent = `${machineName} · ${slotStart} – ${slotEnd} · QR window expired at ${qrExpiredAt}`;
+
+    // Show a "dead" QR placeholder — a greyed lock icon block
+    canvas.innerHTML = `
+      <div style="width:210px;height:210px;border-radius:12px;background:#f1f4f3;border:2px dashed #c9d3cf;
+                  display:grid;place-items:center;margin:10px auto;color:#8f9e97;text-align:center;padding:16px">
+        <div>
+          <div style="font-size:48px;line-height:1">🔒</div>
+          <div style="font-size:11px;margin-top:8px;font-weight:700">QR Code Expired</div>
+          <div style="font-size:9px;margin-top:4px;color:#a0aba6;line-height:1.5">
+            Door access permanently<br>closed for this session
+          </div>
+        </div>
+      </div>`;
+
+    timerEl.innerHTML = `
+      <div style="background:#f4f6f5;border:1px solid #d9e3e0;color:#55665e;padding:12px 14px;border-radius:10px;font-size:11px;line-height:1.6">
+        <b style="display:block;margin-bottom:4px">📋 Session Summary</b>
+        <div>Machine: <b>${machineName}</b></div>
+        <div>Slot: <b>${slotStart} – ${slotEnd}</b></div>
+        <div>QR access window: <b>Opened at ${slotStart.split(', ').pop()} · Closed at ${qrExpiredAt}</b></div>
+        <div style="margin-top:6px;padding:6px 8px;background:#fff0ec;color:#8b2e24;border-radius:7px;font-size:10px">
+          ⚠️ The 10-minute QR access window for this slot has permanently closed. No door entry is possible.
+        </div>
+      </div>`;
+
+    message.innerHTML = `
+      <span style="font-size:10px;color:var(--muted)">
+        This ticket is now <b style="color:#55665e">completed/expired</b>. The QR code that was valid during your slot is now permanently invalidated by the server.
+        If you believe this is an error, please <a href="#" style="color:var(--green)" onclick="showPane('support');closeTicketQr();return false">open a support ticket</a>.
+      </span>`;
+  }
+
   async function showTicketQr(id){
     const modal=document.getElementById('ticketQrModal'),
           canvas=document.getElementById('ticketQrCanvas'),
@@ -509,6 +607,11 @@
     timerEl.innerHTML='';
     message.innerHTML='<span style="color:#078f9d">⏳ Verifying time window & generating secure access QR...</span>';
     modal.hidden=false;
+    // Reset modal title for live QR
+    const qrTitleEl=document.getElementById('ticketQrTitle');
+    const qrSubEl=document.getElementById('ticketQrSubtitle');
+    if(qrTitleEl) qrTitleEl.textContent='Laundry door access QR';
+    if(qrSubEl) qrSubEl.textContent='Show this one-time QR at the laundry door during your ticket window.';
 
     try{
       const c=await ZCSupabase.ready();
