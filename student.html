@@ -259,7 +259,7 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
     </div>
     </section>
   </main>
-</div><div class="policy-modal" id="studentPolicyModal" role="dialog" aria-modal="true" aria-labelledby="studentPolicyTitle" onclick="if(event.target===this)closeStudentPolicy()"><section class="policy-card"><button class="policy-close" onclick="closeStudentPolicy()" aria-label="Close">×</button><span class="policy-kicker">ZC DORM LAUNDRY</span><h2 id="studentPolicyTitle"></h2><div id="studentPolicyBody" class="policy-body"></div><p class="policy-draft">Project draft: Zewail City must review and approve the final policy before production.</p><button class="primary" onclick="closeStudentPolicy()">I understand</button></section></div><div class="notification-panel" id="notificationPanel" role="dialog" aria-modal="false" aria-labelledby="notificationTitle" hidden><div class="notification-panel-head"><div><h2 id="notificationTitle">Notifications</h2><small id="notificationStatus">Connecting securely…</small></div><button type="button" aria-label="Close notifications" onclick="closeNotifications()">×</button></div><button type="button" class="notification-push-enable" onclick="enableFirebasePush()">Enable browser notifications</button><div id="notificationItems" class="notification-items"><p class="notification-empty">Your notifications will appear here after secure account setup.</p></div></div><div class="checkout-modal" id="ticketCheckout" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle"><div class="checkout-box"><button class="checkout-close" onclick="closeTicketCheckout()" aria-label="Close">×</button><div class="checkout-kicker">ZC DORM LAUNDRY · TICKET CHECKOUT</div><h2 id="checkoutTitle">Before you book</h2><p class="checkout-sub">Please review the laundry, safety, and privacy information before you pay.</p><div class="checkout-rules"><h3>Use the washer safely</h3><ul><li>Follow the posted washer instructions and load limits.</li><li>Keep personal items with you and leave the area clean.</li><li>Report equipment faults or hazards to the supervisor.</li></ul><h3>Room access & privacy</h3><ul><li>Your ticket is for one washer and one time slot.</li><li>Door access is tied to your paid ticket and recorded for safety.</li><li>Do not share your QR ticket; emergency exit hardware works independently.</li></ul><h3>Cancellation & no-show</h3><p>The final cancellation, refund, and no-show rules must be approved by the university before real payment is enabled.</p></div><label class="checkout-agree"><input id="checkoutAgree" type="checkbox" onchange="document.getElementById('payTicketButton').disabled=!this.checked"/><span>I have read and agree to the laundry instructions, safety information, privacy notice, and booking policy.</span></label><div class="payment-methods"><label><input type="radio" name="paymentMethod" value="wallet" checked onchange="updatePaymentAction()"/><span><b>Pay from wallet</b><small>Balance: <em id="checkoutWalletBalance">EGP 0.00</em></small></span></label><label><input type="radio" name="paymentMethod" value="paymob" onchange="updatePaymentAction()"/><span><b>Online payment</b><small>Paymob hosted checkout: mobile wallets, debit or credit cards, and Apple Pay where enabled.</small></span></label></div><div id="paymobMethodChoices" hidden><p style="font-size:9px;font-weight:700;margin:10px 0 6px">Choose online method</p><div class="payment-methods"><label><input type="radio" name="paymobMethod" value="card" checked/><span><b>Debit / credit card</b><small>Secure Paymob checkout</small></span></label><label><input type="radio" name="paymobMethod" value="wallet"/><span><b>Mobile wallet</b><small>Available methods depend on Paymob account setup</small></span></label></div></div><div class="checkout-total"><span>Ticket price</span><b id="checkoutPrice">EGP 25.00</b></div><button class="primary" id="payTicketButton" disabled onclick="startTicketPayment()">Pay with wallet</button><p class="checkout-sub">The ticket is confirmed only after the server verifies payment.</p></div></div><div class="ticket-qr-modal" id="ticketQrModal" hidden><section><button type="button" onclick="closeTicketQr()" aria-label="Close">×</button><h2 id="ticketQrTitle">Laundry door access QR</h2><p id="ticketQrSubtitle">Show this one-time QR at the laundry door during your ticket window.</p><div id="ticketQrCanvas"></div><div id="ticketQrTimer" style="margin:10px 0;font-size:12px;font-weight:700"></div><small id="ticketQrMessage"></small></section></div><div class="toast" id="toast"></div>
+</div><div class="policy-modal" id="studentPolicyModal" role="dialog" aria-modal="true" aria-labelledby="studentPolicyTitle" onclick="if(event.target===this)closeStudentPolicy()"><section class="policy-card"><button class="policy-close" onclick="closeStudentPolicy()" aria-label="Close">×</button><span class="policy-kicker">ZC DORM LAUNDRY</span><h2 id="studentPolicyTitle"></h2><div id="studentPolicyBody" class="policy-body"></div><p class="policy-draft">Project draft: Zewail City must review and approve the final policy before production.</p><button class="primary" onclick="closeStudentPolicy()">I understand</button></section></div><div class="notification-panel" id="notificationPanel" role="dialog" aria-modal="false" aria-labelledby="notificationTitle" hidden><div class="notification-panel-head"><div><h2 id="notificationTitle">Notifications</h2><small id="notificationStatus">Connecting securely…</small></div><button type="button" aria-label="Close notifications" onclick="closeNotifications()">×</button></div><button type="button" class="notification-push-enable" onclick="enableFirebasePush()">Enable browser notifications</button><div id="notificationItems" class="notification-items"><p class="notification-empty">Your notifications will appear here after secure account setup.</p></div></div><div class="checkout-modal" id="ticketCheckout" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle"><div class="checkout-box"><button class="checkout-close" onclick="closeTicketCheckout()" aria-label="Close">×</button><div class="checkout-kicker">STEP 4: INTERACTIVE WASHER RESERVATION</div><h2 id="checkoutTitle">Review & Confirm Your Washer</h2><div class="checkout-washer-card" id="checkoutWasherCard" style="display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#075567,#078f9d);color:#fff;border-radius:14px;padding:16px;margin:12px 0"><div style="flex:none;width:52px;height:62px;background:#c8e8e6;border:2px solid #8bbcb8;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 0 #fff8"><div style="width:30px;height:30px;border-radius:50%;border:2px solid #7ab0ac;background:radial-gradient(circle at 35% 35%,#c8f0ee,#5aa7a3 60%,#2d7a76);box-shadow:0 0 0 4px #22c77840"></div></div><div style="flex:1"><b id="checkoutMachineName" style="font:800 15px Manrope;display:block">Washer</b><div id="checkoutSlotTime" style="font-size:11px;color:#cce2d8;margin-top:2px">Today · 05:30 PM – 06:00 PM</div><div id="checkoutUnlockNotice" style="font-size:10px;color:#d8f07d;font-weight:700;margin-top:4px">🚪 Door unlocks 10 min before slot</div></div></div><div class="checkout-rules" style="padding:10px 14px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Location:</span><b id="checkoutDormText">Dorm Building B · Laundry Room</b></div><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Cycle Duration:</span><b>30 Minutes (Standard Wash)</b></div><div style="display:flex;justify-content:space-between"><span>IoT Door Access:</span><b style="color:var(--green)">Dynamic Single-Use QR</b></div></div><label class="checkout-agree"><input id="checkoutAgree" type="checkbox" onchange="document.getElementById('payTicketButton').disabled=!this.checked"/><span>I understand door QR access activates 10 minutes before my slot and is single-use for dorm laundry safety.</span></label><div class="payment-methods"><label><input type="radio" name="paymentMethod" value="wallet" checked onchange="updatePaymentAction()"/><span><b>Pay from wallet (Instant Confirmation)</b><small>Available balance: <em id="checkoutWalletBalance" style="font-weight:700;color:var(--green)">EGP 0.00</em></small></span></label><label><input type="radio" name="paymentMethod" value="paymob" onchange="updatePaymentAction()"/><span><b>Online payment (Card / Mobile Wallet)</b><small>Paymob hosted checkout</small></span></label></div><div id="paymobMethodChoices" hidden><p style="font-size:9px;font-weight:700;margin:10px 0 6px">Choose online method</p><div class="payment-methods"><label><input type="radio" name="paymobMethod" value="card" checked/><span><b>Debit / credit card</b></span></label><label><input type="radio" name="paymobMethod" value="wallet"/><span><b>Mobile wallet</b></span></label></div></div><div class="checkout-total" style="align-items:center;margin:12px 0 8px"><div><span style="font-size:11px;color:var(--muted);display:block">Total Due</span><small style="font-size:9px;color:#22c778">✓ Includes 30-min machine & door access</small></div><b id="checkoutPrice" style="font:800 20px Manrope;color:var(--ink)">EGP 25.00</b></div><button class="primary" id="payTicketButton" disabled onclick="startTicketPayment()" style="font:800 14px Manrope;padding:14px;border-radius:12px;background:linear-gradient(135deg,#078f9d,#0ab5c5)">Confirm & Book Washer →</button><p class="checkout-sub" style="text-align:center;margin-top:8px">Single-use QR code will be generated upon confirmed reservation.</p></div></div><div class="ticket-qr-modal" id="ticketQrModal" hidden><section><button type="button" onclick="closeTicketQr()" aria-label="Close">×</button><h2 id="ticketQrTitle">Laundry door access QR</h2><p id="ticketQrSubtitle">Show this one-time QR at the laundry door during your ticket window.</p><div id="ticketQrCanvas"></div><div id="ticketQrTimer" style="margin:10px 0;font-size:12px;font-weight:700"></div><small id="ticketQrMessage"></small></section></div><div class="toast" id="toast"></div>
 <script>
   function openStudentPolicy(kind){const specs={rules:['Laundry room rules','<h3>Before using a machine</h3><p>Follow the posted load limits and machine instructions. Check pockets and keep small items out of the drum.</p><h3>Room safety</h3><p>Keep walkways clear, do not touch electrical or IoT equipment, and report faults or hazards to the dorm supervisor. Emergency exits must remain accessible.</p><h3>Your booking</h3><p>Use only the washer and time slot shown on your ticket. Arrive on time, leave the area clean, and do not share your door QR code. Cancel if you can no longer attend.</p>'],privacy:['Privacy notice','<h3>Information used</h3><p>The service may use your university account, contact details, booking and payment status, support requests, and door access events to operate the dorm laundry service.</p><h3>Access and retention</h3><p>Students can view their own records. Supervisors and administrators receive access needed for their duties. Final retention periods and a privacy contact must be confirmed by Zewail City.</p><h3>Your choices</h3><p>Contact support to request a correction or ask a privacy question. Never send passwords or full payment card details in a support request.</p>'],terms:['Terms & conditions','<h3>Bookings and tickets</h3><p>A ticket reserves the washer and slot shown before payment. A real ticket is confirmed only after payment is verified. Cancellation, refund, and no-show rules must be approved and displayed before live payment is enabled.</p><h3>Safe use</h3><p>Follow posted machine instructions, keep the laundry room safe, and report equipment issues. Do not tamper with locks, QR scanners, or sensors.</p><h3>Door access</h3><p>Use your own time-limited ticket QR only during its valid access window. Emergency exit hardware must work independently of the app.</p>']};const spec=specs[kind];if(!spec)return;document.getElementById('studentPolicyTitle').textContent=spec[0];document.getElementById('studentPolicyBody').innerHTML=spec[1];document.getElementById('studentPolicyModal').classList.add('open')}function closeStudentPolicy(){document.getElementById('studentPolicyModal').classList.remove('open')}document.addEventListener('keydown',e=>{if(e.key==='Escape')closeStudentPolicy()});
   const dayData=Array.from({length:7},(_,i)=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+i);return [i===0?'TODAY':['SUN','MON','TUE','WED','THU','FRI','SAT'][d.getDay()],String(d.getDate()).padStart(2,'0')]});
@@ -278,16 +278,31 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
   let zcNextTicketId=null;
   let zcDaySlots=[], zcSlotMachines=[], zcSelectedSlot=null, zcSelectedMachine=null;
 
+  function formatTime12(dateOrIso){
+    if(!dateOrIso) return '—';
+    const d = typeof dateOrIso === 'string' ? new Date(dateOrIso) : dateOrIso;
+    return d.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit', hour12:true});
+  }
+
   function bookingAction(){
-    if(zcSelectedMachine && zcSelectedSlot){
-      openTicketCheckout();
-      return;
-    }
     if(zcNextTicketId){
       window.location.href = `washer-access.html?ticket=${zcNextTicketId}`;
       return;
     }
-    document.querySelector('.booking-card')?.scrollIntoView({behavior:'smooth'});
+    if(zcSelectedMachine && zcSelectedSlot){
+      openTicketCheckout();
+      return;
+    }
+    if(!zcSelectedSlot){
+      notify('Step 2: Choose an available time slot first.','info');
+      document.getElementById('slots')?.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    if(!zcSelectedMachine){
+      notify('Step 3: Choose an available washing machine.','info');
+      document.getElementById('step3WasherSection')?.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
   }
   async function cancelBooking(){
     if(!zcNextTicketId){
@@ -299,7 +314,14 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
   function closeTicketCheckout(){document.getElementById('ticketCheckout').classList.remove('open')}
   function setTopup(amount,button){document.getElementById('topupAmount').value=amount;document.querySelectorAll('.topup-choices button').forEach(b=>b.classList.toggle('chosen',b===button))}
   const savedTheme=localStorage.getItem('washdayTheme');if(savedTheme)document.documentElement.dataset.theme=savedTheme;const savedAvatar=localStorage.getItem('washdayAvatar');if(savedAvatar)pickAvatar(savedAvatar);const savedLanguage=localStorage.getItem('washdayLanguage');if(savedLanguage)setLanguage(savedLanguage);
-  function updatePaymentAction(){const m=document.querySelector('input[name="paymentMethod"]:checked')?.value;const choices=document.getElementById('paymobMethodChoices');if(choices)choices.hidden=m!=='paymob';const b=document.getElementById('payTicketButton');if(b)b.textContent=m==='paymob'?'Proceed to online payment':'Pay with wallet'}
+  function updatePaymentAction(){
+    const m=document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    const choices=document.getElementById('paymobMethodChoices');
+    if(choices)choices.hidden=m!=='paymob';
+    const b=document.getElementById('payTicketButton');
+    const p=document.getElementById('checkoutPrice')?.textContent || 'EGP 25.00';
+    if(b)b.textContent=m==='paymob'?`Proceed to online payment (${p}) →`:`Confirm & Pay with Wallet (${p}) →`;
+  }
   async function addWalletFunds(e){e.preventDefault();const amount=Number(document.getElementById('topupAmount').value);if(!Number.isFinite(amount)||amount<10||amount>5000){notify('Enter an amount between EGP 10 and EGP 5,000.','error');return}await window.ZCPayments?.start({kind:'wallet_topup',paymentMethod:document.getElementById('topupMethod').value,amountCents:Math.round(amount*100)})}
   let zcDbSlots=[],zcDbMachines=[],zcDbProfile=null,zcSelectedMachineKey=null;
   let zcLoyaltyData={points:0,ratio:10,min_redeem_points:100};
@@ -686,10 +708,10 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
     zcSelectedMachine = m;
     renderSlotMachines();
 
-    // STEP 4: Update Review & Payment Panel
+    // STEP 4: Update Review Card and open the interactive booking window
     const slotDate = new Date(zcSelectedSlot.slot_time);
     const end = new Date(slotDate.getTime() + 30 * 60000);
-    const timeStr = `${slotDate.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} – ${end.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+    const timeStr = `${formatTime12(slotDate)} – ${formatTime12(end)}`;
     const dateStr = slotDate.toLocaleDateString([], {weekday:'short', month:'short', day:'numeric'});
 
     const badge = document.getElementById('bookingStepBadge');
@@ -699,9 +721,10 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
     document.getElementById('bookingDate').textContent = `${m.display_name} · ${timeStr}`;
     document.getElementById('bookingSubText').textContent = `${dateStr} · 30 min cycle · EGP 25.00`;
     document.getElementById('bookingAction').textContent = 'Proceed to Payment (EGP 25.00) →';
-    document.getElementById('bookingHintText').textContent = 'Door access QR activates when your slot begins and expires 10 minutes later.';
+    document.getElementById('bookingHintText').textContent = 'Door access QR activates 10 min before slot begins.';
 
-    notify(`Selected ${m.display_name} for ${timeStr}. Proceed to payment to confirm.`, 'success');
+    // Open Interactive Booking Modal Window immediately!
+    openTicketCheckout();
   }
 
   /* ── STEP 4 & 5: Review booking, payment, and confirmed reservation */
@@ -710,8 +733,14 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
       notify('Cannot book: Your laundry account is restricted.','error');
       return;
     }
-    if(!zcSelectedMachine || !zcSelectedSlot){
-      notify('Please select an available time slot and washing machine first.','error');
+    if(!zcSelectedSlot){
+      notify('Please select an available 30-minute time slot first.','info');
+      document.getElementById('slots')?.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    if(!zcSelectedMachine){
+      notify('Please select an available washing machine first.','info');
+      document.getElementById('step3WasherSection')?.scrollIntoView({behavior:'smooth', block:'center'});
       return;
     }
     try{
@@ -719,10 +748,28 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
       const { data, error } = await c.rpc('student_ticket_price');
       if(error) throw error;
       const price = (data || 2500) / 100;
+
+      const slotDate = new Date(zcSelectedSlot.slot_time);
+      const end = new Date(slotDate.getTime() + 30 * 60000);
+      const unlockStart = new Date(slotDate.getTime() - 10 * 60000);
+      const timeStr = `${formatTime12(slotDate)} – ${formatTime12(end)}`;
+      const unlockStr = formatTime12(unlockStart);
+      const dateStr = slotDate.toLocaleDateString([], {weekday:'long', month:'short', day:'numeric'});
+
       document.getElementById('checkoutPrice').textContent = 'EGP ' + price.toFixed(2);
-      document.getElementById('checkoutTitle').textContent = `${zcSelectedMachine.display_name} · Review your ticket`;
-      document.getElementById('checkoutAgree').checked = false;
-      document.getElementById('payTicketButton').disabled = true;
+      document.getElementById('checkoutTitle').textContent = `${zcSelectedMachine.display_name} · Reservation`;
+      document.getElementById('checkoutMachineName').textContent = zcSelectedMachine.display_name;
+      document.getElementById('checkoutSlotTime').textContent = `${dateStr} · ${timeStr}`;
+      document.getElementById('checkoutUnlockNotice').textContent = `🚪 Door QR unlocks 10 min before slot (at ${unlockStr})`;
+      document.getElementById('checkoutDormText').textContent = `Dorm Building ${zcDbProfile?.dorm_class || 'B'} · Laundry Room`;
+
+      if(window.ZCPayments?.walletBalanceCents !== undefined){
+        const bal = (window.ZCPayments.walletBalanceCents / 100).toFixed(2);
+        document.getElementById('checkoutWalletBalance').textContent = 'EGP ' + bal;
+      }
+
+      document.getElementById('checkoutAgree').checked = true;
+      document.getElementById('payTicketButton').disabled = false;
       updatePaymentAction();
       document.getElementById('ticketCheckout').classList.add('open');
     }catch(error){
@@ -731,31 +778,38 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
   }
 
   async function startTicketPayment(){
-    if(!document.getElementById('checkoutAgree').checked) return;
+    if(!document.getElementById('checkoutAgree').checked){
+      notify('Please accept the booking terms to proceed.','warning');
+      return;
+    }
     if(!zcSelectedMachine || !zcSelectedSlot){
       notify('Please select an available slot and washer first.', 'error');
       return;
     }
     const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+    const button = document.getElementById('payTicketButton');
     if(method === 'wallet'){
-      const button = document.getElementById('payTicketButton');
       button.disabled = true;
+      button.innerHTML = '⏳ Confirming reservation…';
       try{
         const c = await ZCSupabase.ready();
         const { data, error } = await c.rpc('student_pay_ticket_from_wallet', { p_slot_id: zcSelectedMachine.slot_id });
         if(error) throw error;
-        closeTicketCheckout();
+        
+        button.innerHTML = '✓ Confirmed! Opening Access Page…';
+        button.style.background = '#22c778';
+        notify('Reservation confirmed! Redirecting to your Washer Control Page…', 'success');
         await window.ZCPayments?.loadWalletBalance();
-        notify('Ticket confirmed! Directing to your washer control page…', 'success');
 
         // STEP 5: Redirect to Interactive Washer Control Page
         setTimeout(() => {
+          closeTicketCheckout();
           window.location.href = `washer-access.html?ticket=${data}`;
-        }, 900);
+        }, 800);
       }catch(error){
-        notify(error.message || 'Wallet payment could not be completed.', 'error');
-      }finally{
         button.disabled = false;
+        button.textContent = 'Pay with wallet';
+        notify(error.message || 'Wallet payment could not be completed.', 'error');
       }
       return;
     }
@@ -766,6 +820,8 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
       machineKey: zcSelectedMachine.machine_key,
       slotStart: zcSelectedSlot.slot_time,
       buttonId: 'payTicketButton'
+    });
+  }
     });
   }
 
@@ -835,7 +891,7 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
           const qrExp = new Date(t.end.getTime() + 10*60000);
           const expNote = document.createElement('p');
           expNote.style.cssText = 'margin:3px 0 0;font-size:9px;color:#8f9e97';
-          expNote.textContent = `QR access closed at ${qrExp.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+          expNote.textContent = `QR access closed at ${formatTime12(qrExp)}`;
           info.append(title, when, expNote);
         } else {
           info.append(title, when);
@@ -911,9 +967,9 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
   function showExpiredTicketModal(t){
     const slot = t.laundry_slots;
     const machineName = slot?.laundry_machines?.display_name || slot?.machine_key || 'Washer';
-    const slotStart = t.start ? t.start.toLocaleString([], {weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
-    const slotEnd   = t.end   ? t.end.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—';
-    const qrExpiredAt = t.end ? new Date(t.end.getTime() + 10*60000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—';
+    const slotStart = t.start ? `${t.start.toLocaleDateString([], {weekday:'short',month:'short',day:'numeric'})} ${formatTime12(t.start)}` : '—';
+    const slotEnd   = t.end   ? formatTime12(t.end) : '—';
+    const qrExpiredAt = t.end ? formatTime12(new Date(t.end.getTime() + 10*60000)) : '—';
 
     const modal = document.getElementById('ticketQrModal');
     const canvas = document.getElementById('ticketQrCanvas');
