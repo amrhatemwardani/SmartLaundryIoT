@@ -641,9 +641,13 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
     }
 
     container.innerHTML = zcSlotMachines.map((m, i) => {
-      const isSelected = zcSelectedMachine && zcSelectedMachine.machine_key === m.machine_key;
-      const state = m.machine_state; // 'green', 'orange', 'red', 'gray', 'blue'
-      const isAvailable = m.is_available;
+      const mKey = m.out_machine_key || m.machine_key;
+      const dName = m.out_display_name || m.display_name;
+      const state = m.out_machine_state || m.machine_state; // 'green', 'orange', 'red', 'gray', 'blue'
+      const stateLabel = m.out_state_label || m.state_label;
+      const resInfo = m.out_reservation_info || m.reservation_info || '';
+      const isAvailable = m.out_is_available !== undefined ? m.out_is_available : m.is_available;
+      const isSelected = zcSelectedMachine && (zcSelectedMachine.out_machine_key === mKey || zcSelectedMachine.machine_key === mKey);
 
       return `
         <div class="washer-choice ${isSelected ? 'selected' : ''}" data-state="${state}" onclick="${isAvailable ? `selectSlotMachine(${i})` : ''}" style="${!isAvailable ? 'cursor:not-allowed' : ''}">
@@ -659,11 +663,11 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
             <div class="wc-door"></div>
           </div>
           <div class="wc-shadow"></div>
-          <div class="wc-label">${m.display_name}</div>
-          <div class="wc-state-chip">${m.state_label}</div>
-          <div class="wc-res-info">${m.reservation_info || ''}</div>
+          <div class="wc-label">${dName}</div>
+          <div class="wc-state-chip">${stateLabel}</div>
+          <div class="wc-res-info">${resInfo}</div>
           <button class="wc-action-btn" ${!isAvailable ? 'disabled' : ''} onclick="event.stopPropagation();${isAvailable ? `selectSlotMachine(${i})` : ''}">
-            ${isSelected ? '✓ Selected' : (isAvailable ? 'Select Washer' : m.state_label)}
+            ${isSelected ? '✓ Selected' : (isAvailable ? 'Select Washer' : stateLabel)}
           </button>
         </div>`;
     }).join('');
@@ -671,7 +675,13 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
 
   function selectSlotMachine(idx){
     const m = zcSlotMachines[idx];
-    if(!m || !m.is_available) return;
+    const isAvail = m.out_is_available !== undefined ? m.out_is_available : m.is_available;
+    if(!m || !isAvail) return;
+
+    // Normalize keys
+    m.machine_key = m.out_machine_key || m.machine_key;
+    m.display_name = m.out_display_name || m.display_name;
+    m.slot_id = m.out_slot_id || m.slot_id;
 
     zcSelectedMachine = m;
     renderSlotMachines();

@@ -118,16 +118,17 @@ grant execute on function public.student_get_day_slots(date) to authenticated, s
 -- 4. RPC: GET ALL MACHINES AND THEIR PRECISE STATES FOR A SPECIFIC 30-MIN SLOT
 -- States: 'green' (Available), 'orange' (Temporarily Busy), 'red' (Reserved),
 --         'gray' (Out of Service), 'blue' (Running / Washing)
+drop function if exists public.student_get_slot_machines(timestamptz);
 create or replace function public.student_get_slot_machines(p_starts_at timestamptz)
 returns table(
-  machine_key text,
-  display_name text,
-  dorm_class text,
-  machine_state text,
-  state_label text,
-  reservation_info text,
-  is_available boolean,
-  slot_id uuid
+  out_machine_key text,
+  out_display_name text,
+  out_dorm_class text,
+  out_machine_state text,
+  out_state_label text,
+  out_reservation_info text,
+  out_is_available boolean,
+  out_slot_id uuid
 )
 language plpgsql security definer set search_path = public
 as $$
@@ -158,9 +159,9 @@ begin
     values(m.machine_key, p_starts_at, 30, 'open')
     on conflict (machine_key, starts_at) do nothing;
 
-    select id into s_id
-    from public.laundry_slots
-    where machine_key = m.machine_key and starts_at = p_starts_at
+    select ls.id into s_id
+    from public.laundry_slots ls
+    where ls.machine_key = m.machine_key and ls.starts_at = p_starts_at
     limit 1;
 
     -- Check machine hardware status
@@ -211,14 +212,14 @@ begin
       end if;
     end if;
 
-    machine_key      := m.machine_key;
-    display_name     := m.display_name;
-    dorm_class       := m.dorm_class;
-    machine_state    := st;
-    state_label      := st_lbl;
-    reservation_info := res_info;
-    is_available     := avail;
-    slot_id          := s_id;
+    out_machine_key      := m.machine_key;
+    out_display_name     := m.display_name;
+    out_dorm_class       := m.dorm_class;
+    out_machine_state    := st;
+    out_state_label      := st_lbl;
+    out_reservation_info := res_info;
+    out_is_available     := avail;
+    out_slot_id          := s_id;
     return next;
   end loop;
 end $$;
