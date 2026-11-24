@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#078f9d"/>
@@ -193,7 +193,7 @@
         if(!page) return false;
         const p = page.toLowerCase();
         if(role === 'student') return p === 'student.html' || p === 'payment-result.html' || p === 'audit.html';
-        if(role === 'supervisor') return p === 'supervisor.html' || p === 'supervisor-schedule.html' || p === 'approvals.html' || p === 'support-admin.html' || p === 'audit.html';
+        if(role === 'supervisor') return p === 'supervisor.html' || p === 'supervisor-schedule.html' || p === 'supervisor-students.html' || p === 'approvals.html' || p === 'support-admin.html' || p === 'audit.html';
         if(role === 'admin') return p === 'admin.html' || p.startsWith('admin-') || p === 'audit.html';
         return false;
       }

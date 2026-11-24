@@ -1,4 +1,4 @@
-/* Supabase Auth is the authority. The tab-scoped cache is display data only; every protected page revalidates it. */
+﻿/* Supabase Auth is the authority. The tab-scoped cache is display data only; every protected page revalidates it. */
 (function(){
   const SESSION_KEY='zcLaundrySession',AUDIT_KEY='zcLaundryAudit',IDLE_LIMIT_MS=30*60*1000;
   const rolePages={student:'student.html',supervisor:'supervisor.html',admin:'admin.html'};
@@ -58,7 +58,7 @@
   function guardPage(){
     const file=location.pathname.split('/').pop().toLowerCase();
     const required=(file==='student.html'||file==='payment-result.html')?'student'
-      : (file==='supervisor.html'||file==='supervisor-schedule.html')?'supervisor'
+      : (file==='supervisor.html'||file==='supervisor-schedule.html'||file==='supervisor-students.html')?'supervisor'
       : (file==='approvals.html'||file==='support-admin.html')?'supervisor'
       : (file==='admin.html'||file.startsWith('admin-'))?'admin'
       : file==='audit.html'?'any':null;
