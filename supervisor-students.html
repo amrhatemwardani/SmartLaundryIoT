@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#f4f7f5"/>
+  <title>Student Directory & Laundry Records · Supervisor · ZC Dorm Laundry</title>
+  <script src="auth.js" defer></script><script src="supabase-client.js" defer></script>
+  <script src="loading.js" defer></script><script src="notifications.js" defer></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+    :root{--ink:#172e39;--muted:#71838a;--line:#e7ece8;--paper:#fff;--bg:#f4f7f5;--green:#078f9d;--green2:#e1f4f6;--orange:#f5a666;--red:#c9564b;--shadow:0 12px 38px #1c45300c}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px 'DM Sans',sans-serif}button{font:inherit;cursor:pointer}
+    .app{min-height:100vh;display:grid;grid-template-columns:236px 1fr}
+    aside{background:white;border-right:1px solid var(--line);padding:26px 17px;display:flex;flex-direction:column;gap:32px}
+    .brand{display:flex;align-items:center;gap:10px;padding:0 10px;font:800 19px Manrope,sans-serif;letter-spacing:-.6px}
+    .brand-icon{display:grid;place-items:center;width:34px;height:34px;background:var(--green);border-radius:11px;color:white;font-size:18px}
+    .brand em{font-style:normal;color:var(--green)}
+    .nav-label{padding:0 12px;color:#a0aaa5;text-transform:uppercase;letter-spacing:1.1px;font-size:10px;font-weight:700;margin-bottom:7px}
+    .nav{display:grid;gap:5px}
+    .nav a{color:#72807a;text-decoration:none;padding:11px 12px;border-radius:10px;display:flex;align-items:center;gap:12px;font-weight:600}
+    .nav a.active{color:var(--green);background:#e8f5f6}
+    .nav .ico{width:18px;text-align:center;font-size:16px}
+    .side-bottom{margin-top:auto}
+    .profile{display:flex;align-items:center;gap:10px;padding:15px 8px 0;border-top:1px solid var(--line)}
+    .avatar{width:34px;height:34px;border-radius:50%;background:#d9ecef;display:grid;place-items:center;color:var(--green);font-weight:700}
+    .profile b{display:block;font-size:12px}
+    .profile small{color:var(--muted);font-size:10px}
+    main{max-width:1440px;width:100%;margin:auto;padding:28px 40px 42px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+    .crumb{font-size:12px;color:var(--muted)}
+    .crumb strong{color:var(--ink)}
+    .top-actions{display:flex;align-items:center;gap:12px}
+    .heading{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:21px;flex-wrap:wrap;gap:12px}
+    .heading h1{font:800 28px Manrope,sans-serif;letter-spacing:-.8px;margin:0 0 5px}
+    .heading p{color:var(--muted);margin:0;font-size:12px}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:21px}
+    .metric{background:white;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+    .metric-head{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:10px;font-weight:600}
+    .metric-icon{width:29px;height:29px;border-radius:9px;background:#edf6f7;display:grid;place-items:center;color:var(--green);font-size:14px}
+    .metric strong{display:block;font:800 25px Manrope;margin:11px 0 3px;letter-spacing:-.5px}
+    .metric small{font-size:10px;color:var(--muted)}
+    .card{background:white;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)}
+    .section{padding:18px 19px}
+    .outline{border:1px solid var(--line);background:white;color:#58665f;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+    .outline:hover{background:#f8faf8}
+    .table-wrap{overflow:auto}
+    table{width:100%;border-collapse:collapse;min-width:640px}
+    th{text-align:left;color:#9aa59f;text-transform:uppercase;letter-spacing:.7px;font-size:9px;font-weight:700;padding:12px 10px;border-bottom:1px solid var(--line)}
+    td{padding:13px 10px;border-bottom:1px solid #eff2ef;font-size:11px;color:#53625b}
+    tr.clickable-row{cursor:pointer;transition:background .15s}
+    tr.clickable-row:hover{background:#f8faf9}
+    tr:last-child td{border-bottom:0}
+    .student{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink)}
+    .mini-avatar{display:grid;place-items:center;width:30px;height:30px;background:#edf2ed;border-radius:50%;font-size:10px;color:#587265;font-weight:800;flex-shrink:0}
+    .pill{display:inline-block;padding:4px 9px;border-radius:14px;font-size:9px;font-weight:800;text-transform:uppercase}
+    .pill.none{background:#e9f5ee;color:#38815e}
+    .pill.warning{background:#fff3e2;color:#af792f}
+    .pill.suspended{background:#fff0eb;color:#c94a29}
+    .pill.blocked{background:#fee2e2;color:#991b1b}
+    .pill.confirmed{background:#e8f5f6;color:#078f9d}
+    .pill.completed{background:#e9f5ee;color:#38815e}
+    .pill.cancelled{background:#f1f2f1;color:#8a928e}
+    .pill.used{background:#e9f5ee;color:#38815e}
+    .badge-count{display:inline-block;padding:3px 7px;border-radius:8px;background:#f0f4f1;font-size:10px;font-weight:700;color:var(--ink)}
+    .row-action{border:0;background:transparent;color:var(--green);font-size:11px;font-weight:700;cursor:pointer}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#183a2e;color:#fff;padding:12px 18px;border-radius:10px;font-size:12px;box-shadow:0 8px 30px #0002;transition:.25s;z-index:9999}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    
+    /* Modal styles */
+    .modal-backdrop{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#102a3290;padding:16px;backdrop-filter:blur(3px);overflow-y:auto}
+    .modal-backdrop[hidden]{display:none}
+    .modal-card{position:relative;width:min(720px,100%);background:white;border-radius:18px;padding:26px;box-shadow:0 24px 70px #001c2633;max-height:90vh;overflow-y:auto}
+    .modal-close{position:absolute;right:16px;top:16px;border:0;border-radius:8px;background:#e8f5f6;color:var(--green);font-size:22px;width:32px;height:32px;cursor:pointer;display:grid;place-items:center;line-height:1}
+    .tab-bar{display:flex;gap:8px;border-bottom:1.5px solid var(--line);margin:18px 0 14px}
+    .tab-btn{padding:9px 15px;border:0;background:transparent;font:700 12px 'DM Sans';color:var(--muted);border-bottom:2.5px solid transparent;cursor:pointer;margin-bottom:-1.5px}
+    .tab-btn.active{color:var(--green);border-bottom-color:var(--green)}
+    .tab-pane{display:none}
+    .tab-pane.active{display:block}
+
+    @media(max-width:1000px){.app{grid-template-columns:70px 1fr}aside{padding:22px 10px;align-items:center}.brand{padding:0}.brand-name,.nav-label,.nav a .label,.profile-text{display:none}.nav{width:100%}.nav a{justify-content:center;padding:12px 0}.side-bottom{width:100%}.profile{justify-content:center;padding-left:0;padding-right:0}main{padding:24px}.metrics{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:720px){.app{display:block;padding-bottom:62px}aside{position:fixed;z-index:4;bottom:0;left:0;right:0;height:60px;padding:5px 10px;border:0;border-top:1px solid var(--line);display:block}.brand,.nav-label,.side-bottom{display:none}.nav{display:flex;justify-content:space-around;gap:0}.nav a{display:flex;flex-direction:column;gap:2px;font-size:9px;padding:5px 10px}.nav a .label{display:block}.nav .ico{font-size:17px}main{padding:18px 14px 28px}.heading h1{font-size:23px}.metrics{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside>
+    <div class="brand"><img class="brand-icon" src="zc-laundry-mark.svg" alt=""><span class="brand-name">ZC <em>Dorm Laundry</em></span></div>
+    <div style="width:100%">
+      <div class="nav-label">Management</div>
+      <nav class="nav">
+        <a href="supervisor.html"><span class="ico">&#8962;</span><span class="label">Overview</span></a>
+        <a href="supervisor.html#bookings"><span class="ico">&#9635;</span><span class="label">Bookings</span></a>
+        <a class="active" href="supervisor-students.html"><span class="ico">&#128101;</span><span class="label">All Students</span></a>
+        <a href="supervisor.html#penalties"><span class="ico">&#9888;</span><span class="label">Student Penalties</span></a>
+        <a href="supervisor-schedule.html#machines"><span class="ico">&#9673;</span><span class="label">Machines</span></a>
+        <a href="supervisor-schedule.html#slots"><span class="ico">&#9719;</span><span class="label">Slots</span></a>
+        <a href="approvals.html"><span class="ico">&#10003;</span><span class="label">Student Approvals</span></a>
+        <a href="support-admin.html"><span class="ico">&#9993;</span><span class="label">Support Queue</span></a>
+        <a href="supervisor.html#events"><span class="ico">&#8779;</span><span class="label">Door Events</span></a>
+        <a href="audit.html"><span class="ico">&#8779;</span><span class="label">Activity Log</span></a>
+      </nav>
+    </div>
+    <div class="side-bottom">
+      <div class="profile">
+        <div class="avatar" id="sideAvatar">SV</div>
+        <div class="profile-text"><b data-session-name>Supervisor</b><small>Supervisor &middot; <a href="logout.html" data-logout style="color:var(--green)">Log out</a></small></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEW -->
+  <main>
+    <div class="topbar">
+      <div class="crumb">Laundry room <span style="margin:0 7px;color:#b4beb8">/</span><strong>Student Directory &amp; Laundry Records</strong></div>
+      <div class="top-actions">
+        <a href="supervisor.html" style="color:var(--green);font-size:11px;font-weight:700;text-decoration:none">&larr; Back to Dashboard</a>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="avatar" style="width:30px;height:30px;font-size:10px" id="topAvatar">SV</div>
+          <span data-session-name style="font-size:12px;font-weight:700">Supervisor</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="heading">
+      <div>
+        <h1>Registered Students &amp; Activity Records</h1>
+        <p>Inspect any student's complete profile, room wash bookings, ticket statuses, and access history.</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="outline" onclick="openPenaltyModalFor(null)" style="background:var(--red);color:#fff;border-color:var(--red);font-weight:700">&#65291; Issue Penalty</button>
+        <button class="outline" onclick="loadStudents()">&#8635; Refresh Directory</button>
+      </div>
+    </div>
+
+    <!-- METRICS -->
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-head">Total Registered Students<span class="metric-icon">&#128101;</span></div>
+        <strong id="metricTotalStudents">&mdash;</strong>
+        <small id="metricTotalSub">Across all dorms</small>
+      </div>
+      <div class="metric">
+        <div class="metric-head">Normal Status<span class="metric-icon">&#10003;</span></div>
+        <strong id="metricNormalStudents" style="color:#38815e">&mdash;</strong>
+        <small>Full laundry room access</small>
+      </div>
+      <div class="metric">
+        <div class="metric-head">Under Penalty / Suspended<span class="metric-icon">&#9888;</span></div>
+        <strong id="metricPenalizedStudents" style="color:#c94a29">&mdash;</strong>
+        <small id="metricPenalizedSub">Requires supervisor attention</small>
+      </div>
+      <div class="metric">
+        <div class="metric-head">Total Wash Bookings<span class="metric-icon">&#9635;</span></div>
+        <strong id="metricTotalBookings">&mdash;</strong>
+        <small>Lifetime student laundry tickets</small>
+      </div>
+    </div>
+
+    <!-- SEARCH & FILTER TOOLBAR -->
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+      <input id="searchInput" type="text" placeholder="Search by student name, email, ID, or major&hellip;" oninput="applyFilters()" style="flex:1;min-width:240px;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font:12px 'DM Sans';outline:none;background:#fff"/>
+      <select id="dormFilter" onchange="applyFilters()" style="border:1px solid var(--line);border-radius:10px;padding:10px 14px;font:700 12px 'DM Sans';background:#fff">
+        <option value="">All Dorms</option>
+        <option value="A">Dorm A</option>
+        <option value="B">Dorm B</option>
+        <option value="C">Dorm C</option>
+      </select>
+      <select id="penaltyFilter" onchange="applyFilters()" style="border:1px solid var(--line);border-radius:10px;padding:10px 14px;font:700 12px 'DM Sans';background:#fff">
+        <option value="">All Penalty Statuses</option>
+        <option value="none">Normal</option>
+        <option value="warning">Warning</option>
+        <option value="suspended">Suspended</option>
+        <option value="blocked">Blocked</option>
+      </select>
+    </div>
+
+    <!-- STUDENT DIRECTORY TABLE -->
+    <div class="card section" style="padding:0;overflow:hidden">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>University ID</th>
+              <th>Dorm</th>
+              <th>Major</th>
+              <th>Penalty Status</th>
+              <th>Wash Bookings</th>
+              <th>Wallet Balance</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="studentTableBody">
+            <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">Loading student directory from database&hellip;</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- STUDENT ACTIVITY & TICKETING MODAL -->
+<div class="modal-backdrop" id="studentActivityModal" role="dialog" aria-modal="true" hidden>
+  <section class="modal-card">
+    <button class="modal-close" onclick="closeStudentActivityModal()" aria-label="Close">&#215;</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="mini-avatar" id="modalStudentAvatar" style="width:44px;height:44px;font-size:16px;background:#e1f4f6;color:var(--green)">S</div>
+        <div>
+          <h2 id="modalStudentName" style="font:800 20px Manrope;margin:0 0 3px">Student Name</h2>
+          <div style="font-size:11px;color:var(--muted)" id="modalStudentEmail">email@zewailcity.edu.eg</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="pill none" id="modalStudentStatusPill">NORMAL</span>
+        <button class="outline" onclick="openPenaltyModalForCurrentStudent()" style="background:#fff8ed;border-color:#f4e7d0;color:#c94a29;font-weight:700">&#9888; Manage Penalty</button>
+      </div>
+    </div>
+
+    <!-- Quick Info Cards -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px;background:#f8faf9;border:1px solid var(--line);border-radius:12px;padding:12px">
+      <div><small style="color:var(--muted);font-size:10px;display:block">University ID</small><b id="modalStudentId" style="font-size:11px">&mdash;</b></div>
+      <div><small style="color:var(--muted);font-size:10px;display:block">Dorm Building</small><b id="modalStudentDorm" style="font-size:11px">&mdash;</b></div>
+      <div><small style="color:var(--muted);font-size:10px;display:block">Major</small><b id="modalStudentMajor" style="font-size:11px">&mdash;</b></div>
+      <div><small style="color:var(--muted);font-size:10px;display:block">Phone / WhatsApp</small><b id="modalStudentPhone" style="font-size:11px">&mdash;</b></div>
+      <div><small style="color:var(--muted);font-size:10px;display:block">Wallet Balance</small><b id="modalStudentWallet" style="font-size:11px;color:var(--green)">&mdash;</b></div>
+      <div><small style="color:var(--muted);font-size:10px;display:block">Loyalty Points</small><b id="modalStudentLoyalty" style="font-size:11px;color:#d97706">&mdash;</b></div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchModalTab('tabBookings', this)">▣ Wash Bookings &amp; Tickets (<span id="modalBookingsCount">0</span>)</button>
+      <button class="tab-btn" onclick="switchModalTab('tabSupport', this)">✉ Support Inquiries (<span id="modalSupportCount">0</span>)</button>
+      <button class="tab-btn" onclick="switchModalTab('tabAudits', this)">⚖ Disciplinary &amp; Audit Log (<span id="modalAuditsCount">0</span>)</button>
+    </div>
+
+    <!-- TAB 1: WASH BOOKINGS & TICKETS -->
+    <div class="tab-pane active" id="tabBookings">
+      <div id="modalBookingsList" style="display:grid;gap:8px">
+        <div style="text-align:center;padding:20px;color:var(--muted)">Loading student tickets&hellip;</div>
+      </div>
+    </div>
+
+    <!-- TAB 2: SUPPORT TICKETS -->
+    <div class="tab-pane" id="tabSupport">
+      <div id="modalSupportList" style="display:grid;gap:8px">
+        <div style="text-align:center;padding:20px;color:var(--muted)">Loading support inquiries&hellip;</div>
+      </div>
+    </div>
+
+    <!-- TAB 3: DISCIPLINARY / AUDIT LOG -->
+    <div class="tab-pane" id="tabAudits">
+      <div id="modalAuditsList" style="display:grid;gap:8px">
+        <div style="text-align:center;padding:20px;color:var(--muted)">Loading disciplinary events&hellip;</div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;display:flex;justify-content:flex-end">
+      <button class="outline" onclick="closeStudentActivityModal()">Close Record</button>
+    </div>
+  </section>
+</div>
+
+<!-- PENALTY ACTION MODAL -->
+<div class="modal-backdrop" id="penaltyModal" role="dialog" aria-modal="true" hidden>
+  <section class="modal-card" style="max-width:540px">
+    <button class="modal-close" onclick="closePenaltyModal()">&#215;</button>
+    <div class="eyebrow" style="color:#c94a29;font-size:10px;font-weight:800;letter-spacing:1px;margin-bottom:4px">STUDENT ACCESS CONTROL</div>
+    <h2 id="penaltyModalTitle" style="font:800 20px Manrope;margin:0 0 6px">Apply Student Penalty</h2>
+    <p style="color:var(--muted);font-size:11px;margin:0 0 14px">Set a disciplinary warning, temporary suspension, or permanent block for dorm laundry access.</p>
+
+    <!-- Student Select Dropdown -->
+    <div style="margin-bottom:12px">
+      <label style="font-size:11px;font-weight:700;display:block;margin-bottom:5px">Target Student *</label>
+      <select id="pmStudentSelect" onchange="onPenaltyStudentSelected()" style="width:100%;border:1.5px solid var(--line);border-radius:9px;padding:9px 12px;font:700 12px 'DM Sans';background:#fff;outline:none">
+        <option value="">-- Choose a student --</option>
+      </select>
+    </div>
+
+    <!-- Preview Card -->
+    <div style="background:#f4f7f5;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:12px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
+      <div><small style="color:var(--muted)">Student Name</small><b id="pmStudentName" style="display:block;font-size:12px">&mdash;</b></div>
+      <div><small style="color:var(--muted)">Email</small><b id="pmStudentEmail" style="display:block;font-size:11px;word-break:break-all">&mdash;</b></div>
+      <div><small style="color:var(--muted)">University ID</small><b id="pmStudentID" style="display:block">&mdash;</b></div>
+      <div><small style="color:var(--muted)">Dorm</small><b id="pmStudentDorm" style="display:block">&mdash;</b></div>
+      <div><small style="color:var(--muted)">Current Status</small><span id="pmCurrentStatus" style="display:inline-block;margin-top:4px;padding:4px 9px;border-radius:12px;font-size:9px;font-weight:800;background:#e9f5ee;color:#38815e">NORMAL</span></div>
+      <div><small style="color:var(--muted)">Wallet Balance</small><b id="pmWalletBal" style="display:block;color:var(--green)">&mdash;</b></div>
+    </div>
+
+    <form onsubmit="submitPenalty(event)">
+      <input type="hidden" id="pmUserId"/>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;font-weight:700;display:block;margin-bottom:6px">Penalty Action *</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;cursor:pointer;font-size:11px;font-weight:700;background:#f8faf8"><input type="radio" name="penaltyStatus" value="none" onclick="onPenaltyTypeChange('none')" style="accent-color:#22c778"/> &#9989; Restore Normal</label>
+          <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;cursor:pointer;font-size:11px;font-weight:700;background:#f8faf8"><input type="radio" name="penaltyStatus" value="warning" onclick="onPenaltyTypeChange('warning')" style="accent-color:#f5a666"/> &#9888;&#65039; Warning</label>
+          <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;cursor:pointer;font-size:11px;font-weight:700;background:#f8faf8"><input type="radio" name="penaltyStatus" value="suspended" onclick="onPenaltyTypeChange('suspended')" style="accent-color:#f5a666"/> &#128274; Suspend Access</label>
+          <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;cursor:pointer;font-size:11px;font-weight:700;background:#f8faf8"><input type="radio" name="penaltyStatus" value="blocked" onclick="onPenaltyTypeChange('blocked')" style="accent-color:#c94a29"/> &#128683; Permanent Block</label>
+        </div>
+      </div>
+      <div id="suspensionDurationSection" style="display:none;margin-bottom:12px;background:#fff8ed;border:1px solid #f4e7d0;border-radius:9px;padding:12px">
+        <label style="font-size:11px;font-weight:700;display:block;margin-bottom:8px">Suspension Duration</label>
+        <select id="suspDurationDays" onchange="onDurationChange()" style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:700 11px 'DM Sans';background:#fff">
+          <option value="1">1 day</option>
+          <option value="3">3 days</option>
+          <option value="7" selected>7 days</option>
+          <option value="14">14 days</option>
+          <option value="30">30 days</option>
+          <option value="custom">Custom date/time &rarr;</option>
+        </select>
+        <div id="customDateWrap" style="display:none;margin-top:10px">
+          <label style="font-size:10px;font-weight:700;display:block;margin-bottom:4px;color:var(--muted)">Exact suspension end (Cairo time):</label>
+          <input type="datetime-local" id="suspUntilDatetime" style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:11px;background:#fff;width:100%"/>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;font-weight:700;display:block;margin-bottom:6px">Reason / Notes *</label>
+        <textarea id="penaltyReason" required rows="3" placeholder="e.g. Left laundry unattended repeatedly. Second violation this month." style="width:100%;border:1px solid var(--line);border-radius:9px;padding:10px;font:11px 'DM Sans';resize:vertical;outline:none"></textarea>
+        <small style="font-size:10px;color:var(--muted)">The student is notified immediately. All actions are logged in the audit trail.</small>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <button type="button" onclick="closePenaltyModal()" style="border:1px solid var(--line);background:#fff;border-radius:9px;padding:10px 18px;font:700 11px 'DM Sans';cursor:pointer">Cancel</button>
+        <button type="submit" id="btnSubmitPenalty" style="border:0;background:#c94a29;color:#fff;border-radius:9px;padding:10px 20px;font:700 11px 'DM Sans';cursor:pointer">Apply &amp; Notify Student &rarr;</button>
+      </div>
+    </form>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let studentsCache = [];
+  let currentActiveStudent = null;
+
+  function notify(msg, type){
+    if(window.ZCNotify){ window.ZCNotify.show(msg, type || 'success'); return; }
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show';
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => { t.className = 'toast'; }, 2800);
+  }
+
+  function escHtml(s){
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── Load Students Directory ────────────────────────────────────── */
+  async function loadStudents(){
+    const tbody = document.getElementById('studentTableBody');
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">Loading student directory&hellip;</td></tr>';
+    try {
+      const c = await window.ZCSupabase.ready();
+      const { data, error } = await c.rpc('staff_list_dorm_students', { p_dorm_class: null });
+      if(error) throw error;
+      studentsCache = data || [];
+      renderMetrics();
+      applyFilters();
+
+      // Check if URL contains ?id=... to auto-open student detail
+      const urlParams = new URLSearchParams(window.location.search);
+      const studentIdParam = urlParams.get('id');
+      if(studentIdParam){
+        openStudentDetail(studentIdParam);
+      }
+    } catch(err){
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:#c94a29">${escHtml(err.message || 'Could not load student list')}</td></tr>`;
+    }
+  }
+
+  function renderMetrics(){
+    const total = studentsCache.length;
+    const normal = studentsCache.filter(s => !s.penalty_status || s.penalty_status === 'none').length;
+    const penalized = studentsCache.filter(s => s.penalty_status && s.penalty_status !== 'none').length;
+    const bookings = studentsCache.reduce((sum, s) => sum + (parseInt(s.booking_count, 10) || 0), 0);
+
+    document.getElementById('metricTotalStudents').textContent = total;
+    document.getElementById('metricNormalStudents').textContent = normal;
+    document.getElementById('metricPenalizedStudents').textContent = penalized;
+    document.getElementById('metricTotalBookings').textContent = bookings;
+  }
+
+  function applyFilters(){
+    const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+    const dorm = document.getElementById('dormFilter')?.value || '';
+    const status = document.getElementById('penaltyFilter')?.value || '';
+
+    const filtered = studentsCache.filter(s => {
+      if(dorm && (s.dorm_class || '').toUpperCase() !== dorm.toUpperCase()) return false;
+      if(status && (s.penalty_status || 'none') !== status) return false;
+      if(q){
+        const haystack = `${s.full_name || ''} ${s.university_email || ''} ${s.university_id || ''} ${s.major || ''}`.toLowerCase();
+        if(!haystack.includes(q)) return false;
+      }
+      return true;
+    });
+
+    renderTable(filtered);
+  }
+
+  function renderTable(list){
+    const tbody = document.getElementById('studentTableBody');
+    tbody.replaceChildren();
+
+    if(!list.length){
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">No students match the current filters.</td></tr>';
+      return;
+    }
+
+    list.forEach(s => {
+      const tr = document.createElement('tr');
+      tr.className = 'clickable-row';
+
+      const initials = (s.full_name || 'S').split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase();
+      const statusClass = s.penalty_status || 'none';
+      const statusLabel = statusClass.toUpperCase();
+      const wallet = s.wallet_balance_cents != null ? `EGP ${(s.wallet_balance_cents / 100).toFixed(2)}` : 'EGP 0.00';
+      const bookings = s.booking_count != null ? `${s.booking_count} bookings` : '0 bookings';
+
+      tr.innerHTML = `
+        <td>
+          <div class="student">
+            <span class="mini-avatar">${escHtml(initials)}</span>
+            <div>
+              <div style="font-weight:700">${escHtml(s.full_name || 'Unknown')}</div>
+              <small style="font-size:10px;color:var(--muted);font-weight:400">${escHtml(s.university_email || '')}</small>
+            </div>
+          </div>
+        </td>
+        <td style="font-weight:600">${escHtml(s.university_id || '—')}</td>
+        <td><span class="badge-count">Dorm ${escHtml(s.dorm_class || '—')}</span></td>
+        <td style="font-size:11px;color:var(--muted)">${escHtml(s.major || '—')}</td>
+        <td><span class="pill ${statusClass}">${statusLabel}</span></td>
+        <td><span class="badge-count" style="background:#e8f5f6;color:var(--green)">${escHtml(bookings)}</span></td>
+        <td style="font-weight:700;color:var(--green)">${escHtml(wallet)}</td>
+        <td style="text-align:right;white-space:nowrap">
+          <button class="outline" style="padding:6px 10px;font-size:10px;margin-right:6px" onclick="event.stopPropagation(); openStudentDetail('${escHtml(s.user_id)}')">View Records &rarr;</button>
+          <button class="outline" style="background:var(--red);color:#fff;border-color:var(--red);padding:6px 10px;font-size:10px" onclick="event.stopPropagation(); openPenaltyModalFor('${escHtml(s.user_id)}')">Manage</button>
+        </td>
+      `;
+
+      tr.onclick = () => openStudentDetail(s.user_id);
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* ── Student Activity & History Modal ────────────────────────────── */
+  async function openStudentDetail(studentId){
+    const modal = document.getElementById('studentActivityModal');
+    modal.hidden = false;
+
+    // Reset fields
+    document.getElementById('modalStudentName').textContent = 'Loading student record…';
+    document.getElementById('modalStudentEmail').textContent = 'Fetching from server…';
+    document.getElementById('modalBookingsList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Loading laundry tickets…</div>';
+    document.getElementById('modalSupportList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Loading inquiries…</div>';
+    document.getElementById('modalAuditsList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Loading history…</div>';
+
+    try {
+      const c = await window.ZCSupabase.ready();
+      const { data, error } = await c.rpc('staff_get_student_activity', { p_student_id: studentId });
+      if(error) throw error;
+
+      const s = data.student || {};
+      currentActiveStudent = s;
+
+      const initials = (s.full_name || 'S').split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase();
+      document.getElementById('modalStudentAvatar').textContent = initials;
+      document.getElementById('modalStudentName').textContent = s.full_name || 'Unknown Student';
+      document.getElementById('modalStudentEmail').textContent = s.university_email || '';
+
+      const statusClass = s.penalty_status || 'none';
+      const pill = document.getElementById('modalStudentStatusPill');
+      pill.className = `pill ${statusClass}`;
+      pill.textContent = statusClass.toUpperCase();
+
+      document.getElementById('modalStudentId').textContent = s.university_id || '—';
+      document.getElementById('modalStudentDorm').textContent = s.dorm_class ? `Dorm ${s.dorm_class}` : '—';
+      document.getElementById('modalStudentMajor').textContent = s.major || '—';
+      document.getElementById('modalStudentPhone').textContent = s.phone_number || s.whatsapp_number || '—';
+      document.getElementById('modalStudentWallet').textContent = s.wallet_balance_cents != null ? `EGP ${(s.wallet_balance_cents / 100).toFixed(2)}` : 'EGP 0.00';
+      document.getElementById('modalStudentLoyalty').textContent = s.loyalty_points != null ? `${s.loyalty_points} pts` : '0 pts';
+
+      // 1. Draw Bookings
+      const bookings = data.bookings || [];
+      document.getElementById('modalBookingsCount').textContent = bookings.length;
+      drawBookingsList(bookings);
+
+      // 2. Draw Support Tickets
+      const support = data.support_tickets || [];
+      document.getElementById('modalSupportCount').textContent = support.length;
+      drawSupportList(support);
+
+      // 3. Draw Audits
+      const audits = data.audit_events || [];
+      document.getElementById('modalAuditsCount').textContent = audits.length;
+      drawAuditsList(audits);
+
+    } catch(err){
+      document.getElementById('modalStudentName').textContent = 'Error loading student';
+      document.getElementById('modalStudentEmail').textContent = err.message || 'Could not fetch record';
+    }
+  }
+
+  function closeStudentActivityModal(){
+    document.getElementById('studentActivityModal').hidden = true;
+    currentActiveStudent = null;
+  }
+
+  function drawBookingsList(bookings){
+    const container = document.getElementById('modalBookingsList');
+    container.replaceChildren();
+
+    if(!bookings.length){
+      container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);background:#f9fbf9;border-radius:10px">No laundry wash bookings recorded for this student yet.</div>';
+      return;
+    }
+
+    bookings.forEach(b => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap';
+
+      const start = new Date(b.starts_at);
+      const dateStr = start.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+      const timeStr = start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const statusPillClass = b.ticket_status === 'completed' || b.ticket_status === 'used' ? 'completed' : (b.ticket_status === 'confirmed' ? 'confirmed' : 'cancelled');
+      const shortId = (b.ticket_id || '').slice(0, 8).toUpperCase();
+
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:36px;height:36px;background:#eef5f0;border-radius:9px;display:grid;place-items:center;font-size:16px;color:var(--green)">◉</div>
+          <div>
+            <div style="font-weight:700;font-size:12px">${escHtml(b.machine_name || b.machine_key || 'Washer')} · <small style="color:var(--muted)">Dorm ${escHtml(b.machine_dorm || '—')}</small></div>
+            <div style="font-size:11px;color:var(--muted)">◷ ${dateStr} at ${timeStr} (${b.duration_minutes || 30} mins)</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:10px;font-family:monospace;background:#f0f4f1;padding:3px 7px;border-radius:6px">#${shortId}</span>
+          <span class="pill ${statusPillClass}">${escHtml((b.ticket_status || 'ticket').toUpperCase())}</span>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function drawSupportList(support){
+    const container = document.getElementById('modalSupportList');
+    container.replaceChildren();
+
+    if(!support.length){
+      container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);background:#f9fbf9;border-radius:10px">No support requests submitted by this student.</div>';
+      return;
+    }
+
+    support.forEach(s => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:6px';
+      const created = new Date(s.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const statusClass = s.status === 'resolved' ? 'completed' : (s.status === 'in_progress' ? 'confirmed' : 'warning');
+
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <div>
+            <b style="font-size:12px">${escHtml(s.ticket_number || 'TICKET')}: ${escHtml(s.subject || 'Support issue')}</b>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px">Category: ${escHtml(s.category || 'General')} · ${created}</div>
+          </div>
+          <span class="pill ${statusClass}">${escHtml((s.status || 'open').toUpperCase())}</span>
+        </div>
+        <div style="font-size:11px;color:#4a5551;margin:6px 0;line-height:1.4">${escHtml(s.description || '')}</div>
+        ${s.resolution ? `<div style="background:#f4f7f5;padding:8px 10px;border-radius:8px;font-size:10px;color:var(--green)"><b>Staff resolution:</b> ${escHtml(s.resolution)}</div>` : ''}
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function drawAuditsList(audits){
+    const container = document.getElementById('modalAuditsList');
+    container.replaceChildren();
+
+    if(!audits.length){
+      container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);background:#f9fbf9;border-radius:10px">No disciplinary records or penalties recorded for this student.</div>';
+      return;
+    }
+
+    audits.forEach(a => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:10px';
+      const time = new Date(a.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+      card.innerHTML = `
+        <div>
+          <b style="font-size:11px;color:#c94a29">${escHtml(a.action.replaceAll('_', ' ').toUpperCase())}</b>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Reason: ${escHtml(a.reason || 'Staff action')}</div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);text-align:right">
+          <div>By ${escHtml(a.actor_role || 'Staff')}</div>
+          <time>${time}</time>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function switchModalTab(tabId, btn){
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(tabId)?.classList.add('active');
+  }
+
+  /* ── Penalty Management Modal ────────────────────────────────────── */
+  function populateStudentSelect(selectedUserId){
+    const sel = document.getElementById('pmStudentSelect');
+    if(!sel) return;
+    sel.innerHTML = '<option value="">-- Choose a student --</option>';
+    studentsCache.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.user_id;
+      opt.textContent = `${s.full_name || 'Unknown'} · Dorm ${s.dorm_class || '—'} · ${s.university_id || s.university_email || ''}`;
+      if(s.user_id === selectedUserId) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  function onPenaltyStudentSelected(){
+    const sel = document.getElementById('pmStudentSelect');
+    const uid = sel ? sel.value : '';
+    if(!uid){
+      setPenaltyModalStudentPreview(null);
+      return;
+    }
+    const student = studentsCache.find(s => s.user_id === uid);
+    setPenaltyModalStudentPreview(student);
+  }
+
+  function setPenaltyModalStudentPreview(s){
+    if(!s){
+      document.getElementById('pmUserId').value = '';
+      document.getElementById('pmStudentName').textContent = '—';
+      document.getElementById('pmStudentEmail').textContent = '—';
+      document.getElementById('pmStudentID').textContent = '—';
+      document.getElementById('pmStudentDorm').textContent = '—';
+      document.getElementById('pmWalletBal').textContent = '—';
+      const statusEl = document.getElementById('pmCurrentStatus');
+      statusEl.textContent = 'NORMAL';
+      statusEl.style.cssText = 'background:#e9f5ee;color:#38815e;display:inline-block;margin-top:4px;padding:4px 9px;border-radius:12px;font-size:9px;font-weight:800';
+      return;
+    }
+    document.getElementById('pmUserId').value = s.user_id || '';
+    document.getElementById('pmStudentName').textContent = s.full_name || 'Unknown';
+    document.getElementById('pmStudentEmail').textContent = s.university_email || '—';
+    document.getElementById('pmStudentID').textContent = s.university_id || '—';
+    document.getElementById('pmStudentDorm').textContent = 'Dorm ' + (s.dorm_class || '—');
+    document.getElementById('pmWalletBal').textContent = s.wallet_balance_cents != null ? 'EGP ' + (s.wallet_balance_cents / 100).toFixed(2) : '—';
+    const statusColors = {
+      none: 'background:#e9f5ee;color:#38815e',
+      warning: 'background:#fff3e2;color:#af792f',
+      suspended: 'background:#fff0eb;color:#c94a29',
+      blocked: 'background:#fee2e2;color:#991b1b'
+    };
+    const statusEl = document.getElementById('pmCurrentStatus');
+    statusEl.style.cssText = (statusColors[s.penalty_status] || statusColors.none) + ';display:inline-block;margin-top:4px;padding:4px 9px;border-radius:12px;font-size:9px;font-weight:800';
+    statusEl.textContent = (s.penalty_status || 'none').toUpperCase();
+
+    const curRadio = document.querySelector('input[name="penaltyStatus"][value="' + (s.penalty_status || 'none') + '"]');
+    if(curRadio) curRadio.checked = true;
+    onPenaltyTypeChange(s.penalty_status || 'none');
+    if(s.penalty_reason) document.getElementById('penaltyReason').value = s.penalty_reason;
+  }
+
+  function openPenaltyModalFor(userId){
+    populateStudentSelect(userId || '');
+    if(userId){
+      const s = studentsCache.find(x => x.user_id === userId);
+      if(s){
+        document.getElementById('pmStudentSelect').value = s.user_id;
+        setPenaltyModalStudentPreview(s);
+      }
+    } else {
+      if(studentsCache.length > 0){
+        document.getElementById('pmStudentSelect').value = studentsCache[0].user_id;
+        setPenaltyModalStudentPreview(studentsCache[0]);
+      } else {
+        document.getElementById('pmStudentSelect').value = '';
+        setPenaltyModalStudentPreview(null);
+      }
+    }
+    document.getElementById('penaltyModal').hidden = false;
+  }
+
+  function openPenaltyModalForCurrentStudent(){
+    if(!currentActiveStudent) return;
+    openPenaltyModalFor(currentActiveStudent.user_id);
+  }
+
+  function closePenaltyModal(){
+    document.getElementById('penaltyModal').hidden = true;
+  }
+
+  function onPenaltyTypeChange(val){
+    document.getElementById('suspensionDurationSection').style.display = val === 'suspended' ? 'block' : 'none';
+  }
+
+  function onDurationChange(){
+    const v = document.getElementById('suspDurationDays').value;
+    document.getElementById('customDateWrap').style.display = v === 'custom' ? 'block' : 'none';
+  }
+
+  async function submitPenalty(e){
+    e.preventDefault();
+    const userId = document.getElementById('pmUserId').value;
+    if(!userId){ notify('Please choose a student to penalize.','error'); return; }
+    const penStatusEl = document.querySelector('input[name="penaltyStatus"]:checked');
+    if(!penStatusEl){ notify('Please select a penalty action.','error'); return; }
+    const penStatus = penStatusEl.value;
+    const reason = document.getElementById('penaltyReason').value.trim();
+    if(!reason){ notify('Please enter a reason or notes.','error'); return; }
+    let durationDays = null;
+    let suspendedUntil = null;
+    if(penStatus === 'suspended'){
+      const dv = document.getElementById('suspDurationDays').value;
+      if(dv === 'custom'){
+        const dtVal = document.getElementById('suspUntilDatetime').value;
+        if(!dtVal){ notify('Please pick an exact suspension end date.','error'); return; }
+        suspendedUntil = new Date(dtVal).toISOString();
+      } else {
+        durationDays = parseInt(dv, 10);
+      }
+    }
+    const btn = document.getElementById('btnSubmitPenalty');
+    btn.disabled = true; btn.textContent = 'Applying…';
+    try {
+      const c = await window.ZCSupabase.ready();
+      const result = await c.rpc('staff_set_student_penalty', {
+        p_student_id: userId,
+        p_penalty_status: penStatus,
+        p_reason: reason,
+        p_duration_days: durationDays,
+        p_suspended_until: suspendedUntil
+      });
+      if(result.error) throw result.error;
+      notify('Penalty applied to ' + (result.data?.student_name || 'student') + '. They have been notified.', 'success');
+      closePenaltyModal();
+      loadStudents();
+      if(currentActiveStudent && currentActiveStudent.user_id === userId){
+        openStudentDetail(userId);
+      }
+    } catch(err){
+      notify('Failed to apply penalty: ' + (err.message || 'Error'), 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Apply & Notify Student →';
+    }
+  }
+
+  // Keyboard shortcut: Escape closes modal
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){
+      closeStudentActivityModal();
+      closePenaltyModal();
+    }
+  });
+
+  // Profile avatar setup
+  document.addEventListener('DOMContentLoaded', () => {
+    if(window.WashdayAuth){
+      const s = window.WashdayAuth.currentSession();
+      if(s){
+        const initials = (s.name || s.email || 'SV').split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+        document.querySelectorAll('#sideAvatar, #topAvatar').forEach(el => el.textContent = initials);
+      }
+    }
+    loadStudents();
+  });
+</script>
+</body>
+</html>

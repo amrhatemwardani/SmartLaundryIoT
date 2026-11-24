@@ -11,7 +11,7 @@
     @media(max-width:720px){.app{display:block;padding-bottom:62px}aside{position:fixed;z-index:4;bottom:0;left:0;right:0;height:60px;padding:5px 10px;border:0;border-top:1px solid var(--line);display:block}.brand,.nav-label,.side-bottom{display:none}.nav{display:flex;justify-content:space-around;gap:0}.nav a{display:flex;flex-direction:column;gap:2px;font-size:9px;padding:5px 10px}.nav a .label{display:block}.nav .ico{font-size:17px}main{padding:18px 14px 28px}.heading{align-items:flex-start}.heading h1{font-size:23px}.heading p{font-size:11px}.date{font-size:10px;padding:8px}.metrics{grid-template-columns:repeat(2,1fr);gap:9px}.metric{padding:12px}.metric strong{font-size:22px}.layout{grid-template-columns:1fr;gap:13px}.section{padding:15px}.user-mini span{display:none}}
   </style>
 <script src="loading.js" defer></script><script src="notifications.js" defer></script><style>.mini-usage{margin-top:14px}.usage-bars{height:80px;display:flex;align-items:flex-end;gap:7px;padding:7px 2px 0;background:repeating-linear-gradient(to top,transparent 0 24px,#edf2f2 25px)}.usage-bars span{flex:1;min-width:5px;background:linear-gradient(#42b7bd,#078f9d);border-radius:5px 5px 0 0}.usage-labels{display:flex;justify-content:space-between;margin-top:5px;color:#8b999c;font-size:8px}.booking-modal[hidden]{display:none}.booking-modal{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:#102a3290;padding:16px;backdrop-filter:blur(3px)}.booking-modal-card{position:relative;width:min(560px,100%);background:white;border-radius:17px;padding:23px;box-shadow:0 24px 70px #001c2633}.booking-modal-card h2{font:800 20px Manrope;margin:6px 0}.booking-modal-sub{color:var(--muted);font-size:11px}.booking-modal-close{position:absolute;right:13px;top:12px;border:0;border-radius:8px;background:#e8f5f6;color:var(--green);font-size:20px;width:31px;height:31px;cursor:pointer}.booking-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:15px 0}.booking-detail-grid>div{padding:11px;background:#f6f9f9;border-radius:9px}.booking-detail-grid small{display:block;font-size:9px;color:var(--muted);margin-bottom:5px}.booking-detail-grid b{font-size:10px}.booking-demo-note{background:#fff4e4;color:#775b31;padding:10px;border-radius:8px;font-size:9px;line-height:1.5}@media(max-width:540px){.booking-modal-card{padding:20px 15px}.booking-detail-grid{gap:6px}}</style></head>
-<body><div class="app"><aside><div class="brand"><img class="brand-icon" src="zc-laundry-mark.svg" alt=""><span class="brand-name">ZC <em>Dorm Laundry</em></span></div><div style="width:100%"><div class="nav-label">Management</div><nav class="nav"><a class="active" href="supervisor.html"><span class="ico">&#8962;</span><span class="label">Overview</span></a><a href="#bookings"><span class="ico">&#9635;</span><span class="label">Bookings</span></a><a href="#penalties"><span class="ico">&#9888;</span><span class="label">Student penalties</span></a><a href="supervisor-schedule.html#machines"><span class="ico">&#9673;</span><span class="label">Machines</span></a><a href="supervisor-schedule.html#slots"><span class="ico">&#9719;</span><span class="label">Slots</span></a><a href="approvals.html"><span class="ico">&#10003;</span><span class="label">Student approvals</span></a><a href="support-admin.html"><span class="ico">&#9993;</span><span class="label">Support queue</span></a><a href="#events"><span class="ico">&#8779;</span><span class="label">Door events</span></a><a href="audit.html"><span class="ico">&#8779;</span><span class="label">Activity log</span></a></nav></div><div class="side-bottom"><div class="profile"><div class="avatar">MK</div><div class="profile-text"><b data-session-name>Supervisor</b><small>Supervisor &middot; <a href="logout.html" data-logout style="color:var(--green)">Log out</a></small></div></div></div></aside>
+<body><div class="app"><aside><div class="brand"><img class="brand-icon" src="zc-laundry-mark.svg" alt=""><span class="brand-name">ZC <em>Dorm Laundry</em></span></div><div style="width:100%"><div class="nav-label">Management</div><nav class="nav"><a class="active" href="supervisor.html"><span class="ico">&#8962;</span><span class="label">Overview</span></a><a href="#bookings"><span class="ico">&#9635;</span><span class="label">Bookings</span></a><a href="supervisor-students.html"><span class="ico">&#128101;</span><span class="label">All Students</span></a><a href="#penalties"><span class="ico">&#9888;</span><span class="label">Student Penalties</span></a><a href="supervisor-schedule.html#machines"><span class="ico">&#9673;</span><span class="label">Machines</span></a><a href="supervisor-schedule.html#slots"><span class="ico">&#9719;</span><span class="label">Slots</span></a><a href="approvals.html"><span class="ico">&#10003;</span><span class="label">Student Approvals</span></a><a href="support-admin.html"><span class="ico">&#9993;</span><span class="label">Support Queue</span></a><a href="#events"><span class="ico">&#8779;</span><span class="label">Door Events</span></a><a href="audit.html"><span class="ico">&#8779;</span><span class="label">Activity Log</span></a></nav></div><div class="side-bottom"><div class="profile"><div class="avatar">MK</div><div class="profile-text"><b data-session-name>Supervisor</b><small>Supervisor &middot; <a href="logout.html" data-logout style="color:var(--green)">Log out</a></small></div></div></div></aside>
   <main><div class="topbar"><div class="crumb">Laundry room <span style="margin:0 7px;color:#b4beb8">/</span><strong>Supervisor overview</strong></div><div class="top-actions"><a href="logout.html" data-logout style="color:var(--green);font-size:11px;font-weight:700;text-decoration:none">Log out</a><div class="user-mini"><div class="avatar" id="topAvatar">SV</div><span data-session-name>Supervisor</span></div></div></div>
     <div class="heading"><div><h1>Good morning, <span data-session-name>Supervisor</span></h1><p>Here's what's happening in your assigned laundry room today.</p></div><div class="date" id="supervisorDate">&#9719; &nbsp; Live room status</div></div>
     <div class="metrics"><div class="metric"><div class="metric-head">Today's bookings<span class="metric-icon">&#9635;</span></div><strong id="metricBookings">&mdash;</strong><small class="good" id="metricBookingsSub">Loading bookings&hellip;</small></div><div class="metric"><div class="metric-head">Room capacity now<span class="metric-icon">&#8962;</span></div><strong id="metricCapacity">&mdash;</strong><small id="metricCapacitySub">Available washers</small></div><div class="metric"><div class="metric-head">Active cycles<span class="metric-icon">&#9673;</span></div><strong id="metricCycles">0</strong><small id="metricCyclesSub">Current running cycles</small></div><div class="metric"><div class="metric-head">Device health<span class="metric-icon">&#8961;</span></div><strong id="metricDevices">&mdash;</strong><small id="metricDevicesSub">Door lock &amp; IoT node</small></div></div>
@@ -23,9 +23,13 @@
         <div class="heading" style="margin-bottom:16px">
           <div>
             <h1 style="font-size:21px">Student Penalties &amp; Access Control</h1>
-            <p>Search for a dorm student and apply warnings, suspensions, or block laundry access.</p>
+            <p>Search for a dorm student, choose any registered student, and apply warnings, suspensions, or blocks.</p>
           </div>
-          <button class="outline" onclick="loadPenaltyStudentList()">&#8635; Refresh List</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="outline" onclick="openPenaltyModal(null)" style="background:var(--red);color:#fff;border-color:var(--red);font-weight:700">&#65291; Issue Penalty</button>
+            <a class="outline" href="supervisor-students.html" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px">&#128101; All Students Directory &rarr;</a>
+            <button class="outline" onclick="loadPenaltyStudentList()">&#8635; Refresh List</button>
+          </div>
         </div>
         <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
           <input id="penaltySearchInput" type="text" placeholder="Search by name, email, or ID&hellip;" oninput="filterPenaltyStudents()" style="flex:1;min-width:220px;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font:12px 'DM Sans';outline:none;background:#fff"/>
@@ -40,8 +44,8 @@
         <div class="card section" style="padding:0;overflow:hidden">
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Student</th><th>Dorm</th><th>Penalty Status</th><th>Suspended Until</th><th>Reason</th><th>Wallet (EGP)</th><th>Actions</th></tr></thead>
-              <tbody id="penaltyStudentRows"><tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Loading dorm students&hellip;</td></tr></tbody>
+              <thead><tr><th>Student</th><th>Dorm</th><th>Penalty Status</th><th>Suspended Until</th><th>Reason</th><th>Bookings</th><th>Wallet (EGP)</th><th>Actions</th></tr></thead>
+              <tbody id="penaltyStudentRows"><tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Loading dorm students&hellip;</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -74,11 +78,21 @@
 
   <!-- PENALTY MODAL -->
   <div class="booking-modal" id="penaltyModal" role="dialog" aria-modal="true" hidden>
-    <section class="booking-modal-card" style="max-width:520px">
+    <section class="booking-modal-card" style="max-width:540px">
       <button class="booking-modal-close" onclick="closePenaltyModal()">&#215;</button>
       <div class="eyebrow" style="color:#c94a29">STUDENT ACCESS CONTROL</div>
-      <h2 id="penaltyModalTitle">Manage Student Account</h2>
-      <p class="booking-modal-sub">Apply a warning, suspension, or block to restrict this student's laundry access.</p>
+      <h2 id="penaltyModalTitle">Manage Student Penalty</h2>
+      <p class="booking-modal-sub">Apply a warning, temporary suspension, or permanent block to restrict dorm laundry access.</p>
+
+      <!-- Student Selector Dropdown -->
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;font-weight:700;display:block;margin-bottom:5px">Select Target Student *</label>
+        <select id="pmStudentSelect" onchange="onPenaltyStudentSelected()" style="width:100%;border:1.5px solid var(--line);border-radius:9px;padding:9px 12px;font:700 12px 'DM Sans';background:#fff;outline:none">
+          <option value="">-- Choose a student --</option>
+        </select>
+      </div>
+
+      <!-- Student Info Preview Card -->
       <div style="background:#f4f7f5;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:12px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
         <div><small style="color:var(--muted)">Student Name</small><b id="pmStudentName" style="display:block;font-size:12px"></b></div>
         <div><small style="color:var(--muted)">Email</small><b id="pmStudentEmail" style="display:block;font-size:11px;word-break:break-all"></b></div>
@@ -87,6 +101,7 @@
         <div><small style="color:var(--muted)">Current Status</small><span id="pmCurrentStatus" style="display:inline-block;margin-top:4px;padding:4px 9px;border-radius:12px;font-size:9px;font-weight:800;background:#e9f5ee;color:#38815e">NORMAL</span></div>
         <div><small style="color:var(--muted)">Wallet Balance</small><b id="pmWalletBal" style="display:block;color:var(--green)"></b></div>
       </div>
+
       <form onsubmit="submitPenalty(event)">
         <input type="hidden" id="pmUserId"/>
         <div style="margin-bottom:12px">
@@ -206,15 +221,15 @@
     async function loadPenaltyStudentList(){
       var tbody = document.getElementById('penaltyStudentRows');
       if(!tbody) return;
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Loading&hellip;</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted)">Loading registered students&hellip;</td></tr>';
       try{
         var c = await window.ZCSupabase.ready();
-        var result = await c.rpc('staff_list_dorm_students');
+        var result = await c.rpc('staff_list_dorm_students', { p_dorm_class: null });
         if(result.error) throw result.error;
         penaltyStudentsCache = result.data || [];
         renderPenaltyStudents();
       } catch(e){
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:#c94a29">' + (e.message || 'Could not load students') + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:#c94a29">' + (e.message || 'Could not load students') + '</td></tr>';
       }
     }
 
@@ -237,7 +252,7 @@
       });
       tbody.replaceChildren();
       if(!list.length){
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">No students match the filter.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted)">No students match the filter.</td></tr>';
         return;
       }
       var statusColors = {
@@ -251,6 +266,7 @@
         var sc = statusColors[s.penalty_status] || statusColors.none;
         var untilStr = s.suspended_until ? new Date(s.suspended_until).toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '\u2014';
         var walletEgp = s.wallet_balance_cents != null ? 'EGP ' + (s.wallet_balance_cents / 100).toFixed(2) : '\u2014';
+        var bookingsCount = s.booking_count != null ? s.booking_count + ' bookings' : '0 bookings';
         var initials = (s.full_name||'S').split(/\s+/).map(function(x){return x[0];}).join('').slice(0,2).toUpperCase();
         tr.innerHTML =
           '<td><div class="student"><span class="mini-avatar">' + escHtml(initials) + '</span>' + escHtml(s.full_name||'Unknown') +
@@ -259,21 +275,61 @@
           '<td><span style="display:inline-block;padding:4px 9px;border-radius:12px;font-size:9px;font-weight:800;background:' + sc.bg + ';color:' + sc.col + '">' + (s.penalty_status||'none').toUpperCase() + '</span></td>' +
           '<td style="font-size:10px">' + escHtml(untilStr) + '</td>' +
           '<td style="font-size:10px;color:var(--muted);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escHtml(s.penalty_reason||'\u2014') + '</td>' +
+          '<td style="font-size:10px;font-weight:600">' + escHtml(bookingsCount) + '</td>' +
           '<td style="font-weight:700;color:var(--green)">' + escHtml(walletEgp) + '</td>' +
-          '<td style="text-align:center"><button class="row-action" style="background:var(--red);color:#fff;border-radius:7px;padding:5px 10px;font-size:9px;font-weight:700;border:0;cursor:pointer" data-uid="' + escHtml(s.user_id||'') + '">Manage &rarr;</button></td>';
+          '<td style="text-align:center;white-space:nowrap">' +
+            '<button class="row-action" style="background:var(--red);color:#fff;border-radius:7px;padding:5px 10px;font-size:9px;font-weight:700;border:0;cursor:pointer;margin-right:6px" data-uid="' + escHtml(s.user_id||'') + '">Manage &rarr;</button>' +
+            '<a href="supervisor-students.html?id=' + encodeURIComponent(s.user_id) + '" style="font-size:9px;font-weight:700;color:var(--green);text-decoration:none">View &rarr;</a>' +
+          '</td>';
         var manageBtn = tr.querySelector('[data-uid]');
         (function(student){ manageBtn.addEventListener('click', function(){ openPenaltyModal(student); }); })(s);
         tbody.appendChild(tr);
       });
     }
 
-    function openPenaltyModal(s){
+    function populateStudentSelect(selectedUserId){
+      var sel = document.getElementById('pmStudentSelect');
+      if(!sel) return;
+      sel.innerHTML = '<option value="">-- Choose a student --</option>';
+      penaltyStudentsCache.forEach(function(s){
+        var opt = document.createElement('option');
+        opt.value = s.user_id;
+        opt.textContent = (s.full_name || 'Unknown') + ' · Dorm ' + (s.dorm_class || '—') + ' · ' + (s.university_id || s.university_email || '');
+        if(s.user_id === selectedUserId) opt.selected = true;
+        sel.appendChild(opt);
+      });
+    }
+
+    function onPenaltyStudentSelected(){
+      var sel = document.getElementById('pmStudentSelect');
+      var uid = sel ? sel.value : '';
+      if(!uid){
+        setPenaltyModalStudentPreview(null);
+        return;
+      }
+      var student = penaltyStudentsCache.find(function(s){ return s.user_id === uid; });
+      setPenaltyModalStudentPreview(student);
+    }
+
+    function setPenaltyModalStudentPreview(s){
+      if(!s){
+        document.getElementById('pmUserId').value = '';
+        document.getElementById('pmStudentName').textContent = '—';
+        document.getElementById('pmStudentEmail').textContent = '—';
+        document.getElementById('pmStudentID').textContent = '—';
+        document.getElementById('pmStudentDorm').textContent = '—';
+        document.getElementById('pmWalletBal').textContent = '—';
+        var statusEl = document.getElementById('pmCurrentStatus');
+        statusEl.textContent = 'NORMAL';
+        statusEl.style.cssText = 'background:#e9f5ee;color:#38815e;display:inline-block;margin-top:4px;padding:4px 9px;border-radius:12px;font-size:9px;font-weight:800';
+        return;
+      }
       document.getElementById('pmUserId').value = s.user_id || '';
       document.getElementById('pmStudentName').textContent = s.full_name || 'Unknown';
-      document.getElementById('pmStudentEmail').textContent = s.university_email || '\u2014';
-      document.getElementById('pmStudentID').textContent = s.university_id || '\u2014';
-      document.getElementById('pmStudentDorm').textContent = 'Dorm ' + (s.dorm_class || '\u2014');
-      document.getElementById('pmWalletBal').textContent = s.wallet_balance_cents != null ? 'EGP ' + (s.wallet_balance_cents / 100).toFixed(2) : '\u2014';
+      document.getElementById('pmStudentEmail').textContent = s.university_email || '—';
+      document.getElementById('pmStudentID').textContent = s.university_id || '—';
+      document.getElementById('pmStudentDorm').textContent = 'Dorm ' + (s.dorm_class || '—');
+      document.getElementById('pmWalletBal').textContent = s.wallet_balance_cents != null ? 'EGP ' + (s.wallet_balance_cents / 100).toFixed(2) : '—';
       var statusColors = {
         none: 'background:#e9f5ee;color:#38815e',
         warning: 'background:#fff3e2;color:#af792f',
@@ -283,10 +339,29 @@
       var statusEl = document.getElementById('pmCurrentStatus');
       statusEl.style.cssText = (statusColors[s.penalty_status] || statusColors.none) + ';display:inline-block;margin-top:4px;padding:4px 9px;border-radius:12px;font-size:9px;font-weight:800';
       statusEl.textContent = (s.penalty_status || 'none').toUpperCase();
-      document.querySelectorAll('input[name="penaltyStatus"]').forEach(function(r){ r.checked = false; });
-      document.getElementById('penaltyReason').value = '';
-      document.getElementById('suspensionDurationSection').style.display = 'none';
-      document.getElementById('customDateWrap').style.display = 'none';
+
+      // Set radio to current status or none
+      var curRadio = document.querySelector('input[name="penaltyStatus"][value="' + (s.penalty_status || 'none') + '"]');
+      if(curRadio) curRadio.checked = true;
+      onPenaltyTypeChange(s.penalty_status || 'none');
+      if(s.penalty_reason) document.getElementById('penaltyReason').value = s.penalty_reason;
+    }
+
+    function openPenaltyModal(s){
+      populateStudentSelect(s ? s.user_id : '');
+      if(s){
+        document.getElementById('pmStudentSelect').value = s.user_id;
+        setPenaltyModalStudentPreview(s);
+      } else {
+        // Pick first student if available or blank
+        if(penaltyStudentsCache.length > 0){
+          document.getElementById('pmStudentSelect').value = penaltyStudentsCache[0].user_id;
+          setPenaltyModalStudentPreview(penaltyStudentsCache[0]);
+        } else {
+          document.getElementById('pmStudentSelect').value = '';
+          setPenaltyModalStudentPreview(null);
+        }
+      }
       document.getElementById('penaltyModal').hidden = false;
     }
 
@@ -306,11 +381,12 @@
     async function submitPenalty(e){
       e.preventDefault();
       var userId = document.getElementById('pmUserId').value;
+      if(!userId){ notify('Please choose a student to penalize.','error'); return; }
       var penStatusEl = document.querySelector('input[name="penaltyStatus"]:checked');
       if(!penStatusEl){ notify('Please select a penalty action.','error'); return; }
       var penStatus = penStatusEl.value;
       var reason = document.getElementById('penaltyReason').value.trim();
-      if(!reason){ notify('Please enter a reason.','error'); return; }
+      if(!reason){ notify('Please enter a reason or notes.','error'); return; }
       var durationDays = null;
       var suspendedUntil = null;
       if(penStatus === 'suspended'){
