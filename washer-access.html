@@ -349,6 +349,11 @@
     const card = document.getElementById('resCard');
     card.hidden = false;
 
+    const slot = t.laundry_slots;
+    const machine = slot?.laundry_machines;
+    const start = slot ? new Date(slot.starts_at) : null;
+    const end   = start ? new Date(start.getTime() + (slot.duration_minutes || 30) * 60000) : null;
+
     // USER REQUIREMENT: Door access unlocks 10 minutes BEFORE slot starts!
     const unlockStart = start ? new Date(start.getTime() - 10 * 60000) : null;
     const qrAccessWindowEnd = start ? new Date(start.getTime() + 15 * 60000) : null;
@@ -406,13 +411,20 @@
     if(isEarly){
       document.getElementById('earlyNotice').style.display='block';
       document.getElementById('earlyNotice').innerHTML = `
-        <b>⏰ Door access unlocks 10 minutes before slot</b>
-        Door QR code activates at <b>${fmt(unlockStart)}</b>.<br>
-        Your 30-minute washing cycle starts at <b>${fmt(start)}</b>.<br>
-        Time until door unlock: <span class="countdown-to-start" id="countdownToStart">—</span>`;
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <div style="font-size:28px">⏳</div>
+          <div>
+            <b style="font-size:14px;color:#075567;display:block">Door Access Opens 10 Min Before Slot</b>
+            <div style="font-size:11px;color:#2e6472">Door QR activates at <b>${fmt(unlockStart)}</b> · Washing cycle starts at <b>${fmt(start)}</b></div>
+          </div>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:12px 18px;display:inline-flex;align-items:center;gap:14px;border:1.5px solid #aad8de;box-shadow:0 2px 8px rgba(7,85,103,0.06)">
+          <span style="color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px">Door Access Unlocks In:</span>
+          <span class="countdown-to-start" id="countdownToStart" style="font:800 24px Manrope;color:#075567;margin:0">00:00:00</span>
+        </div>`;
       document.getElementById('startBtn').disabled = true;
-      document.getElementById('startBtn').innerHTML = `<span class="start-btn-label">⏳&nbsp;&nbsp;Unlocks at ${fmt(unlockStart)}</span>`;
-      document.getElementById('statusHint').textContent = `Room unlock opens at ${fmt(unlockStart)}`;
+      document.getElementById('startBtn').innerHTML = `<span class="start-btn-label">⏳&nbsp;&nbsp;Door QR Unlocks at ${fmt(unlockStart)}</span>`;
+      document.getElementById('statusHint').textContent = `Room QR access opens at ${fmt(unlockStart)} (10 min before slot)`;
       startCountdownToUnlock(unlockStart, start);
     }else if(isInWindow){
       document.getElementById('earlyNotice').style.display='none';
@@ -434,6 +446,17 @@
   function fmt(d){
     if(!d) return '—';
     return d.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit', hour12:true});
+  }
+
+  function formatCountdown(sec){
+    if(!sec || sec <= 0) return '00:00';
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    if(h > 0){
+      return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    }
+    return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
   }
 
   /* ── Countdown to door unlock ─────────────────────────── */
@@ -489,16 +512,32 @@
         renderQrCode(data);
       }else if(data.status==='early'){
         setQrState('waiting');
+        let secToUnlock = data.seconds_until_unlock || 0;
         const unlockTimeStr = data.valid_from ? fmt(new Date(data.valid_from)) : '10 minutes before slot';
+        const startStr = data.starts_at ? fmt(new Date(data.starts_at)) : '';
         document.getElementById('qrCanvas').innerHTML=`
-          <div style="color:var(--muted);font-size:11px;text-align:center;padding:20px">
-            <div style="font-size:36px">⏰</div>
-            <b>Door access locked</b><br>
-            Unlocks at <b>${unlockTimeStr}</b>
+          <div style="color:#075567;text-align:center;padding:20px 10px">
+            <div style="font-size:40px;margin-bottom:8px">⏳</div>
+            <b style="font-size:14px;display:block">Door Access Locked</b>
+            <span style="font-size:11px;color:var(--muted);display:block;margin-top:4px">
+              Unlocks 10 min prior to slot at <b>${unlockTimeStr}</b><br>(Washing cycle starts at ${startStr})
+            </span>
           </div>`;
-        document.getElementById('qrStatusBox').className='qr-access-status warning';
-        document.getElementById('qrStatusBox').innerHTML=`<b>Door access not yet open.</b> Unlocks 10 minutes prior to slot at <b>${unlockTimeStr}</b>.`;
-        backToStartWithMsg(`Door access unlocks at ${unlockTimeStr}.`,'info');
+        document.getElementById('qrCountdown').textContent = formatCountdown(secToUnlock);
+        document.getElementById('qrStatusBox').className = 'qr-access-status warning';
+        document.getElementById('qrStatusBox').innerHTML = `<b>Access Locked:</b> Unlocks at <b>${unlockTimeStr}</b>. QR code will automatically generate when door access opens.`;
+
+        if(secToUnlock > 0){
+          qrTimer = setInterval(()=>{
+            secToUnlock--;
+            if(secToUnlock <= 0){
+              clearInterval(qrTimer);
+              handleStartWashing();
+            } else {
+              document.getElementById('qrCountdown').textContent = formatCountdown(secToUnlock);
+            }
+          }, 1000);
+        }
       }else if(data.status==='expired'){
         setQrState('waiting');
         document.getElementById('qrStatusBox').className='qr-access-status error';

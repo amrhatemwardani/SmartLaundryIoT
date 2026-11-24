@@ -259,7 +259,7 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
     </div>
     </section>
   </main>
-</div><div class="policy-modal" id="studentPolicyModal" role="dialog" aria-modal="true" aria-labelledby="studentPolicyTitle" onclick="if(event.target===this)closeStudentPolicy()"><section class="policy-card"><button class="policy-close" onclick="closeStudentPolicy()" aria-label="Close">×</button><span class="policy-kicker">ZC DORM LAUNDRY</span><h2 id="studentPolicyTitle"></h2><div id="studentPolicyBody" class="policy-body"></div><p class="policy-draft">Project draft: Zewail City must review and approve the final policy before production.</p><button class="primary" onclick="closeStudentPolicy()">I understand</button></section></div><div class="notification-panel" id="notificationPanel" role="dialog" aria-modal="false" aria-labelledby="notificationTitle" hidden><div class="notification-panel-head"><div><h2 id="notificationTitle">Notifications</h2><small id="notificationStatus">Connecting securely…</small></div><button type="button" aria-label="Close notifications" onclick="closeNotifications()">×</button></div><button type="button" class="notification-push-enable" onclick="enableFirebasePush()">Enable browser notifications</button><div id="notificationItems" class="notification-items"><p class="notification-empty">Your notifications will appear here after secure account setup.</p></div></div><div class="checkout-modal" id="ticketCheckout" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle"><div class="checkout-box"><button class="checkout-close" onclick="closeTicketCheckout()" aria-label="Close">×</button><div class="checkout-kicker">STEP 4: INTERACTIVE WASHER RESERVATION</div><h2 id="checkoutTitle">Review & Confirm Your Washer</h2><div class="checkout-washer-card" id="checkoutWasherCard" style="display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#075567,#078f9d);color:#fff;border-radius:14px;padding:16px;margin:12px 0"><div style="flex:none;width:52px;height:62px;background:#c8e8e6;border:2px solid #8bbcb8;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 0 #fff8"><div style="width:30px;height:30px;border-radius:50%;border:2px solid #7ab0ac;background:radial-gradient(circle at 35% 35%,#c8f0ee,#5aa7a3 60%,#2d7a76);box-shadow:0 0 0 4px #22c77840"></div></div><div style="flex:1"><b id="checkoutMachineName" style="font:800 15px Manrope;display:block">Washer</b><div id="checkoutSlotTime" style="font-size:11px;color:#cce2d8;margin-top:2px">Today · 05:30 PM – 06:00 PM</div><div id="checkoutUnlockNotice" style="font-size:10px;color:#d8f07d;font-weight:700;margin-top:4px">🚪 Door unlocks 10 min before slot</div></div></div><div class="checkout-rules" style="padding:10px 14px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Location:</span><b id="checkoutDormText">Dorm Building B · Laundry Room</b></div><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Cycle Duration:</span><b>30 Minutes (Standard Wash)</b></div><div style="display:flex;justify-content:space-between"><span>IoT Door Access:</span><b style="color:var(--green)">Dynamic Single-Use QR</b></div></div><label class="checkout-agree"><input id="checkoutAgree" type="checkbox" onchange="document.getElementById('payTicketButton').disabled=!this.checked"/><span>I understand door QR access activates 10 minutes before my slot and is single-use for dorm laundry safety.</span></label><div class="payment-methods"><label><input type="radio" name="paymentMethod" value="wallet" checked onchange="updatePaymentAction()"/><span><b>Pay from wallet (Instant Confirmation)</b><small>Available balance: <em id="checkoutWalletBalance" style="font-weight:700;color:var(--green)">EGP 0.00</em></small></span></label><label><input type="radio" name="paymentMethod" value="paymob" onchange="updatePaymentAction()"/><span><b>Online payment (Card / Mobile Wallet)</b><small>Paymob hosted checkout</small></span></label></div><div id="paymobMethodChoices" hidden><p style="font-size:9px;font-weight:700;margin:10px 0 6px">Choose online method</p><div class="payment-methods"><label><input type="radio" name="paymobMethod" value="card" checked/><span><b>Debit / credit card</b></span></label><label><input type="radio" name="paymobMethod" value="wallet"/><span><b>Mobile wallet</b></span></label></div></div><div class="checkout-total" style="align-items:center;margin:12px 0 8px"><div><span style="font-size:11px;color:var(--muted);display:block">Total Due</span><small style="font-size:9px;color:#22c778">✓ Includes 30-min machine & door access</small></div><b id="checkoutPrice" style="font:800 20px Manrope;color:var(--ink)">EGP 25.00</b></div><button class="primary" id="payTicketButton" disabled onclick="startTicketPayment()" style="font:800 14px Manrope;padding:14px;border-radius:12px;background:linear-gradient(135deg,#078f9d,#0ab5c5)">Confirm & Book Washer →</button><p class="checkout-sub" style="text-align:center;margin-top:8px">Single-use QR code will be generated upon confirmed reservation.</p></div></div><div class="ticket-qr-modal" id="ticketQrModal" hidden><section><button type="button" onclick="closeTicketQr()" aria-label="Close">×</button><h2 id="ticketQrTitle">Laundry door access QR</h2><p id="ticketQrSubtitle">Show this one-time QR at the laundry door during your ticket window.</p><div id="ticketQrCanvas"></div><div id="ticketQrTimer" style="margin:10px 0;font-size:12px;font-weight:700"></div><small id="ticketQrMessage"></small></section></div><div class="toast" id="toast"></div>
+</div><div class="policy-modal" id="studentPolicyModal" role="dialog" aria-modal="true" aria-labelledby="studentPolicyTitle" onclick="if(event.target===this)closeStudentPolicy()"><section class="policy-card"><button class="policy-close" onclick="closeStudentPolicy()" aria-label="Close">×</button><span class="policy-kicker">ZC DORM LAUNDRY</span><h2 id="studentPolicyTitle"></h2><div id="studentPolicyBody" class="policy-body"></div><p class="policy-draft">Project draft: Zewail City must review and approve the final policy before production.</p><button class="primary" onclick="closeStudentPolicy()">I understand</button></section></div><div class="notification-panel" id="notificationPanel" role="dialog" aria-modal="false" aria-labelledby="notificationTitle" hidden><div class="notification-panel-head"><div><h2 id="notificationTitle">Notifications</h2><small id="notificationStatus">Connecting securely…</small></div><button type="button" aria-label="Close notifications" onclick="closeNotifications()">×</button></div><button type="button" class="notification-push-enable" onclick="enableFirebasePush()">Enable browser notifications</button><div id="notificationItems" class="notification-items"><p class="notification-empty">Your notifications will appear here after secure account setup.</p></div></div><div class="checkout-modal" id="ticketCheckout" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle"><div class="checkout-box"><button class="checkout-close" onclick="closeTicketCheckout()" aria-label="Close">×</button><div class="checkout-kicker">STEP 4: INTERACTIVE WASHER RESERVATION</div><h2 id="checkoutTitle">Review & Confirm Your Washer</h2><div class="checkout-washer-card" id="checkoutWasherCard" style="display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#075567,#078f9d);color:#fff;border-radius:14px;padding:16px;margin:12px 0"><div style="flex:none;width:52px;height:62px;background:#c8e8e6;border:2px solid #8bbcb8;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 0 #fff8"><div style="width:30px;height:30px;border-radius:50%;border:2px solid #7ab0ac;background:radial-gradient(circle at 35% 35%,#c8f0ee,#5aa7a3 60%,#2d7a76);box-shadow:0 0 0 4px #22c77840"></div></div><div style="flex:1"><b id="checkoutMachineName" style="font:800 15px Manrope;display:block">Washer</b><div id="checkoutSlotTime" style="font-size:11px;color:#cce2d8;margin-top:2px">Today · 05:30 PM – 06:00 PM</div><div id="checkoutUnlockNotice" style="font-size:10px;color:#d8f07d;font-weight:700;margin-top:4px">🚪 Door unlocks 10 min before slot</div></div></div><div class="checkout-rules" style="padding:10px 14px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Location:</span><b id="checkoutDormText">Dorm Building B · Laundry Room</b></div><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Cycle Duration:</span><b>30 Minutes (Standard Wash)</b></div><div style="display:flex;justify-content:space-between"><span>IoT Door Access:</span><b style="color:var(--green)">Dynamic Single-Use QR</b></div></div><div style="margin:12px 0"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:10px;font-weight:700;color:#075567;text-transform:uppercase;letter-spacing:0.5px">Laundry Instructions & Safety Policy</span><button type="button" onclick="togglePolicyDetails()" style="border:0;background:none;color:var(--green);font-size:10px;font-weight:700;cursor:pointer" id="btnTogglePolicyDetails">Expand Rules ▾</button></div><div id="checkoutPolicyDetails" style="background:#f4fafb;border:1.5px solid #d0eaed;border-radius:10px;padding:12px;max-height:140px;overflow-y:auto;font-size:10px;line-height:1.6;color:#335b66"><p style="margin:0 0 6px"><b>1. Machine Instructions:</b> Inspect pockets for coins and sharp objects. Adhere to posted washer load limits. Do not overload drum.</p><p style="margin:0 0 6px"><b>2. Room Access & 10-Min Window:</b> Your single-use QR unlocks the door <b>10 minutes before slot start</b>. Access expires 10 minutes into the slot. Arrive promptly.</p><p style="margin:0 0 6px"><b>3. Safety & Privacy:</b> Do not share your access QR code with others. IoT door events and camera audit logs are maintained for student dorm security.</p><p style="margin:0"><b>4. Cancellation:</b> If you cannot attend, cancel your booking so other students may use the room.</p></div></div><label class="checkout-agree" style="cursor:pointer;user-select:none;display:flex;gap:10px;align-items:flex-start;background:#fff;border:1.5px solid #d0eaed;border-radius:10px;padding:10px 12px;margin:12px 0"><input id="checkoutAgree" type="checkbox" onchange="onCheckoutAgreeChange()" style="margin-top:2px;cursor:pointer;accent-color:var(--green);width:16px;height:16px"/><span style="font-size:10.5px;color:var(--ink);line-height:1.4"><b>I have read and agree</b> to the Dorm Laundry Instructions, Safety Guidelines, and Room Access Policy.</span></label><div class="payment-methods"><label><input type="radio" name="paymentMethod" value="wallet" checked onchange="updatePaymentAction()"/><span><b>Pay from wallet (Instant Confirmation)</b><small>Available balance: <em id="checkoutWalletBalance" style="font-weight:700;color:var(--green)">EGP 0.00</em></small></span></label><label><input type="radio" name="paymentMethod" value="paymob" onchange="updatePaymentAction()"/><span><b>Online payment (Card / Mobile Wallet)</b><small>Paymob hosted checkout</small></span></label></div><div id="paymobMethodChoices" hidden><p style="font-size:9px;font-weight:700;margin:10px 0 6px">Choose online method</p><div class="payment-methods"><label><input type="radio" name="paymobMethod" value="card" checked/><span><b>Debit / credit card</b></span></label><label><input type="radio" name="paymobMethod" value="wallet"/><span><b>Mobile wallet</b></span></label></div></div><div class="checkout-total" style="align-items:center;margin:12px 0 8px"><div><span style="font-size:11px;color:var(--muted);display:block">Total Due</span><small style="font-size:9px;color:#22c778">✓ Includes 30-min machine & door access</small></div><b id="checkoutPrice" style="font:800 20px Manrope;color:var(--ink)">EGP 25.00</b></div><button class="primary" id="payTicketButton" disabled onclick="startTicketPayment()" style="font:800 14px Manrope;padding:14px;border-radius:12px;background:linear-gradient(135deg,#078f9d,#0ab5c5)">Please agree to instructions & policy to continue</button><p class="checkout-sub" style="text-align:center;margin-top:8px">Single-use QR code will be generated upon confirmed reservation.</p></div></div><div class="ticket-qr-modal" id="ticketQrModal" hidden><section><button type="button" onclick="closeTicketQr()" aria-label="Close">×</button><h2 id="ticketQrTitle">Laundry door access QR</h2><p id="ticketQrSubtitle">Show this one-time QR at the laundry door during your ticket window.</p><div id="ticketQrCanvas"></div><div id="ticketQrTimer" style="margin:10px 0;font-size:12px;font-weight:700"></div><small id="ticketQrMessage"></small></section></div><div class="toast" id="toast"></div>
 <script>
   function openStudentPolicy(kind){const specs={rules:['Laundry room rules','<h3>Before using a machine</h3><p>Follow the posted load limits and machine instructions. Check pockets and keep small items out of the drum.</p><h3>Room safety</h3><p>Keep walkways clear, do not touch electrical or IoT equipment, and report faults or hazards to the dorm supervisor. Emergency exits must remain accessible.</p><h3>Your booking</h3><p>Use only the washer and time slot shown on your ticket. Arrive on time, leave the area clean, and do not share your door QR code. Cancel if you can no longer attend.</p>'],privacy:['Privacy notice','<h3>Information used</h3><p>The service may use your university account, contact details, booking and payment status, support requests, and door access events to operate the dorm laundry service.</p><h3>Access and retention</h3><p>Students can view their own records. Supervisors and administrators receive access needed for their duties. Final retention periods and a privacy contact must be confirmed by Zewail City.</p><h3>Your choices</h3><p>Contact support to request a correction or ask a privacy question. Never send passwords or full payment card details in a support request.</p>'],terms:['Terms & conditions','<h3>Bookings and tickets</h3><p>A ticket reserves the washer and slot shown before payment. A real ticket is confirmed only after payment is verified. Cancellation, refund, and no-show rules must be approved and displayed before live payment is enabled.</p><h3>Safe use</h3><p>Follow posted machine instructions, keep the laundry room safe, and report equipment issues. Do not tamper with locks, QR scanners, or sensors.</p><h3>Door access</h3><p>Use your own time-limited ticket QR only during its valid access window. Emergency exit hardware must work independently of the app.</p>']};const spec=specs[kind];if(!spec)return;document.getElementById('studentPolicyTitle').textContent=spec[0];document.getElementById('studentPolicyBody').innerHTML=spec[1];document.getElementById('studentPolicyModal').classList.add('open')}function closeStudentPolicy(){document.getElementById('studentPolicyModal').classList.remove('open')}document.addEventListener('keydown',e=>{if(e.key==='Escape')closeStudentPolicy()});
   const dayData=Array.from({length:7},(_,i)=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+i);return [i===0?'TODAY':['SUN','MON','TUE','WED','THU','FRI','SAT'][d.getDay()],String(d.getDate()).padStart(2,'0')]});
@@ -314,13 +314,35 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
   function closeTicketCheckout(){document.getElementById('ticketCheckout').classList.remove('open')}
   function setTopup(amount,button){document.getElementById('topupAmount').value=amount;document.querySelectorAll('.topup-choices button').forEach(b=>b.classList.toggle('chosen',b===button))}
   const savedTheme=localStorage.getItem('washdayTheme');if(savedTheme)document.documentElement.dataset.theme=savedTheme;const savedAvatar=localStorage.getItem('washdayAvatar');if(savedAvatar)pickAvatar(savedAvatar);const savedLanguage=localStorage.getItem('washdayLanguage');if(savedLanguage)setLanguage(savedLanguage);
+  function onCheckoutAgreeChange(){
+    const isAgreed = document.getElementById('checkoutAgree')?.checked;
+    const btn = document.getElementById('payTicketButton');
+    if(!btn) return;
+    btn.disabled = !isAgreed;
+    btn.style.opacity = isAgreed ? '1' : '0.5';
+    btn.style.cursor = isAgreed ? 'pointer' : 'not-allowed';
+    updatePaymentAction();
+  }
+  function togglePolicyDetails(){
+    const el = document.getElementById('checkoutPolicyDetails');
+    const btn = document.getElementById('btnTogglePolicyDetails');
+    if(!el) return;
+    const isHidden = el.style.display === 'none';
+    el.style.display = isHidden ? 'block' : 'none';
+    if(btn) btn.textContent = isHidden ? 'Collapse Rules ▴' : 'Expand Rules ▾';
+  }
   function updatePaymentAction(){
-    const m=document.querySelector('input[name="paymentMethod"]:checked')?.value;
-    const choices=document.getElementById('paymobMethodChoices');
-    if(choices)choices.hidden=m!=='paymob';
-    const b=document.getElementById('payTicketButton');
-    const p=document.getElementById('checkoutPrice')?.textContent || 'EGP 25.00';
-    if(b)b.textContent=m==='paymob'?`Proceed to online payment (${p}) →`:`Confirm & Pay with Wallet (${p}) →`;
+    const m = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    const choices = document.getElementById('paymobMethodChoices');
+    if(choices) choices.hidden = m !== 'paymob';
+    const b = document.getElementById('payTicketButton');
+    const isAgreed = document.getElementById('checkoutAgree')?.checked;
+    const p = document.getElementById('checkoutPrice')?.textContent || 'EGP 25.00';
+    if(!isAgreed){
+      if(b) b.textContent = 'Please check policy agreement to proceed';
+      return;
+    }
+    if(b) b.textContent = m === 'paymob' ? `Proceed to online payment (${p}) →` : `Confirm & Pay with Wallet (${p}) →`;
   }
   async function addWalletFunds(e){e.preventDefault();const amount=Number(document.getElementById('topupAmount').value);if(!Number.isFinite(amount)||amount<10||amount>5000){notify('Enter an amount between EGP 10 and EGP 5,000.','error');return}await window.ZCPayments?.start({kind:'wallet_topup',paymentMethod:document.getElementById('topupMethod').value,amountCents:Math.round(amount*100)})}
   let zcDbSlots=[],zcDbMachines=[],zcDbProfile=null,zcSelectedMachineKey=null;
@@ -529,9 +551,10 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
     const targetLabel = document.getElementById('slotTargetTimeText');
     if(targetLabel) targetLabel.textContent = 'Select a time slot above first';
 
-    // Reset review card if no upcoming confirmed booking
-    if(!zcNextTicketId){
+    // Only reset review card if user has NO upcoming confirmed booking and NO washer selected
+    if(!zcNextTicketId && !zcSelectedMachine){
       document.getElementById('bookingStatus').textContent = 'NO BOOKINGS';
+      document.getElementById('bookingStatus').className = 'tag';
       document.getElementById('bookingDate').textContent = 'Select a time slot & washer';
       document.getElementById('bookingSubText').textContent = 'Follow Steps 1, 2, and 3';
       document.getElementById('bookingAction').textContent = '＋  Book a washer';
@@ -768,8 +791,14 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
         document.getElementById('checkoutWalletBalance').textContent = 'EGP ' + bal;
       }
 
-      document.getElementById('checkoutAgree').checked = true;
-      document.getElementById('payTicketButton').disabled = false;
+      const agreeCb = document.getElementById('checkoutAgree');
+      if(agreeCb) agreeCb.checked = false; // UNCHECKED: Student must read & check!
+      const payBtn = document.getElementById('payTicketButton');
+      if(payBtn){
+        payBtn.disabled = true;
+        payBtn.style.opacity = '0.5';
+        payBtn.style.cursor = 'not-allowed';
+      }
       updatePaymentAction();
       document.getElementById('ticketCheckout').classList.add('open');
     }catch(error){
@@ -779,7 +808,7 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
 
   async function startTicketPayment(){
     if(!document.getElementById('checkoutAgree').checked){
-      notify('Please accept the booking terms to proceed.','warning');
+      notify('Please read the laundry instructions and check the agreement box.','warning');
       return;
     }
     if(!zcSelectedMachine || !zcSelectedSlot){
@@ -800,6 +829,7 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
         button.style.background = '#22c778';
         notify('Reservation confirmed! Redirecting to your Washer Control Page…', 'success');
         await window.ZCPayments?.loadWalletBalance();
+        await loadNextBooking(); // Immediately synchronize the "Your next booking" card!
 
         // STEP 5: Redirect to Interactive Washer Control Page
         setTimeout(() => {
@@ -1065,28 +1095,52 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
           canvas.appendChild(img);
         }
 
-        let secondsRemaining=data.time_remaining_seconds||600;
-        timerEl.innerHTML=`<div style="background:#e8f5ed;color:#1e5e3a;padding:8px 12px;border-radius:8px">⏳ <b>Active QR Access:</b> Expires in <span id="qrCountdownVal">${formatCountdown(secondsRemaining)}</span> (at ${new Date(data.valid_until).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})})</div>`;
-        message.innerHTML='<b style="color:#078f9d;display:block;font-size:11px;margin-bottom:4px">🔑 Valid for Door Access (IoT ESP32/STM32)</b><span style="font-size:10px;color:var(--muted)">Scan at laundry door reader. QR vanishes 10 minutes after slot start.</span>';
+        let secondsRemaining = data.time_remaining_seconds || 600;
+        timerEl.innerHTML = `<div style="background:#e8f5ed;color:#1e5e3a;padding:8px 12px;border-radius:8px">⏳ <b>Active QR Access:</b> Expires in <span id="qrCountdownVal">${formatCountdown(secondsRemaining)}</span> (at ${formatTime12(data.valid_until)})</div>`;
+        message.innerHTML = '<b style="color:#078f9d;display:block;font-size:11px;margin-bottom:4px">🔑 Valid for Door Access (IoT ESP32/STM32)</b><span style="font-size:10px;color:var(--muted)">Scan at laundry door reader. Single-use access valid for entry.</span>';
 
-        qrCountdownTimer=setInterval(()=>{
+        qrCountdownTimer = setInterval(()=>{
           secondsRemaining--;
-          if(secondsRemaining<=0){
+          if(secondsRemaining <= 0){
             clearInterval(qrCountdownTimer);
             canvas.replaceChildren();
-            timerEl.innerHTML='<div style="background:#fff0ec;color:#8b2e24;padding:8px 12px;border-radius:8px;font-weight:700">⚠️ QR Code Expired</div>';
-            message.innerHTML='<span style="color:#8b2e24;font-size:11px">The 10-minute door check-in period has ended. Door access is locked. Contact your dorm supervisor.</span>';
+            timerEl.innerHTML = '<div style="background:#fff0ec;color:#8b2e24;padding:8px 12px;border-radius:8px;font-weight:700">⚠️ QR Code Expired</div>';
+            message.innerHTML = '<span style="color:#8b2e24;font-size:11px">The door check-in period has ended. Door access is locked. Contact your dorm supervisor.</span>';
           }else{
-            const cd=document.getElementById('qrCountdownVal');
-            if(cd) cd.textContent=formatCountdown(secondsRemaining);
+            const cd = document.getElementById('qrCountdownVal');
+            if(cd) cd.textContent = formatCountdown(secondsRemaining);
           }
-        },1000);
+        }, 1000);
 
       }else if(data.status==='early'){
         canvas.replaceChildren();
-        const startFormatted=new Date(data.starts_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-        timerEl.innerHTML=`<div style="background:#eef7f8;color:#075567;padding:12px;border-radius:10px;font-size:12px"><b>⏰ Access not yet open</b><br>Your booking starts at <b>${startFormatted}</b>.<br>The door QR code will activate exactly when your slot begins.</div>`;
-        message.innerHTML='<span style="font-size:10px;color:var(--muted)">Door locks remain secured until the slot start time. Please return at your booking time.</span>';
+        let secToUnlock = data.seconds_until_unlock || 0;
+        const unlockTimeStr = data.valid_from ? formatTime12(data.valid_from) : '10 minutes before slot';
+        const startStr = data.starts_at ? formatTime12(data.starts_at) : '';
+        timerEl.innerHTML = `
+          <div style="background:#eef7f8;color:#075567;padding:16px 14px;border-radius:12px;font-size:12px;text-align:center">
+            <div style="font-size:32px;margin-bottom:6px">⏳</div>
+            <b style="font-size:14px;display:block">Door Access Locked</b>
+            <div style="font-size:11px;color:#2e6472;margin:4px 0 8px">Door access activates at <b>${unlockTimeStr}</b> (10 min prior to slot at ${startStr}).</div>
+            <div style="background:#fff;border-radius:10px;padding:8px 14px;display:inline-block;border:1px solid #aad8de">
+              <small style="color:var(--muted);font-size:9px;text-transform:uppercase;font-weight:700;display:block">Time Until Door QR Unlocks</small>
+              <span id="earlyQrCountdown" style="font:800 22px Manrope;color:#075567">${formatCountdown(secToUnlock)}</span>
+            </div>
+          </div>`;
+        message.innerHTML = '<span style="font-size:10px;color:var(--muted)">Door locks remain secured until 10 minutes before your slot. When unlock time arrives, your dynamic single-use QR code will automatically appear here!</span>';
+
+        if(secToUnlock > 0){
+          qrCountdownTimer = setInterval(()=>{
+            secToUnlock--;
+            if(secToUnlock <= 0){
+              clearInterval(qrCountdownTimer);
+              showTicketQr(id);
+            }else{
+              const cd = document.getElementById('earlyQrCountdown');
+              if(cd) cd.textContent = formatCountdown(secToUnlock);
+            }
+          }, 1000);
+        }
       }else if(data.status==='expired'){
         canvas.replaceChildren();
         timerEl.innerHTML=`<div style="background:#fff0ec;color:#8b2e24;padding:12px;border-radius:10px;font-size:12px"><b>❌ 10-Minute Access Window Closed</b><br>${data.message}</div>`;
@@ -1146,9 +1200,15 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
       const end=new Date(start.getTime()+(slot.duration_minutes||30)*60000);
       const machName=slot.laundry_machines?.display_name||slot.machine_key;
 
-      statEl.textContent='CONFIRMED';
-      dateEl.textContent=machName+' · '+start.toLocaleString([],{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+' – '+end.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-      actEl.textContent='▶  START WASHING (Access Page)';
+      statEl.textContent = 'CONFIRMED';
+      statEl.className = 'tag confirmed';
+      dateEl.textContent = `${machName} · ${formatTime12(start)} – ${formatTime12(end)}`;
+      const subEl = document.getElementById('bookingSubText');
+      if(subEl) subEl.textContent = `${start.toLocaleDateString([], {weekday:'short', month:'short', day:'numeric'})} · 30 min cycle · QR Access ready`;
+      actEl.textContent = '▶  START WASHING (Access Page)';
+      actEl.onclick = () => { window.location.href = `washer-access.html?ticket=${next.id}`; };
+      const hintEl = document.getElementById('bookingHintText');
+      if(hintEl) hintEl.textContent = 'Door QR access unlocks 10 min before slot start. Click above to view washer control.';
     }catch(err){
       console.warn('Could not load next booking:', err);
       statEl.textContent='NO BOOKINGS';
@@ -1439,18 +1499,17 @@ html[data-theme="dark"] .machine-vis{background:linear-gradient(135deg,#2d4a40,#
     window.scrollTo({top:0,behavior:'smooth'});
   }
 
-  document.addEventListener('DOMContentLoaded',()=>{
+  document.addEventListener('DOMContentLoaded', async ()=>{
     updateLiveDate();
     renderDays();
-    loadBackendProfile();
-    loadBackendMachines();
-    loadNextBooking();
+    await loadBackendProfile();
+    await loadNextBooking();
+    await loadBackendMachines();
     window.ZCPayments?.loadWalletBalance();
     loadWalletActivity();
     loadLoyaltyBalance();
     loadTickets('all');
     loadSupportRequests();
-    // Phase 6: Supabase Realtime — subscribe to machine status changes
     subscribeToMachineStatus();
   });
 
