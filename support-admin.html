@@ -1,127 +1,623 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Support & complaints queue · ZC Dorm Laundry</title><script src="auth.js" defer></script><script src="supabase-client.js" defer></script><script src="notifications.js" defer></script><style>@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');*{box-sizing:border-box}body{margin:0;background:#f4f7f7;color:#172e39;font:14px 'DM Sans'}header{display:flex;justify-content:space-between;padding:15px 24px;background:white;border-bottom:1px solid #e1e9ea;align-items:center}.brand{font:800 13px Manrope;color:#075567}a{color:#078f9d;text-decoration:none;font-weight:700;font-size:11px;margin-left:12px}main{max-width:1100px;margin:auto;padding:28px 20px}h1{font:800 25px Manrope;margin:0 0 7px}.sub{color:#71838a;font-size:12px;margin:0 0 20px}.filters{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}select,button{padding:8px 12px;border:1px solid #dae6e7;border-radius:8px;background:white;color:#172e39;font-weight:700;font-size:11px;cursor:pointer}.list{display:grid;gap:12px}.item{background:white;border:1px solid #e1e9ea;border-radius:12px;padding:16px;display:grid;grid-template-columns:1fr auto;gap:16px}.ticket-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}.ticket-num{font:800 12px Manrope;color:#075567}.pill{display:inline-block;padding:3px 8px;border-radius:12px;font-size:9px;font-weight:700;text-transform:uppercase}.pill.washer{background:#e5f5f5;color:#087886}.pill.wallet,.pill.payment{background:#eef2f7;color:#2c3e50}.pill.door_access{background:#fff8e6;color:#7a5a17}.pill.urgent{background:#fff0ec;color:#8b2e24}.pill.status-open{background:#eef7f8;color:#078f9d}.pill.status-in_progress{background:#fff8e6;color:#7a5a17}.pill.status-resolved{background:#e8f5ed;color:#1e5e3a}.pill.status-closed{background:#f1f5f5;color:#71838a}.item h2{font-size:14px;font-weight:700;margin:4px 0 6px}.item p{font-size:11px;line-height:1.55;color:#586d74;margin:0 0 8px;white-space:pre-wrap}.meta{font-size:10px;color:#74878c;margin-top:6px}.resolution-box{margin-top:8px;padding:8px 12px;background:#e8f5ed;border-left:3px solid #1e5e3a;border-radius:4px;font-size:11px;color:#1e5e3a}.actions{display:flex;gap:7px;align-items:flex-start;flex-wrap:wrap}.primary{background:#078f9d;color:white;border-color:#078f9d}.empty{background:white;padding:24px;border-radius:12px;color:#71838a;text-align:center;border:1px solid #e1e9ea}@media(max-width:640px){.item{grid-template-columns:1fr}.actions{justify-content:flex-start}}
-</style></head><body><header><div class="brand">ZC · Zewail City Laundry · Support & complaints</div><nav><a id="overviewLink" href="supervisor.html">Overview</a><a href="approvals.html">Approvals</a><a href="audit.html">Audit log</a><a href="logout.html" data-logout>Log out</a></nav></header><main><h1>Student support tickets</h1><p class="sub">Review complaints, hardware faults, booking errors, and door access issues scoped to your staff assignment.</p><div class="filters"><label style="font-size:11px;font-weight:700">Status: <select id="statusFilter"><option value="">All tickets</option><option value="open">Open</option><option value="in_progress">In progress</option><option value="resolved">Resolved</option><option value="closed">Closed</option></select></label><label style="font-size:11px;font-weight:700">Category: <select id="categoryFilter"><option value="">All topics</option><option value="washer">Washer hardware</option><option value="booking">Bookings</option><option value="payment">Payment & billing</option><option value="wallet">Wallet balance</option><option value="door_access">Door access</option><option value="complaint">Room complaints</option><option value="other">Other</option></select></label><button onclick="loadSupportQueue()">↻ Refresh</button></div><section class="list" id="supportQueue"><p class="empty">Loading support requests…</p></section></main><script>
-let cachedTickets = [];
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Support & Complaints Queue · ZC Dorm Laundry</title>
+  <script src="auth.js" defer></script>
+  <script src="supabase-client.js" defer></script>
+  <script src="notifications.js" defer></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
+    *{box-sizing:border-box}
+    body{margin:0;background:#f4f7f7;color:#172e39;font:14px 'DM Sans',sans-serif}
+    header{display:flex;justify-content:space-between;padding:15px 24px;background:white;border-bottom:1px solid #e1e9ea;align-items:center}
+    .brand{font:800 13px Manrope;color:#075567;display:flex;align-items:center;gap:8px}
+    a{color:#078f9d;text-decoration:none;font-weight:700;font-size:11px;margin-left:12px}
+    main{max-width:1160px;margin:auto;padding:28px 20px}
+    h1{font:800 25px Manrope;margin:0 0 7px;color:#102a32}
+    .sub{color:#71838a;font-size:12px;margin:0 0 20px}
+    .filters{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+    select,button,input,textarea{font-family:inherit}
+    select,button{padding:8px 12px;border:1px solid #dae6e7;border-radius:8px;background:white;color:#172e39;font-weight:700;font-size:11px;cursor:pointer}
+    .list{display:grid;gap:12px}
+    .item{background:white;border:1px solid #e1e9ea;border-radius:12px;padding:18px;display:grid;grid-template-columns:1fr auto;gap:16px;transition:box-shadow .2s;cursor:pointer}
+    .item:hover{box-shadow:0 6px 20px #07556712}
+    .ticket-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+    .ticket-num{font:800 12px Manrope;color:#075567;background:#eef6f7;padding:3px 8px;border-radius:6px}
+    .pill{display:inline-block;padding:3px 9px;border-radius:12px;font-size:9px;font-weight:700;text-transform:uppercase}
+    .pill.washer{background:#e5f5f5;color:#087886}
+    .pill.wallet,.pill.payment{background:#eef2f7;color:#2c3e50}
+    .pill.door_access{background:#fff8e6;color:#7a5a17}
+    .pill.urgent{background:#fff0ec;color:#8b2e24;animation:pulse 2s infinite}
+    .pill.supervisor_escalation{background:#fae8ff;color:#86198f;border:1px solid #f0abfc}
+    .pill.status-open{background:#eef7f8;color:#078f9d}
+    .pill.status-in_progress{background:#fff8e6;color:#7a5a17}
+    .pill.status-resolved{background:#e8f5ed;color:#1e5e3a}
+    .pill.status-closed{background:#f1f5f5;color:#71838a}
+    .item h2{font-size:15px;font-weight:700;margin:4px 0 6px;color:#102a32}
+    .item p{font-size:11.5px;line-height:1.55;color:#586d74;margin:0 0 8px;white-space:pre-wrap}
+    .meta{font-size:10.5px;color:#74878c;margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
+    .resolution-box{margin-top:8px;padding:8px 12px;background:#e8f5ed;border-left:3px solid #1e5e3a;border-radius:4px;font-size:11px;color:#1e5e3a}
+    .actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+    .primary{background:#078f9d;color:white;border-color:#078f9d}
+    .primary:hover{background:#06737e}
+    .btn-escalate{background:#fff0eb;color:#c94a29;border:1px solid #fcd3c1}
+    .btn-escalate:hover{background:#ffe3d8}
+    .empty{background:white;padding:32px;border-radius:12px;color:#71838a;text-align:center;border:1px solid #e1e9ea}
+    
+    /* ── Ticket Detail & Conversation Modal ── */
+    .modal-overlay{display:none;position:fixed;inset:0;z-index:90;background:#0d1e2475;backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px}
+    .modal-overlay.open{display:flex}
+    .modal-box{background:white;border-radius:16px;box-shadow:0 24px 60px #00000030;width:min(780px,100%);max-height:90vh;display:flex;flex-direction:column;overflow:hidden;border:1px solid #d5e2e4;animation:fadeIn .2s ease-out}
+    .modal-header{padding:16px 20px;border-bottom:1px solid #e5ecee;display:flex;justify-content:space-between;align-items:center;background:#fafcfc}
+    .modal-body{padding:20px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:16px}
+    .modal-footer{padding:14px 20px;border-top:1px solid #e5ecee;background:#fafcfc;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .close-btn{border:0;background:none;font-size:22px;color:#74878c;cursor:pointer;line-height:1;padding:4px}
+    .close-btn:hover{color:#172e39}
+    
+    /* Thread conversation speech bubbles */
+    .thread-wrap{background:#f8fafb;border:1px solid #e1ebed;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:220px;max-height:360px;overflow-y:auto}
+    .msg-bubble{display:flex;flex-direction:column;max-width:82%;gap:4px}
+    .msg-bubble.student{align-self:flex-start}
+    .msg-bubble.student .msg-content{background:white;border:1px solid #dbe6e8;color:#18323a;border-radius:14px 14px 14px 2px}
+    .msg-bubble.supervisor,.msg-bubble.admin{align-self:flex-end}
+    .msg-bubble.supervisor .msg-content{background:#078f9d;color:white;border-radius:14px 14px 2px 14px}
+    .msg-bubble.admin .msg-content{background:#172e39;color:white;border-radius:14px 14px 2px 14px}
+    .msg-bubble.system{align-self:center;max-width:92%}
+    .msg-bubble.system .msg-content{background:#fff8ec;border:1px dashed #e6ba7e;color:#85581e;border-radius:8px;font-size:10.5px;text-align:center}
+    .msg-header{display:flex;gap:6px;align-items:center;font-size:10px;color:#74878c}
+    .msg-content{padding:10px 14px;font-size:12px;line-height:1.5;box-shadow:0 1px 3px #00000008;white-space:pre-wrap}
+    .reply-box{display:flex;gap:8px;align-items:flex-end}
+    .reply-box textarea{flex:1;border:1.5px solid #d5e2e4;border-radius:10px;padding:10px 12px;font-size:12px;resize:vertical;min-height:64px;outline:none}
+    .reply-box textarea:focus{border-color:#078f9d}
+    .student-badge-card{background:#edf6f7;border:1px solid #cee4e7;border-radius:10px;padding:12px 14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;font-size:11px}
+    .student-badge-card b{display:block;color:#075567;font-size:11.5px}
+    .student-badge-card span{color:#647980;font-size:10px}
+    
+    @keyframes fadeIn{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+    @media(max-width:640px){.item{grid-template-columns:1fr}.actions{justify-content:flex-start}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span style="background:#078f9d;color:white;width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-weight:800">ZC</span>
+      ZC Dorm Laundry · Support & Complaints System
+    </div>
+    <nav>
+      <a id="overviewLink" href="supervisor.html">Overview</a>
+      <a href="approvals.html">Approvals</a>
+      <a href="audit.html">Audit Log</a>
+      <a href="logout.html" data-logout>Log out</a>
+    </nav>
+  </header>
 
-document.addEventListener('DOMContentLoaded',()=>{
-  const s=WashdayAuth.currentSession();
-  if(s?.role==='admin') document.getElementById('overviewLink').href='admin.html';
-  document.getElementById('statusFilter').addEventListener('change', renderTicketsList);
-  document.getElementById('categoryFilter').addEventListener('change', renderTicketsList);
-  loadSupportQueue();
-});
+  <main>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+      <div>
+        <h1>Student Support Tickets & Inquiries</h1>
+        <p class="sub">Review reported washer hardware faults, booking errors, wallet refund requests, and door access issues.</p>
+      </div>
+      <button onclick="loadSupportQueue()" style="background:#fff;border:1.5px solid #d5e2e4;padding:8px 14px;font-size:11px;font-weight:700;border-radius:8px;display:flex;gap:6px;align-items:center">
+        <span>↻</span> Refresh Tickets
+      </button>
+    </div>
 
-async function loadSupportQueue(){
-  const list=document.getElementById('supportQueue');
-  try{
-    const c=await ZCSupabase.ready();
-    const {data,error}=await c.rpc('staff_list_support_tickets');
-    if(error)throw error;
-    cachedTickets=data||[];
-    renderTicketsList();
-  }catch(error){
-    list.innerHTML='';
-    const p=document.createElement('p');
-    p.className='empty';
-    p.textContent='Could not load support queue: '+(error.message||'Backend not configured');
-    list.append(p);
-  }
-}
+    <div class="filters">
+      <label style="font-size:11px;font-weight:700">Status:
+        <select id="statusFilter">
+          <option value="">All Tickets</option>
+          <option value="open">Open</option>
+          <option value="in_progress">In Progress</option>
+          <option value="resolved">Resolved</option>
+          <option value="closed">Closed</option>
+        </select>
+      </label>
+      <label style="font-size:11px;font-weight:700">Category:
+        <select id="categoryFilter">
+          <option value="">All Categories</option>
+          <option value="washer">Washer Hardware</option>
+          <option value="booking">Bookings</option>
+          <option value="payment">Payment & Billing</option>
+          <option value="wallet">Wallet Balance</option>
+          <option value="door_access">Door Access</option>
+          <option value="supervisor_escalation">Supervisor Escalations</option>
+          <option value="complaint">Room Complaints</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+      <label style="font-size:11px;font-weight:700">Search:
+        <input type="text" id="searchInput" placeholder="Search student, ticket #, subject…" oninput="renderTicketsList()" style="padding:7px 10px;border:1px solid #dae6e7;border-radius:8px;font-size:11px;width:220px"/>
+      </label>
+    </div>
 
-function renderTicketsList(){
-  const list=document.getElementById('supportQueue');
-  const statusFilter=document.getElementById('statusFilter').value;
-  const categoryFilter=document.getElementById('categoryFilter').value;
+    <section class="list" id="supportQueue">
+      <p class="empty">Loading support requests from database…</p>
+    </section>
+  </main>
 
-  const filtered=cachedTickets.filter(t => {
-    if(statusFilter && t.status !== statusFilter) return false;
-    if(categoryFilter && t.category !== categoryFilter) return false;
-    return true;
-  });
+  <!-- ═════════ Support Ticket Conversation & Details Modal ═════════ -->
+  <div class="modal-overlay" id="ticketModal" role="dialog" aria-modal="true" aria-labelledby="modalTicketNum">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="ticket-num" id="modalTicketNum" style="font-size:14px">SUP-000000</span>
+          <span id="modalCategoryPill" class="pill">TOPIC</span>
+          <span id="modalStatusPill" class="pill status-open">OPEN</span>
+          <span id="modalUrgentPill" class="pill urgent" style="display:none">⚠️ URGENT</span>
+        </div>
+        <button type="button" class="close-btn" onclick="closeTicketModal()" aria-label="Close">×</button>
+      </div>
 
-  list.replaceChildren();
-  if(!filtered.length){
-    list.innerHTML='<p class="empty">No support tickets match the selected filters.</p>';
-    return;
-  }
+      <div class="modal-body">
+        <!-- Student & Context Info -->
+        <div class="student-badge-card">
+          <div>
+            <span>Student Name</span>
+            <b id="modalStudentName">—</b>
+          </div>
+          <div>
+            <span>Student Email</span>
+            <b id="modalStudentEmail">—</b>
+          </div>
+          <div>
+            <span>Dorm Location</span>
+            <b id="modalDormText">—</b>
+          </div>
+          <div>
+            <span>Related Washer</span>
+            <b id="modalMachineName">None specified</b>
+          </div>
+          <div>
+            <span>Created At</span>
+            <b id="modalCreatedAt">—</b>
+          </div>
+        </div>
 
-  filtered.forEach(t=>{
-    const card=document.createElement('article');
-    card.className='item';
-    const copy=document.createElement('div');
+        <!-- Issue Description -->
+        <div style="background:#fff;border:1px solid #e1e9ea;border-radius:10px;padding:14px">
+          <div style="font-size:10px;font-weight:800;color:#075567;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Reported Problem / Subject</div>
+          <h3 id="modalSubject" style="margin:0 0 6px;font-size:15px;font-weight:700;color:#102a32">—</h3>
+          <p id="modalDescription" style="margin:0;font-size:12px;line-height:1.6;color:#495f66;white-space:pre-wrap">—</p>
+        </div>
 
-    const topHeader=document.createElement('div');
-    topHeader.className='ticket-header';
-    const num=document.createElement('span');
-    num.className='ticket-num';
-    num.textContent=t.ticket_number || ('SUP-'+t.ticket_id.slice(0,6));
-    const catPill=document.createElement('span');
-    catPill.className='pill '+(t.category||'other');
-    catPill.textContent=(t.category||'other').replaceAll('_',' ');
-    const statPill=document.createElement('span');
-    statPill.className='pill status-'+t.status;
-    statPill.textContent=t.status.replaceAll('_',' ');
-    topHeader.append(num, catPill, statPill);
+        <!-- Conversation Messages Thread -->
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:11px;font-weight:800;color:#102a32;text-transform:uppercase;letter-spacing:0.5px">Conversation & Replies</span>
+            <small style="color:#71838a;font-size:10px" id="msgCountLabel">0 messages</small>
+          </div>
+          <div class="thread-wrap" id="threadContainer">
+            <div style="text-align:center;color:#71838a;font-size:11px;padding:20px">Loading conversation history…</div>
+          </div>
+        </div>
 
-    if(t.urgency==='high'||t.urgency==='urgent'){
-      const urg=document.createElement('span');
-      urg.className='pill urgent';
-      urg.textContent='⚠️ URGENT';
-      topHeader.appendChild(urg);
+        <!-- Reply Composer -->
+        <div>
+          <label style="font-size:11px;font-weight:700;display:block;margin-bottom:6px;color:#172e39">Reply to Student</label>
+          <div class="reply-box">
+            <textarea id="replyInput" placeholder="Type your response, clarification, or resolution note for the student…"></textarea>
+            <button type="button" class="primary" id="btnSendReply" onclick="sendReply()" style="padding:12px 18px;height:64px;border-radius:10px;font-size:11.5px">
+              Send Reply →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span style="font-size:11px;font-weight:700;color:#586d74">Update Status:</span>
+          <button type="button" onclick="changeStatus('in_progress')" id="btnStatusInProgress">In Progress</button>
+          <button type="button" onclick="changeStatus('resolved')" id="btnStatusResolved" style="background:#e8f5ed;color:#1e5e3a;border-color:#b9e2cb">Mark Resolved</button>
+          <button type="button" onclick="changeStatus('closed')" id="btnStatusClosed">Close Ticket</button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button type="button" class="btn-escalate" onclick="openEscalationModal()" id="btnOpenEscalate">
+            ⚡ Escalate to Admin / Request Refund
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════ Supervisor Escalate to Admin Modal ═════════ -->
+  <div class="modal-overlay" id="escalationModal" role="dialog" aria-modal="true" style="z-index:95">
+    <div class="modal-box" style="width:min(580px,100%)">
+      <div class="modal-header" style="background:#fff7f3">
+        <div>
+          <b style="color:#c94a29;font-size:13px">⚡ Escalate Ticket to Administration</b>
+          <p style="margin:2px 0 0;font-size:10.5px;color:#8f5240">Submit a priority administrative request (e.g. wallet credit, hardware inspection, or disciplinary review).</p>
+        </div>
+        <button type="button" class="close-btn" onclick="closeEscalationModal()">×</button>
+      </div>
+      <form onsubmit="submitEscalation(event)" style="padding:20px;display:flex;flex-direction:column;gap:14px">
+        <div>
+          <label style="font-size:11px;font-weight:700;display:block;margin-bottom:4px">Target Student</label>
+          <input id="escStudentInfo" readonly style="width:100%;background:#f4f7f7;border:1px solid #dae6e7;border-radius:8px;padding:9px;font-size:11.5px;color:#172e39"/>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;display:block;margin-bottom:4px">Subject / Purpose</label>
+          <input id="escSubject" required placeholder="e.g. Request EGP 20 Wallet Refund - Washer Error" style="width:100%;border:1px solid #dae6e7;border-radius:8px;padding:9px;font-size:11.5px"/>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;display:block;margin-bottom:4px">Requested Student Refund / Credit (EGP, optional)</label>
+          <input id="escCreditEgp" type="number" min="0" max="500" step="5" value="20" placeholder="e.g. 20" style="width:100%;border:1px solid #dae6e7;border-radius:8px;padding:9px;font-size:11.5px"/>
+          <small style="color:#71838a;font-size:10px">If a cycle was interrupted or charged in error, specify the compensation amount for admin approval.</small>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;display:block;margin-bottom:4px">Supervisor Reason & Assessment *</label>
+          <textarea id="escReason" required rows="3" placeholder="Explain the situation and what action Administration needs to take…" style="width:100%;border:1px solid #dae6e7;border-radius:8px;padding:9px;font-size:11.5px;resize:vertical"></textarea>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px">
+          <button type="button" onclick="closeEscalationModal()">Cancel</button>
+          <button type="submit" class="primary" id="btnSubmitEscalation" style="background:#c94a29;border-color:#c94a29">
+            Submit Escalation to Admin →
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let cachedTickets = [];
+    let activeTicket = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const s = WashdayAuth.currentSession();
+      if(s?.role === 'admin') document.getElementById('overviewLink').href = 'admin.html';
+      document.getElementById('statusFilter').addEventListener('change', renderTicketsList);
+      document.getElementById('categoryFilter').addEventListener('change', renderTicketsList);
+      loadSupportQueue();
+    });
+
+    async function loadSupportQueue(){
+      const list = document.getElementById('supportQueue');
+      try{
+        const c = await ZCSupabase.ready();
+        const { data, error } = await c.rpc('staff_list_support_tickets');
+        if(error) throw error;
+        cachedTickets = data || [];
+        renderTicketsList();
+        
+        // If modal is currently open, refresh the active ticket data
+        if(activeTicket){
+          const updated = cachedTickets.find(x => x.ticket_id === activeTicket.ticket_id);
+          if(updated) openTicketModal(updated, false);
+        }
+      }catch(error){
+        list.innerHTML = `<p class="empty">Could not load support queue: ${error.message || 'Backend not configured'}</p>`;
+      }
     }
 
-    const title=document.createElement('h2');
-    title.textContent=t.subject;
+    function renderTicketsList(){
+      const list = document.getElementById('supportQueue');
+      const statusFilter = document.getElementById('statusFilter').value;
+      const categoryFilter = document.getElementById('categoryFilter').value;
+      const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
 
-    const desc=document.createElement('p');
-    desc.textContent=t.description;
+      const filtered = cachedTickets.filter(t => {
+        if(statusFilter && t.status !== statusFilter) return false;
+        if(categoryFilter && t.category !== categoryFilter) return false;
+        if(search){
+          const haystack = `${t.ticket_number || ''} ${t.student_name || ''} ${t.student_email || ''} ${t.subject || ''} ${t.description || ''}`.toLowerCase();
+          if(!haystack.includes(search)) return false;
+        }
+        return true;
+      });
 
-    const meta=document.createElement('div');
-    meta.className='meta';
-    meta.textContent=`Student: ${t.student_name} (${t.student_email}) · Dorm ${t.dorm_class}${t.machine_name ? ' · Machine: '+t.machine_name : ''} · ${new Date(t.created_at).toLocaleString()}`;
+      list.replaceChildren();
+      if(!filtered.length){
+        list.innerHTML = '<p class="empty">No support tickets match the selected filters or search query.</p>';
+        return;
+      }
 
-    copy.append(topHeader, title, desc, meta);
+      filtered.forEach(t => {
+        const card = document.createElement('article');
+        card.className = 'item';
+        card.onclick = () => openTicketModal(t);
 
-    if(t.resolution){
-      const resBox=document.createElement('div');
-      resBox.className='resolution-box';
-      resBox.innerHTML=`<b>Staff Resolution Note:</b> ${t.resolution}`;
-      copy.appendChild(resBox);
+        const copy = document.createElement('div');
+
+        const topHeader = document.createElement('div');
+        topHeader.className = 'ticket-header';
+        
+        const num = document.createElement('span');
+        num.className = 'ticket-num';
+        num.textContent = t.ticket_number || ('SUP-' + t.ticket_id.slice(0, 6));
+
+        const catPill = document.createElement('span');
+        catPill.className = 'pill ' + (t.category || 'other');
+        catPill.textContent = (t.category || 'other').replaceAll('_', ' ');
+
+        const statPill = document.createElement('span');
+        statPill.className = 'pill status-' + t.status;
+        statPill.textContent = t.status.replaceAll('_', ' ');
+
+        topHeader.append(num, catPill, statPill);
+
+        if(t.urgency === 'high' || t.urgency === 'urgent'){
+          const urg = document.createElement('span');
+          urg.className = 'pill urgent';
+          urg.textContent = '⚠️ URGENT';
+          topHeader.appendChild(urg);
+        }
+
+        const title = document.createElement('h2');
+        title.textContent = t.subject;
+
+        const desc = document.createElement('p');
+        desc.textContent = t.description;
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.innerHTML = `<span>👤 <b>${t.student_name}</b> (${t.student_email})</span><span>🏢 Dorm ${t.dorm_class}</span>${t.machine_name ? `<span>🧺 ${t.machine_name}</span>` : ''}<span>◷ ${new Date(t.created_at).toLocaleString()}</span>`;
+
+        copy.append(topHeader, title, desc, meta);
+
+        if(t.resolution){
+          const resBox = document.createElement('div');
+          resBox.className = 'resolution-box';
+          resBox.innerHTML = `<b>Latest Staff Note:</b> ${t.resolution}`;
+          copy.appendChild(resBox);
+        }
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+        actions.onclick = (e) => e.stopPropagation(); // prevent double modal trigger
+
+        const btnView = document.createElement('button');
+        btnView.className = 'primary';
+        btnView.textContent = '💬 View & Reply';
+        btnView.onclick = () => openTicketModal(t);
+        actions.appendChild(btnView);
+
+        if(t.status !== 'resolved' && t.status !== 'closed'){
+          const btnQuickResolve = document.createElement('button');
+          btnQuickResolve.textContent = 'Resolve';
+          btnQuickResolve.onclick = () => quickUpdateStatus(t.ticket_id, 'resolved');
+          actions.appendChild(btnQuickResolve);
+        }
+
+        card.append(copy, actions);
+        list.appendChild(card);
+      });
     }
 
-    const actions=document.createElement('div');
-    actions.className='actions';
-    for(const [label,next] of [['In Progress','in_progress'],['Resolve & Reply','resolved'],['Close','closed']]){
-      const b=document.createElement('button');
-      b.className=next==='resolved'?'primary':'';
-      b.textContent=label;
-      b.disabled=t.status===next||t.status==='closed';
-      b.onclick=()=>updateSupport(t.ticket_id,next,b);
-      actions.appendChild(b);
-    }
-    card.append(copy,actions);
-    list.appendChild(card);
-  });
-}
+    /* ── Ticket Detail & Conversation Modal Operations ── */
+    async function openTicketModal(t, reloadMessages = true){
+      activeTicket = t;
+      document.getElementById('modalTicketNum').textContent = t.ticket_number || ('SUP-' + t.ticket_id.slice(0, 6));
+      
+      const catPill = document.getElementById('modalCategoryPill');
+      catPill.className = 'pill ' + (t.category || 'other');
+      catPill.textContent = (t.category || 'other').replaceAll('_', ' ');
 
-async function updateSupport(id,status,button){
-  let resolution=null;
-  if(status==='resolved'||status==='closed'){
-    resolution=prompt('Enter resolution note to record and notify student:');
-    if(!resolution||resolution.trim().length<3){
-      ZCNotify?.error('Please enter a short resolution note.');
-      return;
+      const statPill = document.getElementById('modalStatusPill');
+      statPill.className = 'pill status-' + t.status;
+      statPill.textContent = t.status.replaceAll('_', ' ');
+
+      const urgPill = document.getElementById('modalUrgentPill');
+      urgPill.style.display = (t.urgency === 'high' || t.urgency === 'urgent') ? 'inline-block' : 'none';
+
+      document.getElementById('modalStudentName').textContent = t.student_name || 'Student';
+      document.getElementById('modalStudentEmail').textContent = t.student_email || '—';
+      document.getElementById('modalDormText').textContent = 'Dorm ' + (t.dorm_class || '—');
+      document.getElementById('modalMachineName').textContent = t.machine_name || (t.machine_key || 'None specified');
+      document.getElementById('modalCreatedAt').textContent = new Date(t.created_at).toLocaleString();
+
+      document.getElementById('modalSubject').textContent = t.subject || 'Support Ticket';
+      document.getElementById('modalDescription').textContent = t.description || 'No description provided.';
+      document.getElementById('replyInput').value = '';
+
+      // Update action button states
+      document.getElementById('btnStatusInProgress').disabled = t.status === 'in_progress';
+      document.getElementById('btnStatusResolved').disabled = t.status === 'resolved';
+      document.getElementById('btnStatusClosed').disabled = t.status === 'closed';
+
+      document.getElementById('ticketModal').classList.add('open');
+
+      if(reloadMessages){
+        await loadTicketMessages(t.ticket_id);
+      }
     }
-  }
-  button.disabled=true;
-  try{
-    const c=await ZCSupabase.ready();
-    const {error}=await c.rpc('staff_update_support_ticket',{p_ticket_id:id,p_status:status,p_resolution:resolution});
-    if(error)throw error;
-    ZCNotify?.success('Support ticket updated; student notified.');
-    loadSupportQueue();
-  }catch(error){
-    ZCNotify?.error(error.message||'Could not update request.');
-    button.disabled=false;
-  }
-}
-</script></body></html>
+
+    function closeTicketModal(){
+      document.getElementById('ticketModal').classList.remove('open');
+      activeTicket = null;
+    }
+
+    async function loadTicketMessages(ticketId){
+      const wrap = document.getElementById('threadContainer');
+      const countLabel = document.getElementById('msgCountLabel');
+      wrap.innerHTML = '<div style="text-align:center;color:#71838a;font-size:11px;padding:20px">Loading messages…</div>';
+
+      try{
+        const c = await ZCSupabase.ready();
+        const { data, error } = await c.rpc('get_support_ticket_messages', { p_ticket_id: ticketId });
+        if(error) throw error;
+
+        wrap.replaceChildren();
+
+        // Always show the student's initial inquiry at the top of the thread
+        if(activeTicket && activeTicket.description){
+          const initBox = document.createElement('div');
+          initBox.className = 'msg-bubble student';
+          initBox.innerHTML = `
+            <div class="msg-header">
+              <span>👤 <b>${activeTicket.student_name || 'Student'}</b></span>
+              <span>· Initial Report</span>
+              <span>· ${new Date(activeTicket.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+            </div>
+            <div class="msg-content">${escapeHtml(activeTicket.description)}</div>
+          `;
+          wrap.appendChild(initBox);
+        }
+
+        const messages = data || [];
+        countLabel.textContent = `${messages.length + 1} message${messages.length !== 0 ? 's' : ''}`;
+
+        messages.forEach(m => {
+          const b = document.createElement('div');
+          const isStaff = m.sender_role === 'supervisor' || m.sender_role === 'admin';
+          const isSystem = m.sender_role === 'system' || m.message.startsWith('=== SUPERVISOR ESCALATION');
+
+          b.className = 'msg-bubble ' + (isSystem ? 'system' : (isStaff ? m.sender_role : 'student'));
+
+          const timeStr = new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+          const dateStr = new Date(m.created_at).toLocaleDateString([], {month:'short', day:'numeric'});
+
+          b.innerHTML = `
+            <div class="msg-header">
+              <span>${isStaff ? '🛡️' : '👤'} <b>${escapeHtml(m.sender_name)}</b></span>
+              <span>· ${m.sender_role.toUpperCase()}</span>
+              <span>· ${dateStr} ${timeStr}</span>
+            </div>
+            <div class="msg-content">${escapeHtml(m.message)}</div>
+          `;
+          wrap.appendChild(b);
+        });
+
+        // Scroll to bottom of conversation
+        setTimeout(() => { wrap.scrollTop = wrap.scrollHeight; }, 50);
+      }catch(err){
+        wrap.innerHTML = `<div style="text-align:center;color:#c94a29;font-size:11px;padding:20px">Could not load messages: ${err.message}</div>`;
+      }
+    }
+
+    async function sendReply(){
+      if(!activeTicket) return;
+      const text = document.getElementById('replyInput').value.trim();
+      if(!text){
+        ZCNotify?.warning('Please type a reply message first.');
+        return;
+      }
+      const btn = document.getElementById('btnSendReply');
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      try{
+        const c = await ZCSupabase.ready();
+        const { error } = await c.rpc('add_support_ticket_message', {
+          p_ticket_id: activeTicket.ticket_id,
+          p_message: text
+        });
+        if(error) throw error;
+
+        ZCNotify?.success('Reply sent successfully and notified student.');
+        document.getElementById('replyInput').value = '';
+        await loadTicketMessages(activeTicket.ticket_id);
+        await loadSupportQueue();
+      }catch(err){
+        ZCNotify?.error('Failed to send reply: ' + (err.message || 'Error'));
+      }finally{
+        btn.disabled = false;
+        btn.textContent = 'Send Reply →';
+      }
+    }
+
+    async function changeStatus(newStatus){
+      if(!activeTicket) return;
+      try{
+        const c = await ZCSupabase.ready();
+        const replyText = document.getElementById('replyInput').value.trim();
+        const { error } = await c.rpc('staff_update_support_ticket', {
+          p_ticket_id: activeTicket.ticket_id,
+          p_status: newStatus,
+          p_resolution: replyText || null
+        });
+        if(error) throw error;
+
+        ZCNotify?.success(`Ticket marked ${newStatus.replaceAll('_', ' ')}.`);
+        if(replyText) document.getElementById('replyInput').value = '';
+        
+        await loadSupportQueue();
+        if(activeTicket) {
+          activeTicket.status = newStatus;
+          const statPill = document.getElementById('modalStatusPill');
+          statPill.className = 'pill status-' + newStatus;
+          statPill.textContent = newStatus.replaceAll('_', ' ');
+          await loadTicketMessages(activeTicket.ticket_id);
+        }
+      }catch(err){
+        ZCNotify?.error('Could not update status: ' + (err.message || 'Error'));
+      }
+    }
+
+    async function quickUpdateStatus(ticketId, newStatus){
+      try{
+        const c = await ZCSupabase.ready();
+        const { error } = await c.rpc('staff_update_support_ticket', {
+          p_ticket_id: ticketId,
+          p_status: newStatus,
+          p_resolution: 'Resolved by dorm supervisor'
+        });
+        if(error) throw error;
+        ZCNotify?.success(`Ticket ${newStatus}.`);
+        loadSupportQueue();
+      }catch(err){
+        ZCNotify?.error('Failed to update ticket: ' + (err.message || 'Error'));
+      }
+    }
+
+    /* ── Escalation to Admin Modal ── */
+    function openEscalationModal(){
+      if(!activeTicket) return;
+      document.getElementById('escStudentInfo').value = `${activeTicket.student_name} (${activeTicket.student_email}) · Dorm ${activeTicket.dorm_class}`;
+      document.getElementById('escSubject').value = `[ESCALATION] Request Admin Credit / Intervention for ${activeTicket.student_name}`;
+      document.getElementById('escCreditEgp').value = '20';
+      document.getElementById('escReason').value = `Student experienced issue during ticket ${activeTicket.ticket_number || ''}. Please review for wallet credit / technical assistance.`;
+      document.getElementById('escalationModal').classList.add('open');
+    }
+
+    function closeEscalationModal(){
+      document.getElementById('escalationModal').classList.remove('open');
+    }
+
+    async function submitEscalation(e){
+      e.preventDefault();
+      if(!activeTicket) return;
+      const btn = document.getElementById('btnSubmitEscalation');
+      btn.disabled = true;
+      btn.textContent = 'Submitting escalation…';
+
+      try{
+        const subject = document.getElementById('escSubject').value.trim();
+        const creditEgp = Number(document.getElementById('escCreditEgp').value) || 0;
+        const reason = document.getElementById('escReason').value.trim();
+
+        const c = await ZCSupabase.ready();
+        const { data, error } = await c.rpc('supervisor_escalate_ticket_to_admin', {
+          p_student_ticket_id: activeTicket.ticket_id,
+          p_subject: subject,
+          p_reason: reason,
+          p_requested_credit_cents: Math.round(creditEgp * 100)
+        });
+        if(error) throw error;
+
+        ZCNotify?.success(`Successfully escalated to Administration! Ticket Ref: ${data?.escalation_ticket_number || 'ESC'}`);
+        closeEscalationModal();
+        await loadTicketMessages(activeTicket.ticket_id);
+        await loadSupportQueue();
+      }catch(err){
+        ZCNotify?.error('Escalation failed: ' + (err.message || 'Permission denied'));
+      }finally{
+        btn.disabled = false;
+        btn.textContent = 'Submit Escalation to Admin →';
+      }
+    }
+
+    function escapeHtml(text){
+      if(!text) return '';
+      return text.replace(/[&<>"']/g, m => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      }[m]));
+    }
+  </script>
+</body>
+</html>
